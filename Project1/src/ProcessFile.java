@@ -15,7 +15,6 @@ public class ProcessFile {
     public Depot depots[];
     public Customer customers[];
 
-
     public ProcessFile(String Filename){
         //readTextFileUsingFileReader("./TestData/p01");
 
@@ -27,6 +26,22 @@ public class ProcessFile {
             e.printStackTrace();
         }
     }
+
+    /*public ProcessFile(int vehicle_count, int customer_count, int depot_count, Depot[] depots, Customer[] customers){
+
+        this.vehicle_count = vehicle_count;
+        this.depot_count = depot_count;
+        this.customer_count = customer_count;
+        this.depots = depots;
+        this.customers = customers;
+    }
+
+    public ProcessFile Clone(){
+        ProcessFile o = new ProcessFile();
+
+        o.
+        return o;
+    }*/
 
     private void ProcessLine(String line){
         if(this.line_number == 0){
@@ -41,7 +56,6 @@ public class ProcessFile {
 
         }else if(line_number > 0 && line_number < depot_count + 1){
             String[] depot_line = line.split(" ");
-
             Depot depot = new Depot(Integer.parseInt(depot_line[0]),Integer.parseInt(depot_line[1]));
             this.depots[line_number -1] = depot;
         }
@@ -79,8 +93,17 @@ public class ProcessFile {
                     }
                 }
             }
-            depots[this.depots_finished].setX(depot_line[1]);
-            depots[this.depots_finished].setY(depot_line[2]);
+            Depot depot =  depots[this.depots_finished];
+            depot.setX(depot_line[1]);
+            depot.setY(depot_line[2]);
+
+            Car[] cars = new Car[this.vehicle_count];
+
+            for(int i =0; i < this.vehicle_count;i++){
+                cars[i] = new Car(i +1,depot.getMaximum_load(),depot.getMaximum_duration(),depot);
+            }
+            depot.setCars(cars);
+
             depots_finished ++;
         }
         this.line_number++;
