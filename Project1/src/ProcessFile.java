@@ -14,6 +14,7 @@ public class ProcessFile {
     public int depot_count;
     public Depot depots[];
     public Customer customers[];
+    public Car vehicles[];
 
     //This class processes a dataset, extracts the data and creates objects and variables
 
@@ -40,6 +41,7 @@ public class ProcessFile {
             this.depot_count = Integer.parseInt(first_line[2]);
             this.depots = new Depot[this.depot_count];
             this.customers = new Customer[this.customer_count];
+            this.vehicles = new Car[this.vehicle_count*this.depot_count];
 
         }else if(line_number > 0 && line_number < depot_count + 1){
             String[] depot_line = line.split(" ");
@@ -87,7 +89,9 @@ public class ProcessFile {
             Car[] cars = new Car[this.vehicle_count];
 
             for(int i =0; i < this.vehicle_count;i++){
-                cars[i] = new Car(i +1,depot.getMaximum_load(),depot.getMaximum_duration(),depot);
+                Car car = new Car(i +1,depot.getMaximum_load(),depot.getMaximum_duration(),depot);
+                cars[i] = car;
+                this.vehicles[i + ((depot.getDepot_nr()-1)*this.vehicle_count)] = car;
             }
             depot.setCars(cars);
 

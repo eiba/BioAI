@@ -7,11 +7,11 @@ public class PrintSolution {
     public void Print(ProposedSolution n){
         DecimalFormat numberFormat = new DecimalFormat("#.00");
 
-        ArrayList<SolutionLine> f = n.getSolution();
+        SolutionLine[] f = n.getSolution();
         System.out.println(n.getScore());
 
-        for(int i = 0; i < f.size();i++){
-            SolutionLine line = f.get(i);
+        for(int i = 0; i < f.length;i++){
+            SolutionLine line = f[i];
             String s = line.getDepot_nr() + " " + line.getCar_nr() + " " + numberFormat.format(line.getDuration()) + " " + line.getLoad();
             String customer_sequence = " ";
             for(int m = 0; m < line.getSequence().length; m++){
