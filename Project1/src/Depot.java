@@ -5,6 +5,7 @@ public class Depot {
     private int x;
     private int y;
     private Car cars[];
+    private int depot_nr;
 
     public int getMaximum_duration() {
         return maximum_duration;
@@ -46,12 +47,12 @@ public class Depot {
         this.cars = cars;
     }
 
-    public Depot(int maximum_duration, int maximum_load, int x, int y, Car[] cars) {
-        this.maximum_duration = maximum_duration;
-        this.maximum_load = maximum_load;
-        this.x = x;
-        this.y = y;
-        this.cars = cars;
+    public int getDepot_nr() {
+        return depot_nr;
+    }
+
+    public void setDepot_nr(int depot_nr) {
+        this.depot_nr = depot_nr;
     }
 
     public Depot(int maximum_duration, int maximum_load) {

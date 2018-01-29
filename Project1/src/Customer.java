@@ -5,7 +5,6 @@ public class Customer {
     private int y;
     private int serivice_duration;
     private int customer_demand;
-    private boolean assigned;
 
     public Customer(int customer_nr, int x, int y, int serivice_duration, int customer_demand){
         this.customer_nr = customer_nr;
@@ -13,16 +12,7 @@ public class Customer {
         this.y = y;
         this.serivice_duration = serivice_duration;
         this.customer_demand = customer_demand;
-        this.assigned = false;
 
-    }
-
-    public boolean isAssigned() {
-        return assigned;
-    }
-
-    public void setAssigned(boolean assigned) {
-        this.assigned = assigned;
     }
 
     public int getCustomer_nr() {

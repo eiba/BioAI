@@ -15,11 +15,13 @@ public class ProcessFile {
     public Depot depots[];
     public Customer customers[];
 
+    //This class processes a dataset, extracts the data and creates objects and variables
+
     public ProcessFile(String Filename){
-        //readTextFileUsingFileReader("./TestData/p01");
 
         try (Stream<String> stream = Files.lines(Paths.get(Filename))) {
 
+            //iterate over all the lines in the dataset
             stream.forEach(k -> ProcessLine(k));
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -27,22 +29,7 @@ public class ProcessFile {
         }
     }
 
-    /*public ProcessFile(int vehicle_count, int customer_count, int depot_count, Depot[] depots, Customer[] customers){
-
-        this.vehicle_count = vehicle_count;
-        this.depot_count = depot_count;
-        this.customer_count = customer_count;
-        this.depots = depots;
-        this.customers = customers;
-    }
-
-    public ProcessFile Clone(){
-        ProcessFile o = new ProcessFile();
-
-        o.
-        return o;
-    }*/
-
+    //process a line in the data set
     private void ProcessLine(String line){
         if(this.line_number == 0){
             //First line
@@ -72,7 +59,6 @@ public class ProcessFile {
                             break;
                         }
                     }
-
             }
             Customer customer = new Customer(customer_line[0],customer_line[1],customer_line[2],customer_line[3],customer_line[4]);
 
@@ -96,6 +82,7 @@ public class ProcessFile {
             Depot depot =  depots[this.depots_finished];
             depot.setX(depot_line[1]);
             depot.setY(depot_line[2]);
+            depot.setDepot_nr(depots_finished +1);
 
             Car[] cars = new Car[this.vehicle_count];
 
