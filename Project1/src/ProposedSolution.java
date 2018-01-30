@@ -3,18 +3,18 @@ import java.util.ArrayList;
 public class ProposedSolution {
 
     private double score;
-    private ArrayList<CarLine> solution;
+    private SolutionLine[] solution;
 
-    public ProposedSolution(double score, ArrayList<CarLine> solution) {
+    public ProposedSolution(SolutionLine[] solution) {
         this.score = score;
         this.solution = solution;
     }
 
-    public ArrayList<CarLine> getSolution() {
+    public SolutionLine[] getSolution() {
         return solution;
     }
 
-    public void setSolution(ArrayList<CarLine> solution) {
+    public void setSolution(SolutionLine[] solution) {
         this.solution = solution;
     }
 

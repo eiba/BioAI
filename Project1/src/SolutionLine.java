@@ -1,14 +1,14 @@
 import java.util.ArrayList;
 
-public class CarLine{
+public class SolutionLine {
 
         private int depot_nr;
         private int car_nr;
         private double duration;
         private int load;
-        private ArrayList<Customer> sequence;
+        private int[] sequence;
 
-    public CarLine(int depot_nr, int car_nr, double duration, int load, ArrayList<Customer> sequence) {
+    public SolutionLine(int depot_nr, int car_nr, double duration, int load, int[] sequence) {
         this.depot_nr = depot_nr;
         this.car_nr = car_nr;
         this.duration = duration;
@@ -48,11 +48,11 @@ public class CarLine{
         this.load = load;
     }
 
-    public ArrayList<Customer> getSequence() {
+    public int[] getSequence() {
         return sequence;
     }
 
-    public void setSequence(ArrayList<Customer> sequence) {
+    public void setSequence(int[] sequence) {
         this.sequence = sequence;
     }
 }

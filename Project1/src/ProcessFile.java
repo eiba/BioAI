@@ -13,19 +13,27 @@ public class ProcessFile {
     public int depot_count;
     public Depot depots[];
     public Customer customers[];
+    public Car vehicles[];
+
+    //This class processes a dataset, extracts the data and creates objects and variables
 
     public ProcessFile(String Filename){
-        //readTextFileUsingFileReader("./TestData/p01");
 
         try (Stream<String> stream = Files.lines(Paths.get(Filename))) {
 
+<<<<<<< HEAD
             stream.forEach(k -> processLine(k));
+=======
+            //iterate over all the lines in the dataset
+            stream.forEach(k -> ProcessLine(k));
+>>>>>>> c2b6b3f8238e19b9729decdcf3f24b03c7bf1e17
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
+<<<<<<< HEAD
     /*public ProcessFile(int vehicle_count, int customer_count, int depot_count, Depot[] depots, Customer[] customers){
 
         this.vehicle_count = vehicle_count;
@@ -43,6 +51,10 @@ public class ProcessFile {
     }*/
 
     private void processLine(String line){
+=======
+    //process a line in the data set
+    private void ProcessLine(String line){
+>>>>>>> c2b6b3f8238e19b9729decdcf3f24b03c7bf1e17
         if(this.line_number == 0){
             //First line
             String[] first_line = line.split(" ");
@@ -52,6 +64,7 @@ public class ProcessFile {
             this.depot_count = Integer.parseInt(first_line[2]);
             this.depots = new Depot[this.depot_count];
             this.customers = new Customer[this.customer_count];
+            this.vehicles = new Car[this.vehicle_count*this.depot_count];
 
         }else if(line_number > 0 && line_number < depot_count + 1){
             String[] depot_line = line.split(" ");
@@ -71,7 +84,6 @@ public class ProcessFile {
                             break;
                         }
                     }
-
             }
             Customer customer = new Customer(customer_line[0],customer_line[1],customer_line[2],customer_line[3],customer_line[4]);
 
@@ -95,11 +107,14 @@ public class ProcessFile {
             Depot depot =  depots[this.depots_finished];
             depot.setX(depot_line[1]);
             depot.setY(depot_line[2]);
+            depot.setDepot_nr(depots_finished +1);
 
             Car[] cars = new Car[this.vehicle_count];
 
             for(int i =0; i < this.vehicle_count;i++){
-                cars[i] = new Car(i +1,depot.getMaximum_load(),depot.getMaximum_duration(),depot);
+                Car car = new Car(i +1,depot.getMaximum_load(),depot.getMaximum_duration(),depot);
+                cars[i] = car;
+                this.vehicles[i + ((depot.getDepot_nr()-1)*this.vehicle_count)] = car;
             }
             depot.setCars(cars);
 

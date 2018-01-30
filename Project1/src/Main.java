@@ -11,13 +11,15 @@ import java.text.DecimalFormat;
 public class Main{
 
     public static void main(String[] args) {
-        ProcessFile f = new ProcessFile("./TestData/p01");
-        //System.out.println(f.depots[0].getCars()[1].getCurrent_duration());
-        PopulationGenerator g = new PopulationGenerator(f,100);
+        ProcessFile f = new ProcessFile("./TestData/p12");
+        //System.out.println(f.depots[1].getMaximum_duration());
+        //System.out.println(f.vehicles[13].getX());
+        PopulationGenerator g = new PopulationGenerator(f,1);
+        PrintSolution p = new PrintSolution();
+        p.Print(g.speciemens[0]);
+        //System.out.println("------------------------------");
+        //p.Print(g.speciemens[1]);
 
-        PrintSolution p = new PrintSolution(g.speciemens[0]);
-        System.out.println("------------------------------");
-        PrintSolution b = new PrintSolution(g.speciemens[1]);
 
     }
 
