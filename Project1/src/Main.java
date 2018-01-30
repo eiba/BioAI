@@ -11,7 +11,7 @@ import java.text.DecimalFormat;
 public class Main{
 
     public static void main(String[] args) {
-        ProcessFile f = new ProcessFile("./TestData/p12");
+        ProcessFile f = new ProcessFile("./TestData/p01");
         //System.out.println(f.depots[1].getMaximum_duration());
         //System.out.println(f.vehicles[13].getX());
         PopulationGenerator g = new PopulationGenerator(f,1);

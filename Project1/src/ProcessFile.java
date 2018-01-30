@@ -14,6 +14,10 @@ public class ProcessFile {
     public Depot depots[];
     public Customer customers[];
     public Car vehicles[];
+    public int minX = Integer.MAX_VALUE;
+    public int minY = Integer.MAX_VALUE;
+    public int maxX = Integer.MIN_VALUE;
+    public int maxY = Integer.MIN_VALUE;
 
     //This class processes a dataset, extracts the data and creates objects and variables
 
@@ -28,22 +32,6 @@ public class ProcessFile {
             e.printStackTrace();
         }
     }
-
-    /*public ProcessFile(int vehicle_count, int customer_count, int depot_count, Depot[] depots, Customer[] customers){
-
-        this.vehicle_count = vehicle_count;
-        this.depot_count = depot_count;
-        this.customer_count = customer_count;
-        this.depots = depots;
-        this.customers = customers;
-    }
-
-    public ProcessFile Clone(){
-        ProcessFile o = new ProcessFile();
-
-        o.
-        return o;
-    }*/
 
     //process a line in the data set
     private void processLine(String line){
@@ -77,7 +65,21 @@ public class ProcessFile {
                         }
                     }
             }
-            Customer customer = new Customer(customer_line[0],customer_line[1],customer_line[2],customer_line[3],customer_line[4]);
+            int customerX = customer_line[1];
+            int customerY = customer_line[2];
+            Customer customer = new Customer(customer_line[0],customerX,customerY,customer_line[3],customer_line[4]);
+
+            if(customerX > this.maxX){
+                this.maxX = customerX;
+            }else if(customerX < this.minX){
+                this.minX = customerX;
+            }
+
+            if(customerY > this.maxY){
+                this.maxY = customerY;
+            }else if(customerY < this.minY){
+                this.minY = customerY;
+            }
 
             this.customers[line_number - depot_count - 1] = customer;
         }
@@ -97,9 +99,26 @@ public class ProcessFile {
                 }
             }
             Depot depot =  depots[this.depots_finished];
-            depot.setX(depot_line[1]);
-            depot.setY(depot_line[2]);
+            int depotX = depot_line[1];
+            int depotY = depot_line[2];
+
+            depot.setX(depotX);
+            depot.setY(depotY);
             depot.setDepot_nr(depots_finished +1);
+
+            //check to see wheter these are min or max coordinates
+            if(depotX >this. maxX){
+                this.maxX = depotX;
+            }else if(depotX < this.minX){
+                this.minX = depotX;
+            }
+
+            if(depotY > this.maxY){
+                this.maxY = depotX;
+            }else if(depotX < this.minY){
+                this.minY = depotX;
+            }
+
 
             Car[] cars = new Car[this.vehicle_count];
 
