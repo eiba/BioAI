@@ -20,8 +20,15 @@ public class Main extends Application{
         primaryStage.setScene(scene);
         primaryStage.setTitle("IT3708 - Assignment 1");
 
-        //Read data from file
-        ProcessFile f = new ProcessFile("./TestData/p01");
+        //Execute the evolutionary algorithm
+        EvolutionaryAlgorithm e = new EvolutionaryAlgorithm("./TestData/p09",100);
+
+        //Get all the data from the data set
+        ProcessFile f = e.processFile;
+
+        //Print one of the solutions found
+        new PrintSolution().Print(e.proposedSolutions[0]);
+
         //Create a new graph
         Graph graph = new Graph(700, 500, f.minX, f.minY, f.maxX, f.maxY);
         BorderPane.setAlignment(graph, Pos.CENTER);
@@ -29,15 +36,7 @@ public class Main extends Application{
         graph.setCustomers(f.customers);
         borderPane.setCenter(graph);
 
-        //System.out.println(f.depots[1].getMaximum_duration());
-        //System.out.println(f.vehicles[13].getX());
-        PopulationGenerator g = new PopulationGenerator(f,1);
-        graph.setRoutes(g.speciemens[0].getSolution());
-
-        PrintSolution p = new PrintSolution();
-//        p.Print(g.speciemens[0]);
-        //System.out.println("------------------------------");
-        //p.Print(g.speciemens[1]);
+        graph.setRoutes(e.proposedSolutions[0]);
 
         primaryStage.show();
     }

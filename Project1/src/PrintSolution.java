@@ -1,4 +1,5 @@
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class PrintSolution {
 
@@ -6,19 +7,19 @@ public class PrintSolution {
     public void Print(ProposedSolution n){
         DecimalFormat numberFormat = new DecimalFormat("#.00");
 
-        SolutionLine[] f = n.getSolution();
+        Car[] cars = n.getCars();
         System.out.println(n.getDurationScore());
+        System.out.println(n.getCustomerScore());
 
-        for(int i = 0; i < f.length;i++){
-            SolutionLine line = f[i];
-            String s = line.getDepot_nr() + " " + line.getCar_nr() + " " + numberFormat.format(line.getDuration()) + " " + line.getLoad();
+        for (Car car : cars) {
+            String s = car.getDepot().getDepot_nr() + " " + car.getVehichle_number() + " " + numberFormat.format(car.getCurrent_duration()) + " " + car.getCurrent_load();
             String customer_sequence = " ";
-            for(int m = 0; m < line.getSequence().length; m++){
+            for(int m = 0; m < car.getCustomer_sequence().size(); m++){
 
-                customer_sequence += line.getSequence()[m] +" ";
+
+                customer_sequence += car.getCustomer_sequence().get(m).getCustomer_nr() +" ";
             }
             System.out.println(s+customer_sequence);
-
         }
     }
 }
