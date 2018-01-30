@@ -1,5 +1,6 @@
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
 public class Graph extends Pane {
@@ -25,11 +26,20 @@ public class Graph extends Pane {
 
     void addDepots(Depot[] depots) {
         for (Depot depot : depots) {
-            Rectangle depotRect = new Rectangle(10,10);
-            depotRect.setTranslateX(mapXToGraph(depot.getX()));
-            depotRect.setTranslateY(mapYToGraph(depot.getY()));
-            depotRect.setStyle("-fx-background-color: blue");
-            depotPane.getChildren().add(depotRect);
+            Rectangle depotRectangle = new Rectangle(10,10);
+            depotRectangle.setTranslateX(mapXToGraph(depot.getX()));
+            depotRectangle.setTranslateY(mapYToGraph(depot.getY()));
+            depotRectangle.setStyle("-fx-background-color: #04d403");
+            depotPane.getChildren().add(depotRectangle);
+        }
+    }
+
+    void addCustomers(Customer[] customers) {
+        for (Customer customer : customers) {
+            Circle customerCircle = new Circle(5);
+            customerCircle.setTranslateX(mapXToGraph(customer.getX()));
+            customerCircle.setTranslateY(mapYToGraph(customer.getY()));
+            customerCircle.setStyle("-fx-background-color: #1eb0ff");
         }
     }
 
