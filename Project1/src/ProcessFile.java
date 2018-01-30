@@ -1,4 +1,3 @@
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -20,7 +19,7 @@ public class ProcessFile {
 
         try (Stream<String> stream = Files.lines(Paths.get(Filename))) {
 
-            stream.forEach(k -> ProcessLine(k));
+            stream.forEach(k -> processLine(k));
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -43,7 +42,7 @@ public class ProcessFile {
         return o;
     }*/
 
-    private void ProcessLine(String line){
+    private void processLine(String line){
         if(this.line_number == 0){
             //First line
             String[] first_line = line.split(" ");
