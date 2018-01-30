@@ -1,14 +1,8 @@
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-
-import java.text.DecimalFormat;
 
 public class Main extends Application{
 
@@ -31,14 +25,14 @@ public class Main extends Application{
         //Create a new graph
         Graph graph = new Graph(700, 500, f.minX, f.minY, f.maxX, f.maxY);
         BorderPane.setAlignment(graph, Pos.CENTER);
-        graph.addDepots(f.depots);
-        graph.addCustomers(f.customers);
+        graph.setDepots(f.depots);
+        graph.setCustomers(f.customers);
         borderPane.setCenter(graph);
 
         //System.out.println(f.depots[1].getMaximum_duration());
         //System.out.println(f.vehicles[13].getX());
         PopulationGenerator g = new PopulationGenerator(f,1);
-        graph.addRoutes(g.speciemens[0].getSolution());
+        graph.setRoutes(g.speciemens[0].getSolution());
 
         PrintSolution p = new PrintSolution();
 //        p.Print(g.speciemens[0]);

@@ -1,28 +1,21 @@
-import java.util.ArrayList;
-
 public class ProposedSolution {
 
-    private double score;
-    private SolutionLine[] solution;
+    private double durationScore;
+    private double customerScore;
 
-    public ProposedSolution(SolutionLine[] solution) {
-        this.score = score;
-        this.solution = solution;
+    public ProposedSolution(Car[] cars) {
+
+        for (Car car : cars) {
+            durationScore += car.getCurrent_duration();
+        }
+
     }
 
-    public SolutionLine[] getSolution() {
-        return solution;
+    public double getDurationScore() {
+        return durationScore;
     }
 
-    public void setSolution(SolutionLine[] solution) {
-        this.solution = solution;
-    }
-
-    public double getScore() {
-        return score;
-    }
-
-    public void setScore(double score) {
-        this.score = score;
+    public void setDurationScore(double durationScore) {
+        this.durationScore = durationScore;
     }
 }

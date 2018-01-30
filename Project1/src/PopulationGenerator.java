@@ -108,7 +108,7 @@ public class PopulationGenerator {
             ProposedSolution solution = new ProposedSolution(lines);
 
             double cost = calculate_cost(solution);
-            solution.setScore(cost);
+            solution.setDurationScore(cost);
 
             speciemens[number_of_specimen] = solution;
             number_of_specimen +=1;

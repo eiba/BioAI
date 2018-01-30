@@ -1,5 +1,4 @@
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 public class PrintSolution {
 
@@ -8,7 +7,7 @@ public class PrintSolution {
         DecimalFormat numberFormat = new DecimalFormat("#.00");
 
         SolutionLine[] f = n.getSolution();
-        System.out.println(n.getScore());
+        System.out.println(n.getDurationScore());
 
         for(int i = 0; i < f.length;i++){
             SolutionLine line = f[i];

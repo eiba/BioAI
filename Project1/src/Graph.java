@@ -1,4 +1,3 @@
-import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -7,7 +6,7 @@ import javafx.scene.shape.Rectangle;
 
 public class Graph extends Pane {
 
-    private final Pane depotPane, customerPane, roadPane;
+    private final Pane depotPane, customerPane, routePane;
     private final int minX, minY;
     private final double height, factorX, factorY;
 
@@ -21,10 +20,10 @@ public class Graph extends Pane {
         super();
         depotPane = new Pane();
         customerPane = new Pane();
-        roadPane= new Pane();
+        routePane = new Pane();
         super.setMinSize(width, height);
         super.setMaxSize(width, height);
-        super.getChildren().addAll(depotPane, customerPane, roadPane);
+        super.getChildren().addAll(depotPane, customerPane, routePane);
 
         this.minX = minX;
         this.minY = minY;
@@ -33,8 +32,10 @@ public class Graph extends Pane {
         this.factorY = height / Math.abs(maxY - minY);
     }
 
-    void addDepots(Depot[] depots) {
+    void setDepots(Depot[] depots) {
         this.depots = depots;
+        depotPane.getChildren().clear();
+
         for (Depot depot : depots) {
             Rectangle depotRectangle = new Rectangle(10,10);
             depotRectangle.setTranslateX(mapXToGraph(depot.getX()));
@@ -44,8 +45,10 @@ public class Graph extends Pane {
         }
     }
 
-    void addCustomers(Customer[] customers) {
+    void setCustomers(Customer[] customers) {
         this.customers = customers;
+        customerPane.getChildren().clear();
+
         for (Customer customer : customers) {
             Circle customerCircle = new Circle(5);
             customerCircle.setTranslateX(mapXToGraph(customer.getX()));
@@ -56,7 +59,8 @@ public class Graph extends Pane {
         }
     }
 
-    void addRoutes(SolutionLine[] solutionLines) {
+    void setRoutes(SolutionLine[] solutionLines) {
+        routePane.getChildren().clear();
 
         int counter = 0;
 
@@ -78,7 +82,7 @@ public class Graph extends Pane {
                 lineRoute.setEndY(mapYToGraph(customers[customerID - 1].getY()));
                 currentX = customers[customerID - 1].getX();
                 currentY = customers[customerID - 1].getY();
-                roadPane.getChildren().add(lineRoute);
+                routePane.getChildren().add(lineRoute);
             }
             Line lineRoute = new Line();
             lineRoute.setStroke(color);
@@ -86,7 +90,7 @@ public class Graph extends Pane {
             lineRoute.setStartY(mapYToGraph(currentY));
             lineRoute.setEndX(mapXToGraph(depots[depotID - 1].getX()));
             lineRoute.setEndY(mapYToGraph(depots[depotID - 1].getY()));
-            roadPane.getChildren().add(lineRoute);
+            routePane.getChildren().add(lineRoute);
         }
     }
 

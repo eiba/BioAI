@@ -24,6 +24,29 @@ public class Car {
         this.customer_sequence = new ArrayList<>();
     }
 
+    static Car[] createCopy(Car[] cars) {
+        Car[] copy = new Car[cars.length];
+
+        for (int i = 0; i < cars.length; i ++) {
+            Car car = cars[i];
+            copy[i] = new Car(car.vehichle_number, car.maximum_load, car.maximum_duration, car.depot);
+        }
+
+        return copy;
+    }
+
+    void addDuration(double duration) {
+        current_duration += duration;
+    }
+
+    void addLoad(int load) {
+        current_load += load;
+    }
+
+    void addCustomerVisited(Customer customer) {
+        customer_sequence.add(customer);
+    }
+
     public int getX() {
         return x;
     }
