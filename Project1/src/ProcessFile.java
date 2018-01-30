@@ -71,13 +71,15 @@ public class ProcessFile {
 
             if(customerX > this.maxX){
                 this.maxX = customerX;
-            }else if(customerX < this.minX){
+            }
+            if(customerX < this.minX){
                 this.minX = customerX;
             }
 
             if(customerY > this.maxY){
                 this.maxY = customerY;
-            }else if(customerY < this.minY){
+            }
+            if(customerY < this.minY){
                 this.minY = customerY;
             }
 
@@ -109,13 +111,15 @@ public class ProcessFile {
             //check to see wheter these are min or max coordinates
             if(depotX >this. maxX){
                 this.maxX = depotX;
-            }else if(depotX < this.minX){
+            }
+            if(depotX < this.minX){
                 this.minX = depotX;
             }
 
             if(depotY > this.maxY){
                 this.maxY = depotX;
-            }else if(depotX < this.minY){
+            }
+            if(depotY < this.minY){
                 this.minY = depotX;
             }
 

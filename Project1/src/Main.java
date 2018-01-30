@@ -1,6 +1,7 @@
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
@@ -26,15 +27,21 @@ public class Main extends Application{
         primaryStage.setTitle("IT3708 - Assignment 1");
 
         //Read data from file
-        ProcessFile f = new ProcessFile("./TestData/p12");
+        ProcessFile f = new ProcessFile("./TestData/p01");
         //Create a new graph
-        Graph graph = new Graph(700, 500, );
+        Graph graph = new Graph(700, 500, f.minX, f.minY, f.maxX, f.maxY);
+        BorderPane.setAlignment(graph, Pos.CENTER);
+        graph.addDepots(f.depots);
+        graph.addCustomers(f.customers);
+        borderPane.setCenter(graph);
 
         //System.out.println(f.depots[1].getMaximum_duration());
         //System.out.println(f.vehicles[13].getX());
         PopulationGenerator g = new PopulationGenerator(f,1);
+        graph.addRoutes(g.speciemens[0].getSolution());
+
         PrintSolution p = new PrintSolution();
-        p.Print(g.speciemens[0]);
+//        p.Print(g.speciemens[0]);
         //System.out.println("------------------------------");
         //p.Print(g.speciemens[1]);
 
