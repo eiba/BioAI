@@ -21,19 +21,14 @@ public class ProcessFile {
 
         try (Stream<String> stream = Files.lines(Paths.get(Filename))) {
 
-<<<<<<< HEAD
             stream.forEach(k -> processLine(k));
-=======
             //iterate over all the lines in the dataset
-            stream.forEach(k -> ProcessLine(k));
->>>>>>> c2b6b3f8238e19b9729decdcf3f24b03c7bf1e17
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-<<<<<<< HEAD
     /*public ProcessFile(int vehicle_count, int customer_count, int depot_count, Depot[] depots, Customer[] customers){
 
         this.vehicle_count = vehicle_count;
@@ -50,11 +45,8 @@ public class ProcessFile {
         return o;
     }*/
 
-    private void processLine(String line){
-=======
     //process a line in the data set
-    private void ProcessLine(String line){
->>>>>>> c2b6b3f8238e19b9729decdcf3f24b03c7bf1e17
+    private void processLine(String line){
         if(this.line_number == 0){
             //First line
             String[] first_line = line.split(" ");
