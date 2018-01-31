@@ -47,7 +47,7 @@ public class Population {
 
                 //Checking how many Customers that cannot be visited by the car assigned
                 if (car.getCurrentDuration() > car.getMaximumDuration() || car.getCurrentLoad() > car.getMaximumLoad()) {
-                    illegalMoves = car.getCustomerSequence().size();
+                    illegalMoves += car.getCustomerSequence().size();
                 }
             }
 
