@@ -22,13 +22,13 @@ public class Main extends Application{
         primaryStage.setTitle("IT3708 - Assignment 1");
 
         //Execute the evolutionary algorithm
-        EvolutionaryAlgorithm e = new EvolutionaryAlgorithm("./TestData/p23",100);
+        EvolutionaryAlgorithm e = new EvolutionaryAlgorithm("./TestData/p01",100);
 
         //Get all the data from the data set
         ProcessFile f = e.processFile;
 
         //Print one of the solutions found
-        new PrintSolution().Print(e.proposedSolutions[0]);
+        //new PrintSolution().Print(e.proposedSolutions[0]);
 
         //Create a new graph
         Graph graph = new Graph(700, 500, f.minX, f.minY, f.maxX, f.maxY);
