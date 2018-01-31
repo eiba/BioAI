@@ -76,7 +76,7 @@ public class Graph extends Pane {
             int currentX = depot.getX();
             int currentY = depot.getY();
 
-            ArrayList<Customer> customers = car.getCustomer_sequence();
+            ArrayList<Customer> customers = car.getCustomerSequence();
             for (Customer customer : customers) {
                 Line lineRoute = new Line();
                 lineRoute.setStroke(color);

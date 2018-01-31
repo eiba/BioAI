@@ -1,5 +1,4 @@
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 public class PrintSolution {
 
@@ -12,12 +11,12 @@ public class PrintSolution {
         System.out.println(n.getCustomerScore());
 
         for (Car car : cars) {
-            String s = car.getDepot().getDepot_nr() + " " + car.getVehichle_number() + " " + numberFormat.format(car.getCurrent_duration()) + " " + car.getCurrent_load();
+            String s = car.getDepot().getDepot_nr() + " " + car.getVehicleNumber() + " " + numberFormat.format(car.getCurrentDuration()) + " " + car.getCurrentLoad();
             String customer_sequence = " ";
-            for(int m = 0; m < car.getCustomer_sequence().size(); m++){
+            for(int m = 0; m < car.getCustomerSequence().size(); m++){
 
 
-                customer_sequence += car.getCustomer_sequence().get(m).getCustomer_nr() +" ";
+                customer_sequence += car.getCustomerSequence().get(m).getCustomer_nr() +" ";
             }
             System.out.println(s+customer_sequence);
         }

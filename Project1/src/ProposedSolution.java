@@ -9,7 +9,7 @@ public class ProposedSolution {
         this.customerScore = customerScore;
         this.cars = cars;
         for (Car car : cars) {
-            durationScore += car.getCurrent_duration();
+            durationScore += car.getCurrentDuration();
         }
 
     }

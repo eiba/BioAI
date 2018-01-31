@@ -2,26 +2,21 @@ import java.util.ArrayList;
 
 public class Car {
 
-    private int current_load;
-    private int maximum_load;
-    private int maximum_duration;
     private Depot depot;
-    private int vehichle_number;
-    private double current_duration;
-    private int x;
-    private int y;
+    private int currentLoad,  maximumLoad, vehicleNumber, maximumDuration, x, y;
+    private double currentDuration;
 
-    private ArrayList<Customer> customer_sequence;
+    private ArrayList<Customer> customerSequence;
 
-    public Car(int vehichle_number, int maximum_load, int maximum_duration, Depot depot) {
-        this.vehichle_number = vehichle_number;
-        this.maximum_load = maximum_load;
-        this.maximum_duration = maximum_duration;
+    public Car(int vehicleNumber, int maximumLoad, int maximumDuration, Depot depot) {
+        this.vehicleNumber = vehicleNumber;
+        this.maximumLoad = maximumLoad;
+        this.maximumDuration = maximumDuration;
         this.depot = depot;
-        this.current_duration = 0.0;
+        this.currentDuration = 0.0;
         this.x = depot.getX();
         this.y = depot.getY();
-        this.customer_sequence = new ArrayList<>();
+        this.customerSequence = new ArrayList<>();
     }
 
     static Car[] createCopy(Car[] cars) {
@@ -29,22 +24,22 @@ public class Car {
 
         for (int i = 0; i < cars.length; i ++) {
             Car car = cars[i];
-            copy[i] = new Car(car.vehichle_number, car.maximum_load, car.maximum_duration, car.depot);
+            copy[i] = new Car(car.vehicleNumber, car.maximumLoad, car.maximumDuration, car.depot);
         }
 
         return copy;
     }
 
     void addDuration(double duration) {
-        current_duration += duration;
+        currentDuration += duration;
     }
 
     void addLoad(int load) {
-        current_load += load;
+        currentLoad += load;
     }
 
     void addCustomerVisited(Customer customer) {
-        customer_sequence.add(customer);
+        customerSequence.add(customer);
     }
 
     public int getX() {
@@ -63,52 +58,52 @@ public class Car {
         this.y = y;
     }
 
-    public ArrayList<Customer> getCustomer_sequence() {
-        return customer_sequence;
+    public ArrayList<Customer> getCustomerSequence() {
+        return customerSequence;
     }
 
-    public void setCustomer_sequence(ArrayList<Customer> customer_sequence) {
-        this.customer_sequence = customer_sequence;
+    public void setCustomerSequence(ArrayList<Customer> customerSequence) {
+        this.customerSequence = customerSequence;
     }
 
-    public int getVehichle_number() {
-        return vehichle_number;
+    public int getVehicleNumber() {
+        return vehicleNumber;
     }
 
-    public void setVehichle_number(int vehichle_number) {
-        this.vehichle_number = vehichle_number;
+    public void setVehicleNumber(int vehicleNumber) {
+        this.vehicleNumber = vehicleNumber;
     }
 
-    public double getCurrent_duration() {
-        return current_duration;
+    public double getCurrentDuration() {
+        return currentDuration;
     }
 
-    public void setCurrent_duration(double current_duration) {
-        this.current_duration = current_duration;
+    public void setCurrentDuration(double currentDuration) {
+        this.currentDuration = currentDuration;
     }
 
-    public int getCurrent_load() {
-        return current_load;
+    public int getCurrentLoad() {
+        return currentLoad;
     }
 
-    public void setCurrent_load(int current_load) {
-        this.current_load = current_load;
+    public void setCurrentLoad(int currentLoad) {
+        this.currentLoad = currentLoad;
     }
 
-    public int getMaximum_load() {
-        return maximum_load;
+    public int getMaximumLoad() {
+        return maximumLoad;
     }
 
-    public void setMaximum_load(int maximum_load) {
-        this.maximum_load = maximum_load;
+    public void setMaximumLoad(int maximumLoad) {
+        this.maximumLoad = maximumLoad;
     }
 
-    public int getMaximum_duration() {
-        return maximum_duration;
+    public int getMaximumDuration() {
+        return maximumDuration;
     }
 
-    public void setMaximum_duration(int maximum_duration) {
-        this.maximum_duration = maximum_duration;
+    public void setMaximumDuration(int maximumDuration) {
+        this.maximumDuration = maximumDuration;
     }
 
     public Depot getDepot() {
