@@ -46,7 +46,7 @@ public class Population {
                 car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
 
                 //Checking how many Customers that cannot be visited by the car assigned
-                if (car.getCurrentDuration() > car.getMaximumDuration()) {
+                if (car.getCurrentDuration() > car.getMaximumDuration() || car.getCurrentLoad() > car.getMaximumLoad()) {
                     illegalMoves = car.getCustomerSequence().size();
                 }
             }
