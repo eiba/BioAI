@@ -1,6 +1,7 @@
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -21,7 +22,7 @@ public class Main extends Application{
         primaryStage.setTitle("IT3708 - Assignment 1");
 
         //Execute the evolutionary algorithm
-        EvolutionaryAlgorithm e = new EvolutionaryAlgorithm("./TestData/p01",100);
+        EvolutionaryAlgorithm e = new EvolutionaryAlgorithm("./TestData/p23",100);
 
         //Get all the data from the data set
         ProcessFile f = e.processFile;
@@ -38,6 +39,7 @@ public class Main extends Application{
 
         graph.setRoutes(e.proposedSolutions[0]);
 
+        primaryStage.getIcons().add(new Image("file:elster2.png"));
         primaryStage.show();
     }
 }

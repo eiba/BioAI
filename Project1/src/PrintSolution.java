@@ -15,7 +15,6 @@ public class PrintSolution {
             String customer_sequence = " ";
             for(int m = 0; m < car.getCustomerSequence().size(); m++){
 
-
                 customer_sequence += car.getCustomerSequence().get(m).getCustomer_nr() +" ";
             }
             System.out.println(s+customer_sequence);
