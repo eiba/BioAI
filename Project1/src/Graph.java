@@ -12,7 +12,7 @@ public class Graph extends Pane {
     private final int minX, minY;
     private final double height, factorX, factorY;
 
-    private final Color[] colors = {Color.GREEN, Color.RED, Color.ORANGE, Color.BROWN, Color.PURPLE, Color.BLACK};
+    private final Color[] colors = {Color.GREEN, Color.RED, Color.ORANGE, Color.BLUE, Color.PURPLE, Color.BLACK};
 
     private Depot[] depots;
     private Customer[] customers;
@@ -25,7 +25,7 @@ public class Graph extends Pane {
         routePane = new Pane();
         super.setMinSize(width, height);
         super.setMaxSize(width, height);
-        super.getChildren().addAll(depotPane, customerPane, routePane);
+        super.getChildren().addAll(routePane, depotPane, customerPane);
 
         this.minX = minX;
         this.minY = minY;
@@ -40,6 +40,8 @@ public class Graph extends Pane {
 
         for (Depot depot : depots) {
             Rectangle depotRectangle = new Rectangle(10,10);
+            depotRectangle.setLayoutX(-5);
+            depotRectangle.setLayoutY(-5);
             depotRectangle.setTranslateX(mapXToGraph(depot.getX()));
             depotRectangle.setTranslateY(mapYToGraph(depot.getY()));
             depotRectangle.setStyle("-fx-fill: #04d403");
