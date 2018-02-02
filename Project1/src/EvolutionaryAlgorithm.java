@@ -6,6 +6,7 @@ public class EvolutionaryAlgorithm {
 
     public EvolutionaryAlgorithm(String filename, int initial_population_count){
         processFile = new ProcessFile(filename);
+        // Hei hei Stigen. hvor flink dere er! hilsen Sigve :D
         this.initial_population_count = initial_population_count;
 
         //Generate an initial population
@@ -14,7 +15,9 @@ public class EvolutionaryAlgorithm {
         //select parents
         ProposedSolution[] selected_parents = new ParentSelection().SelectParent(proposedSolutions);
 
-        
+        ProposedSolution[] offspring = new Crossover().Crossover(selected_parents);
+
+        /*
         double totalPop = 0.0;
         double totalparent = 0.0;
 
@@ -24,7 +27,7 @@ public class EvolutionaryAlgorithm {
             totalparent += selected_parents[i].getFitnessScore();
         }
         System.out.println(totalPop);
-        System.out.println(totalparent);
+        System.out.println(totalparent);*/
 
     }
 }
