@@ -11,12 +11,17 @@ public class Car {
     public Car(int vehicleNumber, int maximumLoad, int maximumDuration, Depot depot) {
         this.vehicleNumber = vehicleNumber;
         this.maximumLoad = maximumLoad;
-        this.maximumDuration = maximumDuration;
         this.depot = depot;
         this.currentDuration = 0.0;
         this.x = depot.getX();
         this.y = depot.getY();
         this.customerSequence = new ArrayList<>();
+
+        if(maximumDuration == 0){
+            this.maximumDuration = Integer.MAX_VALUE;
+        }else{
+            this.maximumDuration = maximumDuration;
+        }
     }
 
     static Car[] createCopy(Car[] cars) {

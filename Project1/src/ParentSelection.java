@@ -15,7 +15,7 @@ public class ParentSelection {
 
         double score_sum = 0.0;
         for(ProposedSolution solution: solutions){
-            score_sum += 1/solution.getDurationScore();   //using only duration score atm, need to create a better fitness value
+            score_sum += 1/solution.getFitnessScore();
         }
 
         //for each iteration add a parent
@@ -25,7 +25,7 @@ public class ParentSelection {
 
             double cumulativeProbability = 0.0;
             for (ProposedSolution solution : solutions) {
-                cumulativeProbability +=  (1 / solution.getDurationScore()) / score_sum;    //add to the cumulative probability
+                cumulativeProbability +=  (1 / solution.getFitnessScore()) / score_sum;    //add to the cumulative probability
 
                 if (p <= cumulativeProbability) {
                     selected_parents[i] = solution;

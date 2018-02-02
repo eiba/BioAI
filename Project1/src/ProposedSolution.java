@@ -2,6 +2,7 @@ public class ProposedSolution {
 
     private double durationScore;
     private int customerScore;
+    private double fitnessScore;
     private Car[] cars;
 
     public ProposedSolution(Car[] cars, int customerScore) {
@@ -11,7 +12,16 @@ public class ProposedSolution {
         for (Car car : cars) {
             durationScore += car.getCurrentDuration();
         }
+        this.fitnessScore = (this.customerScore+1)*this.durationScore;
 
+    }
+
+    public double getFitnessScore() {
+        return fitnessScore;
+    }
+
+    public void setFitnessScore(double fitnessScore) {
+        this.fitnessScore = fitnessScore;
     }
 
     public Car[] getCars() {

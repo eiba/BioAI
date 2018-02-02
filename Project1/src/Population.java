@@ -28,7 +28,6 @@ public class Population {
 
                 //duration needed for car to drive home from customer
 //                double duration_to_get_home = eucledianDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY());
-
                 car.addCustomerVisited(customer);
                 car.addLoad(customer.getCustomer_demand());
                 car.addDuration(euclideanDistance(customer.getX(), customer.getY(), car.getX(), car.getY()));
@@ -42,7 +41,7 @@ public class Population {
             }
 
             //Driving all cars home
-            for (Car car : processFile.vehicles) {
+            for (Car car :cars) {
                 car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
 
                 //Checking how many Customers that cannot be visited by the car assigned

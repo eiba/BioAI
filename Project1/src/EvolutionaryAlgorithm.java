@@ -14,5 +14,17 @@ public class EvolutionaryAlgorithm {
         //select parents
         ProposedSolution[] selected_parents = new ParentSelection().SelectParent(proposedSolutions);
 
+        
+        double totalPop = 0.0;
+        double totalparent = 0.0;
+
+        for (int i=0; i<proposedSolutions.length;i++){
+            //System.out.println(proposedSolutions[i].getFitnessScore());
+            totalPop += proposedSolutions[i].getFitnessScore();
+            totalparent += selected_parents[i].getFitnessScore();
+        }
+        System.out.println(totalPop);
+        System.out.println(totalparent);
+
     }
 }
