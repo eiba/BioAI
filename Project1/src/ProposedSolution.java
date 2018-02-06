@@ -13,7 +13,6 @@ public class ProposedSolution {
             durationScore += car.getCurrentDuration();
         }
         this.fitnessScore = (this.customerScore+1)*this.durationScore;
-
     }
 
     public double getFitnessScore() {

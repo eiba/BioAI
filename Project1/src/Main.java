@@ -22,7 +22,7 @@ public class Main extends Application{
         primaryStage.setTitle("IT3708 - Assignment 1");
 
         //Execute the evolutionary algorithm
-        EvolutionaryAlgorithm e = new EvolutionaryAlgorithm("./TestData/p01",100);
+        EvolutionaryAlgorithm e = new EvolutionaryAlgorithm("./TestData/p23",100);
 
         //Get all the data from the data set
         ProcessFile f = e.processFile;

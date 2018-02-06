@@ -17,7 +17,7 @@ public class EvolutionaryAlgorithm {
 
         ProposedSolution[] offspring = new Crossover().Crossover(selected_parents);
 
-        /*
+
         double totalPop = 0.0;
         double totalparent = 0.0;
 
@@ -27,7 +27,7 @@ public class EvolutionaryAlgorithm {
             totalparent += selected_parents[i].getFitnessScore();
         }
         System.out.println(totalPop);
-        System.out.println(totalparent);*/
+        System.out.println(totalparent);
 
     }
 }
