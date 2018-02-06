@@ -15,7 +15,7 @@ public class EvolutionaryAlgorithm {
         //select parents
         ProposedSolution[] selected_parents = new ParentSelection().selectParent(proposedSolutions);
 
-        ProposedSolution[] offspring = new Crossover().Crossover(selected_parents);
+        ProposedSolution[] offspring = new Crossover(processFile).Crossover(selected_parents);
 
 
         double totalPop = 0.0;
