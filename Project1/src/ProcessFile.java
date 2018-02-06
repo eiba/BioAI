@@ -13,7 +13,7 @@ public class ProcessFile {
     public int depot_count;
     public Depot depots[];
     public Customer customers[];
-    public Car vehicles[];
+    public Car cars[];
     public int minX = Integer.MAX_VALUE;
     public int minY = Integer.MAX_VALUE;
     public int maxX = Integer.MIN_VALUE;
@@ -21,14 +21,14 @@ public class ProcessFile {
 
     //This class processes a dataset, extracts the data and creates objects and variables
 
-    public ProcessFile(String Filename){
+    ProcessFile(String Filename){
 
         try (Stream<String> stream = Files.lines(Paths.get(Filename))) {
 
-            stream.forEach(k -> processLine(k));
+            stream.forEach(this::processLine);
             //iterate over all the lines in the dataset
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -44,9 +44,10 @@ public class ProcessFile {
             this.depot_count = Integer.parseInt(first_line[2]);
             this.depots = new Depot[this.depot_count];
             this.customers = new Customer[this.customer_count];
-            this.vehicles = new Car[this.vehicle_count*this.depot_count];
+            this.cars = new Car[this.vehicle_count*this.depot_count];
 
-        }else if(line_number > 0 && line_number < depot_count + 1){
+        }
+        else if(line_number > 0 && line_number < depot_count + 1){
             String[] depot_line = line.split(" ");
             Depot depot = new Depot(Integer.parseInt(depot_line[0]),Integer.parseInt(depot_line[1]));
             this.depots[line_number -1] = depot;
@@ -108,7 +109,7 @@ public class ProcessFile {
             depot.setY(depotY);
             depot.setDepot_nr(depots_finished +1);
 
-            //check to see wheter these are min or max coordinates
+            //check to see whether these are min or max coordinates
             if(depotX >this. maxX){
                 this.maxX = depotX;
             }
@@ -117,10 +118,10 @@ public class ProcessFile {
             }
 
             if(depotY > this.maxY){
-                this.maxY = depotX;
+                this.maxY = depotY;
             }
             if(depotY < this.minY){
-                this.minY = depotX;
+                this.minY = depotY;
             }
 
 
@@ -129,7 +130,7 @@ public class ProcessFile {
             for(int i =0; i < this.vehicle_count;i++){
                 Car car = new Car(i +1,depot.getMaximum_load(),depot.getMaximum_duration(),depot);
                 cars[i] = car;
-                this.vehicles[i + ((depot.getDepot_nr()-1)*this.vehicle_count)] = car;
+                this.cars[i + ((depot.getDepot_nr()-1)*this.vehicle_count)] = car;
             }
             depot.setCars(cars);
 
@@ -137,6 +138,17 @@ public class ProcessFile {
         }
         this.line_number++;
 
+    }
+
+    Depot[] getDepots() {
+        Depot[] copy = new Depot[depots.length];
+
+        for (int i = 0; i < depots.length; i ++) {
+            Depot depot = depots[i];
+            copy[i] = new Depot(depot);
+        }
+
+        return copy;
     }
 
 }

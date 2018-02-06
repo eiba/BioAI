@@ -7,6 +7,20 @@ public class Depot {
     private Car cars[];
     private int depot_nr;
 
+    Depot(int maximum_duration, int maximum_load) {
+        this.maximum_duration = maximum_duration;
+        this.maximum_load = maximum_load;
+    }
+
+    Depot(Depot depot) {
+        this.maximum_duration = depot.maximum_duration;
+        this.maximum_load = depot.maximum_load;
+        this.x = depot.x;
+        this.y = depot.y;
+        this.depot_nr = depot.depot_nr;
+        this.cars = Car.createCopy(depot.cars, this);
+    }
+
     public int getMaximum_duration() {
         return maximum_duration;
     }
@@ -55,8 +69,4 @@ public class Depot {
         this.depot_nr = depot_nr;
     }
 
-    public Depot(int maximum_duration, int maximum_load) {
-        this.maximum_duration = maximum_duration;
-        this.maximum_load = maximum_load;
-    }
 }

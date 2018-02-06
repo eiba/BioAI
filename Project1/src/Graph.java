@@ -68,33 +68,34 @@ public class Graph extends Pane {
 
         int counter = 0;
 
-        for (Car car : solution.getCars()) {
-            Color color = colors[counter % colors.length];
-            counter ++;
+        for (Depot depot : solution.depots) {
+            for (Car car : depot.getCars()) {
+                Color color = colors[counter % colors.length];
+                counter ++;
 
-            Depot depot = car.getDepot();
-            int currentX = depot.getX();
-            int currentY = depot.getY();
+                int currentX = depot.getX();
+                int currentY = depot.getY();
 
-            ArrayList<Customer> customers = car.getCustomerSequence();
-            for (Customer customer : customers) {
+                ArrayList<Customer> customers = car.getCustomerSequence();
+                for (Customer customer : customers) {
+                    Line lineRoute = new Line();
+                    lineRoute.setStroke(color);
+                    lineRoute.setStartX(mapXToGraph(currentX));
+                    lineRoute.setStartY(mapYToGraph(currentY));
+                    lineRoute.setEndX(mapXToGraph(customer.getX()));
+                    lineRoute.setEndY(mapYToGraph(customer.getY()));
+                    currentX = customer.getX();
+                    currentY = customer.getY();
+                    routePane.getChildren().add(lineRoute);
+                }
                 Line lineRoute = new Line();
                 lineRoute.setStroke(color);
                 lineRoute.setStartX(mapXToGraph(currentX));
                 lineRoute.setStartY(mapYToGraph(currentY));
-                lineRoute.setEndX(mapXToGraph(customer.getX()));
-                lineRoute.setEndY(mapYToGraph(customer.getY()));
-                currentX = customer.getX();
-                currentY = customer.getY();
+                lineRoute.setEndX(mapXToGraph(depot.getX()));
+                lineRoute.setEndY(mapYToGraph(depot.getY()));
                 routePane.getChildren().add(lineRoute);
             }
-            Line lineRoute = new Line();
-            lineRoute.setStroke(color);
-            lineRoute.setStartX(mapXToGraph(currentX));
-            lineRoute.setStartY(mapYToGraph(currentY));
-            lineRoute.setEndX(mapXToGraph(depot.getX()));
-            lineRoute.setEndY(mapYToGraph(depot.getY()));
-            routePane.getChildren().add(lineRoute);
         }
     }
 

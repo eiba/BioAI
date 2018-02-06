@@ -17,14 +17,26 @@ public class Population {
         for (int i = 0; i < populationSize; i ++) {
             int illegalMoves = 0;  //number of moves made that exceeds duration and load limits
 
-            Car[] cars = Car.createCopy(processFile.vehicles);
+            Depot[] depots = processFile.getDepots();
 
             //Giving every customer a random car
             for (Customer customer : processFile.customers) {
 
+
+                //Finding the closest depot
+                double bestDistance = Double.MAX_VALUE;
+                Depot bestDepot = null;
+                for (Depot depot : depots) {
+                    double distance = euclideanDistance(customer.getX(), customer.getY(), depot.getX(), depot.getY());
+                    if (distance < bestDistance || bestDepot == null) {
+                        bestDistance = distance;
+                        bestDepot = depot;
+                    }
+                }
+
                 //Selecting a random Car
-                int randomIndex = new Random().nextInt(processFile.vehicles.length);
-                Car car = cars[randomIndex];
+                int randomIndex = new Random().nextInt(bestDepot.getCars().length);
+                Car car = bestDepot.getCars()[randomIndex];
 
                 //duration needed for car to drive home from customer
 //                double duration_to_get_home = eucledianDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY());
@@ -41,17 +53,19 @@ public class Population {
             }
 
             //Driving all cars home
-            for (Car car :cars) {
-                car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
+            for (Depot depot : depots) {
+                for (Car car : depot.getCars()) {
+                    car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
 
-                //Checking how many Customers that cannot be visited by the car assigned
-                if (car.getCurrentDuration() > car.getMaximumDuration() || car.getCurrentLoad() > car.getMaximumLoad()) {
-                    illegalMoves += car.getCustomerSequence().size();
+                    //Checking how many Customers that cannot be visited by the car assigned
+                    if (car.getCurrentDuration() > car.getMaximumDuration() || car.getCurrentLoad() > car.getMaximumLoad()) {
+                        illegalMoves += car.getCustomerSequence().size();
+                    }
                 }
             }
 
             //Add the solution to the solutions list
-            proposedSolutions[i] = new ProposedSolution(cars, illegalMoves);
+            proposedSolutions[i] = new ProposedSolution(depots, illegalMoves);
         }
 
         return proposedSolutions;

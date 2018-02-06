@@ -13,7 +13,7 @@ public class EvolutionaryAlgorithm {
         proposedSolutions = new Population(processFile,initial_population_count).generateInitialPopulation();
 
         //select parents
-        ProposedSolution[] selected_parents = new ParentSelection().SelectParent(proposedSolutions);
+        ProposedSolution[] selected_parents = new ParentSelection().selectParent(proposedSolutions);
 
         ProposedSolution[] offspring = new Crossover().Crossover(selected_parents);
 
