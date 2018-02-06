@@ -13,7 +13,7 @@ public class EvolutionaryAlgorithm {
         proposedSolutions = new Population(processFile,initial_population_count).generateInitialPopulation();
 
         //select parents
-        ProposedSolution[] selected_parents = new ParentSelection().SelectParent(proposedSolutions);
+        ProposedSolution[] selected_parents = new ParentSelection().selectParent(proposedSolutions);
 
         ProposedSolution[] offspring = new Crossover().Crossover(selected_parents);
 
@@ -23,8 +23,8 @@ public class EvolutionaryAlgorithm {
 
         for (int i=0; i<proposedSolutions.length;i++){
             //System.out.println(proposedSolutions[i].getFitnessScore());
-            totalPop += proposedSolutions[i].getFitnessScore();
-            totalparent += selected_parents[i].getFitnessScore();
+            totalPop += proposedSolutions[i].fitnessScore;
+            totalparent += selected_parents[i].fitnessScore;
         }
         System.out.println(totalPop);
         System.out.println(totalparent);

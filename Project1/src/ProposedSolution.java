@@ -1,49 +1,21 @@
 public class ProposedSolution {
 
-    private double durationScore;
-    private int customerScore;
-    private double fitnessScore;
-    private Car[] cars;
+    final double durationScore;
+    final int customerScore;
+    final double fitnessScore;
+    final Depot[] depots;
 
-    public ProposedSolution(Car[] cars, int customerScore) {
-
+    public ProposedSolution(Depot[] depots, int customerScore) {
         this.customerScore = customerScore;
-        this.cars = cars;
-        for (Car car : cars) {
-            durationScore += car.getCurrentDuration();
+        this.depots = depots;
+
+        double duration = 0;
+        for (Depot depot : depots) {
+            for (Car car : depot.getCars()) {
+                duration += car.getCurrentDuration();
+            }
         }
-        this.fitnessScore = (this.customerScore+1)*this.durationScore;
-    }
-
-    public double getFitnessScore() {
-        return fitnessScore;
-    }
-
-    public void setFitnessScore(double fitnessScore) {
-        this.fitnessScore = fitnessScore;
-    }
-
-    public Car[] getCars() {
-        return cars;
-    }
-
-    public void setCars(Car[] cars) {
-        this.cars = cars;
-    }
-
-    public int getCustomerScore() {
-        return customerScore;
-    }
-
-    public void setCustomerScore(int customerScore) {
-        this.customerScore = customerScore;
-    }
-
-    public double getDurationScore() {
-        return durationScore;
-    }
-
-    public void setDurationScore(double durationScore) {
-        this.durationScore = durationScore;
+        durationScore = duration;
+        this.fitnessScore = (this.customerScore + 1)* durationScore;
     }
 }

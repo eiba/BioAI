@@ -24,25 +24,14 @@ public class Crossover {
     public ProposedSolution copulate(ProposedSolution parent1, ProposedSolution parent2){
 
         Random rand = new Random();
-        Car[] parent1Cars = parent1.getCars();
-        Car[] parent2Cars = Car.createCopy(parent2.getCars());
+        //Car[] parent1Cars = parent1.getCars();
+        //Car[] parent2Cars = Car.createCopy(parent2.getCars());
 
 
         //Car route1 = Car.createCopy(parent1Cars[rand.nextInt(parent1Cars.length)]);
-        Car route2 = parent2Cars[rand.nextInt(parent2Cars.length)];
+        //Car route2 = parent2Cars[rand.nextInt(parent2Cars.length)];
 
 
         return null;
-    }
-
-    public ArrayList<Customer>[] createGenotype(ProposedSolution solution){
-
-        ArrayList<Customer>[] genotype = new ArrayList[solution.getCars().length];
-
-        for(int i=0; i<genotype.length;i++){
-            genotype[i] = solution.getCars()[i].getCustomerSequence();
-        }
-
-        return genotype;
     }
 }

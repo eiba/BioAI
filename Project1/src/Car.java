@@ -6,9 +6,9 @@ public class Car {
     private int currentLoad,  maximumLoad, vehicleNumber, maximumDuration, x, y;
     private double currentDuration;
 
-    private ArrayList<Customer> customerSequence;
+    private final ArrayList<Customer> customerSequence;
 
-    public Car(int vehicleNumber, int maximumLoad, int maximumDuration, Depot depot) {
+    Car(int vehicleNumber, int maximumLoad, int maximumDuration, Depot depot) {
         this.vehicleNumber = vehicleNumber;
         this.maximumLoad = maximumLoad;
         this.depot = depot;
@@ -24,12 +24,12 @@ public class Car {
         }
     }
 
-    static Car[] createCopy(Car[] cars) {
+    static Car[] createCopy(Car[] cars, Depot depot) {
         Car[] copy = new Car[cars.length];
 
         for (int i = 0; i < cars.length; i ++) {
             Car car = cars[i];
-            copy[i] = new Car(car.vehicleNumber, car.maximumLoad, car.maximumDuration, car.depot);
+            copy[i] = new Car(car.vehicleNumber, car.maximumLoad, car.maximumDuration, depot);
         }
 
         return copy;
@@ -67,9 +67,9 @@ public class Car {
         return customerSequence;
     }
 
-    public void setCustomerSequence(ArrayList<Customer> customerSequence) {
-        this.customerSequence = customerSequence;
-    }
+//    public void setCustomerSequence(ArrayList<Customer> customerSequence) {
+//        this.customerSequence = customerSequence;
+//    }
 
     public int getVehicleNumber() {
         return vehicleNumber;

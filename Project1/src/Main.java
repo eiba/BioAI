@@ -22,24 +22,36 @@ public class Main extends Application{
         primaryStage.setTitle("IT3708 - Assignment 1");
 
         //Execute the evolutionary algorithm
-        EvolutionaryAlgorithm e = new EvolutionaryAlgorithm("./TestData/p23",100);
+
+        EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/p01",100);
 
         //Get all the data from the data set
-        ProcessFile f = e.processFile;
+        ProcessFile processFile = evolutionaryAlgorithm.processFile;
 
         //Print one of the solutions found
         //new PrintSolution().Print(e.proposedSolutions[0]);
 
         //Create a new graph
-        Graph graph = new Graph(700, 500, f.minX, f.minY, f.maxX, f.maxY);
+        Graph graph = new Graph(700, 500, processFile.minX, processFile.minY, processFile.maxX, processFile.maxY);
         BorderPane.setAlignment(graph, Pos.CENTER);
-        graph.setDepots(f.depots);
-        graph.setCustomers(f.customers);
+        graph.setDepots(processFile.depots);
+        graph.setCustomers(processFile.customers);
         borderPane.setCenter(graph);
 
-        graph.setRoutes(e.proposedSolutions[0]);
+        //Create statistics for the graph
+        Statistic statistic = new Statistic();
+        BorderPane.setAlignment(statistic, Pos.CENTER);
+        double fitness = 0;
+        for (ProposedSolution proposedSolution : evolutionaryAlgorithm.proposedSolutions) {
+            fitness += proposedSolution.fitnessScore;
+        }
+        fitness /= evolutionaryAlgorithm.proposedSolutions.length;
+        statistic.setDistance(fitness);
+        borderPane.setBottom(statistic);
 
-        primaryStage.getIcons().add(new Image("file:elster2.png"));
+        graph.setRoutes(evolutionaryAlgorithm.proposedSolutions[0]);
+
+        primaryStage.getIcons().add(new Image("elster2.png"));
         primaryStage.show();
     }
 }
