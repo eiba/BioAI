@@ -1,33 +1,35 @@
 public class EvolutionaryAlgorithm {
 
-    private final int initial_population_count;
-    public final ProcessFile processFile;
+    private final int initialPopulationCount;
+    private final ProcessFile processFile;
+    private final Population population;
     public ProposedSolution[] proposedSolutions;
 
-    public EvolutionaryAlgorithm(String filename, int initial_population_count){
+    EvolutionaryAlgorithm(String filename, int initialPopulationCount){
+        this.initialPopulationCount = initialPopulationCount;
         processFile = new ProcessFile(filename);
-        // Hei hei Stigen. hvor flink dere er! hilsen Sigve :D
-        this.initial_population_count = initial_population_count;
+        population = new Population(processFile, initialPopulationCount);
 
         //Generate an initial population
-        proposedSolutions = new Population(processFile,initial_population_count).generateInitialPopulation();
+        proposedSolutions = population.generateInitialPopulation();
 
-        //select parents
-        ProposedSolution[] selected_parents = new ParentSelection().selectParent(proposedSolutions);
+        //Select parents
+        ProposedSolution[] selectedParents = population.selectParent(proposedSolutions);
 
-        ProposedSolution[] offspring = new Crossover(processFile).Crossover(selected_parents);
+        // @TODO Change Crossover from Class to method inside Population class
+        ProposedSolution[] offspring = new Crossover(processFile).Crossover(selectedParents);
 
 
-        double totalPop = 0.0;
-        double totalparent = 0.0;
+        double totalPopulation = 0.0;
+        double totalParent = 0.0;
 
         for (int i=0; i<proposedSolutions.length;i++){
             //System.out.println(proposedSolutions[i].getFitnessScore());
-            totalPop += proposedSolutions[i].fitnessScore;
-            totalparent += selected_parents[i].fitnessScore;
+            totalPopulation += proposedSolutions[i].fitnessScore;
+            totalParent += selectedParents[i].fitnessScore;
         }
-        System.out.println(totalPop);
-        System.out.println(totalparent);
+        System.out.println(totalPopulation);
+        System.out.println(totalParent);
 
     }
 }

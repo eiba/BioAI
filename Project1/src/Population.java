@@ -71,6 +71,35 @@ public class Population {
         return proposedSolutions;
     }
 
+    public ProposedSolution[] selectParent(ProposedSolution[] solutions){
+
+        //list containing all selected parents
+        //There should be as many selected parents as there are specimen in the population as one parent can eb selected more than once
+        ProposedSolution[] selected_parents = new ProposedSolution[solutions.length];
+
+        double score_sum = 0.0;
+
+        for(ProposedSolution solution: solutions){
+            score_sum += 1/solution.fitnessScore;
+        }
+
+        //for each iteration add a parent
+        for(int i=0;i<solutions.length;i++){
+
+            double p = Math.random();   //random number from 0 to 1
+
+            double cumulativeProbability = 0.0;
+            for (ProposedSolution solution : solutions) {
+                cumulativeProbability +=  (1 / solution.fitnessScore) / score_sum;    //add to the cumulative probability
+
+                if (p <= cumulativeProbability) {
+                    selected_parents[i] = solution;
+                    break;
+                }
+            }
+        }
+        return selected_parents;
+    }
 
     //calculates the euclidean distance from a to b
     private static double euclideanDistance(int x1, int y1, int x2, int y2){
