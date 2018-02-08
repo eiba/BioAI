@@ -47,6 +47,17 @@ public class Car {
         customerSequence.add(customer);
     }
 
+    /**
+     * This method is used to determine if the car is eligible to add a customer to its route or not
+     * @param customer
+     * @return True iff the car is eligible to serve the customer, False otherwise
+     */
+    boolean isEligible(Customer customer) {
+        final boolean durationCheck = currentDuration + Population.euclideanDistance(x, y, customer.getX(), customer.getY()) <= maximumDuration;
+        final boolean loadCheck = currentLoad + customer.getDemand() <= maximumLoad;
+        return durationCheck && loadCheck;
+    }
+
     public int getX() {
         return x;
     }

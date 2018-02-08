@@ -1,41 +1,42 @@
 public class Customer {
 
-    private int customer_nr;
+    private int customerNr;
     private int x;
     private int y;
-    private int serivice_duration;
-    private int customer_demand;
+    private int seriviceDuration;
+    private int demand;
 
-    public Customer(int customer_nr, int x, int y, int serivice_duration, int customer_demand){
-        this.customer_nr = customer_nr;
+    public Customer(int customerNr, int x, int y, int seriviceDuration, int demand){
+        this.customerNr = customerNr;
         this.x = x;
         this.y = y;
-        this.serivice_duration = serivice_duration;
-        this.customer_demand = customer_demand;
+        this.seriviceDuration = seriviceDuration;
+        this.demand = demand;
 
     }
 
-    public int getCustomer_nr() {
-        return customer_nr;
+    public int getCustomerNr() {
+        return customerNr;
     }
 
-    public void setCustomer_nr(int customer_nr) {
-        this.customer_nr = customer_nr;
-    }
-    public int getCustomerDemand() {
-        return customer_demand;
+    public void setCustomerNr(int customerNr) {
+        this.customerNr = customerNr;
     }
 
-    public void setCustomer_demand(int customer_demand) {
-        this.customer_demand = customer_demand;
+    public int getDemand() {
+        return demand;
     }
 
-    public int getSerivice_duration() {
-        return serivice_duration;
+    public void setDemand(int demand) {
+        this.demand = demand;
     }
 
-    public void setSerivice_duration(int serivice_duration) {
-        this.serivice_duration = serivice_duration;
+    public int getSeriviceDuration() {
+        return seriviceDuration;
+    }
+
+    public void setSeriviceDuration(int seriviceDuration) {
+        this.seriviceDuration = seriviceDuration;
     }
 
     public int getY() {

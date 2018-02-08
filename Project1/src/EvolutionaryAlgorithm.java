@@ -44,7 +44,8 @@ public class EvolutionaryAlgorithm {
 
 
             // Evaluate the individual fitness of new individuals.
-            for (ProposedSolution proposedSolution : offspring) {
+//            for (ProposedSolution proposedSolution : offspring) {
+            for (ProposedSolution proposedSolution : proposedSolutions) {
                 proposedSolution.evaluateFitness();
             }
 
