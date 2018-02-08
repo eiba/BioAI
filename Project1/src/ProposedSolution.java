@@ -1,3 +1,5 @@
+import java.text.DecimalFormat;
+
 public class ProposedSolution {
 
     final Depot[] depots;
@@ -27,5 +29,24 @@ public class ProposedSolution {
 
     double getFitness() {
         return fitness;
+    }
+
+    @Override
+    public String toString() {
+        final DecimalFormat numberFormat = new DecimalFormat("#.00");
+        final StringBuilder stringBuilder = new StringBuilder();
+
+//        System.out.println(proposedSolution.durationScore);
+//        System.out.println(proposedSolution.customerScore);
+
+        for (Car car : cars) {
+            String s = car.getDepot().getDepot_nr() + " " + car.getVehicleNumber() + " " + numberFormat.format(car.getCurrentDuration()) + " " + car.getCurrentLoad();
+            StringBuilder customerSequence = new StringBuilder(" ");
+            for(int m = 0; m < car.getCustomerSequence().size(); m++){
+                customerSequence.append(car.getCustomerSequence().get(m).getCustomer_nr()).append(" ");
+            }
+            stringBuilder.append(s).append(customerSequence.toString()).append("\n");
+        }
+        return stringBuilder.toString();
     }
 }
