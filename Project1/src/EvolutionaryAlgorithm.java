@@ -40,7 +40,7 @@ public class EvolutionaryAlgorithm {
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
             // @TODO make crossover method work!
-            ProposedSolution[] offspring = population.Crossover(selectedParents,mutationRate);
+            //ProposedSolution[] offspring = population.Crossover(selectedParents,mutationRate);
 
 
             // Evaluate the individual fitness of new individuals.

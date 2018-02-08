@@ -1,4 +1,4 @@
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -19,19 +19,36 @@ public class ProcessFile {
     public int minY = Integer.MAX_VALUE;
     public int maxX = Integer.MIN_VALUE;
     public int maxY = Integer.MIN_VALUE;
+    public double optimalFitness;
 
     //This class processes a dataset, extracts the data and creates objects and variables
 
     ProcessFile(String Filename){
 
+        //read dataset
         try (Stream<String> stream = Files.lines(Paths.get(Filename))) {
 
             stream.forEach(this::processLine);
+
             //iterate over all the lines in the dataset
         }
         catch (IOException e) {
             e.printStackTrace();
         }
+
+        //read solution file and get the optimal fitness
+        try{
+            BufferedReader optimalFitnessLine = new BufferedReader(new FileReader(Filename+".res"));
+            try{
+                this.optimalFitness = Double.parseDouble(optimalFitnessLine.readLine());
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+
     }
 
     //process a line in the data set

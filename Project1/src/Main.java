@@ -22,7 +22,7 @@ public class Main extends Application{
         primaryStage.setTitle("IT3708 - Assignment 1");
 
         //Initiate the evolutionary algorithm
-        EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/p01");
+        EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/p02");
 
         //Run the evolutionary algorithm
         ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,100);
@@ -50,6 +50,8 @@ public class Main extends Application{
 
         //Display one of the solutions
         graph.setRoutes(solutions[0]);
+        System.out.println("Solution 0 fitness value: "+solutions[0].getFitness());
+        System.out.println("Optimal known fitness value: "+processFile.optimalFitness);
 
         primaryStage.getIcons().add(new Image("elster2.png"));
         primaryStage.show();
