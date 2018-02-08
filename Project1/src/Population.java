@@ -90,7 +90,7 @@ public class Population {
         return selected_parents;
     }
 
-    public ProposedSolution[] Crossover(ProposedSolution[] solutions){
+    public ProposedSolution[] Crossover(ProposedSolution[] solutions, double mutationRate){
 
         ProposedSolution[] children = new ProposedSolution[solutions.length*5];
         Random rand = new Random();
@@ -101,6 +101,8 @@ public class Population {
 
             children[i] = copulate(parent1,parent2);
         }
+
+        mutate(children, mutationRate);
 
         return children;
     }
@@ -146,6 +148,25 @@ public class Population {
         //Car route2 = parent2Cars[rand.nextInt(parent2Cars.length)];
 
         return null;
+    }
+
+    //Mutate children
+    public void mutate(ProposedSolution[] soulutions, double mutationRate){
+
+        for(ProposedSolution solution: soulutions){
+            double p = Math.random();
+
+            //mutate with a probability of mutationRate
+            if(mutationRate >= p){
+                inverseMutation(solution);
+            }
+        }
+        //return soulutions;
+    }
+
+    public void inverseMutation(ProposedSolution solution){
+
+        //implement inverse mutation
     }
 
     //calculates the euclidean distance from a to b
