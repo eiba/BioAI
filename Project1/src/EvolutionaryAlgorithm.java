@@ -43,7 +43,9 @@ public class EvolutionaryAlgorithm {
             ProposedSolution[] offspring = new Crossover(processFile).Crossover(selectedParents);
 
             // Evaluate the individual fitness of new individuals.
-            // @TODO void population.evaluate(ProposedSolution[] ps)
+            for (ProposedSolution proposedSolution : offspring) {
+                proposedSolution.evaluateFitness();
+            }
 
             // Replace least-fit population with new individuals.
             // @TODO ProposedSolution[] population.select(ProposedSolution[] parents, ProposedSolution[] offspring)
