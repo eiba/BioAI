@@ -6,6 +6,8 @@ public class Population {
 
     private final ProcessFile processFile;
     private final Random random;
+    private int populationSize;
+    private ProposedSolution[] currentPopulation;
 
     Population(ProcessFile processFile) {
         this.processFile = processFile;
@@ -13,7 +15,7 @@ public class Population {
     }
 
     ProposedSolution[] generateInitialPopulation(int populationSize) {
-
+        this.populationSize = populationSize;
         // Initiating variables
         final ProposedSolution[] proposedSolutions = new ProposedSolution[populationSize];
 
@@ -84,6 +86,7 @@ public class Population {
 
     public ProposedSolution[] selectParent(ProposedSolution[] solutions){
 
+        this.currentPopulation = solutions;
         //list containing all selected parents
         //There should be as many selected parents as there are specimen in the population as one parent can eb selected more than once
         ProposedSolution[] selected_parents = new ProposedSolution[solutions.length];
@@ -124,14 +127,16 @@ public class Population {
             children[i] = copulate(parent1,parent2);
         }
 
+        // mutate the children
         mutate(children, mutationRate);
 
         return children;
     }
 
+    //@TODO proper copulate method. Create new ProposedSolution objects as we need the old ones for survivor selection
     public ProposedSolution copulate(ProposedSolution parent1, ProposedSolution parent2){
 
-        Random rand = new Random();
+        //Random rand = new Random();
 
         Depot[] depotsParent1 = new Depot[processFile.depot_count]; //all depots in the first parent
         Depot[] depotsParent2 = new Depot[processFile.depot_count]; //all depots in second parent
@@ -142,8 +147,8 @@ public class Population {
             depotsParent2[i] = new Depot(parent2.depots[i]);
         }
 
-        Car route1 = depotsParent1[rand.nextInt(processFile.depot_count)].getCars()[rand.nextInt(processFile.vehicle_count)];   //random route frm first parent
-        Car route2 = depotsParent2[rand.nextInt(processFile.depot_count)].getCars()[rand.nextInt(processFile.vehicle_count)];   //random route from second parent
+        Car route1 = depotsParent1[random.nextInt(processFile.depot_count)].getCars()[random.nextInt(processFile.vehicle_count)];   //random route frm first parent
+        Car route2 = depotsParent2[random.nextInt(processFile.depot_count)].getCars()[random.nextInt(processFile.vehicle_count)];   //random route from second parent
 
         //sequence of customers from random route in parent 1
         ArrayList<Customer> customerSequence1 = route1.getCustomerSequence();
@@ -161,6 +166,7 @@ public class Population {
                 customerSequence2.remove(k);
             }
         }
+
 
         //Car[] parent1Cars = Car.createCopy(parent1.cars,);
         //Car[] parent2Cars = Car.createCopy(parent2.getCars());
@@ -237,6 +243,47 @@ public class Population {
            customerSequence.add(i,inverseCustomerArray[count]);
            count ++;
         }
+    }
+
+    //selects the populationsize best individuals
+    public ProposedSolution[] select(ProposedSolution[] parents, ProposedSolution[] offspring){
+
+        //list of survivors, need to be as big as the initial population count
+        ProposedSolution[] survivors = new ProposedSolution[this.populationSize];
+        ProposedSolution[] selectionPool = new ProposedSolution[parents.length+offspring.length];
+
+        //add both parents and offspring into one combined array
+        int index = offspring.length;
+        for (int i = 0; i < offspring.length; i++) {
+            selectionPool[i] = offspring[i];
+        }
+        for (int i = 0; i < parents.length; i++) {
+            selectionPool[i + index] = parents[i];
+        }
+
+        //iterate over parent and offspring lists, each time select the best individual
+        for(int i=0; i<survivors.length;i++){
+
+            //current best solution
+            ProposedSolution bestSolution = null;
+            Double bestFitness = Double.MAX_VALUE;
+            int bestSolutionIndex = -1;
+
+            //iterate over the selectionPool (parents and offspring) and select the best one each time
+            for(int j=0;j<selectionPool.length;j++){
+
+                ProposedSolution solution = selectionPool[j];
+                if(solution != null && solution.getFitness() < bestFitness){
+                    bestSolution = solution;
+                    bestFitness = solution.getFitness();
+                    bestSolutionIndex = j;
+                }
+            }
+            survivors[i] = bestSolution;
+            selectionPool[bestSolutionIndex] = null;
+        }
+
+        return survivors;
     }
 
     //calculates the euclidean distance from a to b

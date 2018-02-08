@@ -42,15 +42,17 @@ public class EvolutionaryAlgorithm {
             // @TODO make crossover method work!
             //ProposedSolution[] offspring = population.Crossover(selectedParents,mutationRate);
 
+            // Replace least-fit population with new individuals.
+            //proposedSolutions = population.select(selectedParents, offspring);
 
             // Evaluate the individual fitness of new individuals.
-//            for (ProposedSolution proposedSolution : offspring) {
-            for (ProposedSolution proposedSolution : proposedSolutions) {
-                proposedSolution.evaluateFitness();
-            }
 
-            // Replace least-fit population with new individuals.
-            // @TODO ProposedSolution[] population.select(ProposedSolution[] parents, ProposedSolution[] offspring)
+            //We probably don't need to do this here, as we need to do it for survivor selection anyway
+//            for (ProposedSolution proposedSolution : offspring) {
+            /*for (ProposedSolution proposedSolution : proposedSolutions) {
+                proposedSolution.evaluateFitness();
+            }*/
+
         }
 
         return proposedSolutions;
