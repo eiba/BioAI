@@ -22,7 +22,7 @@ public class Customer {
     public void setCustomer_nr(int customer_nr) {
         this.customer_nr = customer_nr;
     }
-    public int getCustomer_demand() {
+    public int getCustomerDemand() {
         return customer_demand;
     }
 

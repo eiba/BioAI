@@ -6,8 +6,8 @@ public class PrintSolution {
     public void Print(ProposedSolution proposedSolution){
         DecimalFormat numberFormat = new DecimalFormat("#.00");
 
-        System.out.println(proposedSolution.durationScore);
-        System.out.println(proposedSolution.customerScore);
+//        System.out.println(proposedSolution.durationScore);
+//        System.out.println(proposedSolution.customerScore);
 
         for (Depot depot : proposedSolution.depots) {
             for (Car car : depot.getCars()) {

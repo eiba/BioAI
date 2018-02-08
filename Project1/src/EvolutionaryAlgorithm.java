@@ -29,7 +29,9 @@ public class EvolutionaryAlgorithm {
         ProposedSolution[] proposedSolutions = population.generateInitialPopulation(populationSize);
 
         // Step Two: Evaluate the fitness of each individual in that population (time limit, sufficient fitness achieved, etc.)
-        // @TODO void population.evaluate(ProposedSolution[] ps)
+        for (ProposedSolution proposedSolution : proposedSolutions) {
+            proposedSolution.evaluateFitness();
+        }
 
         // Step Three: Repeat the following regeneration steps until termination:
         for (int i = 0; i < iterations; i ++) {

@@ -9,19 +9,20 @@ public class Population {
     }
 
     ProposedSolution[] generateInitialPopulation(int populationSize) {
+
+        // Initiating variables
         final ProposedSolution[] proposedSolutions = new ProposedSolution[populationSize];
 
-        //Generating a random solution for each iteration
+        // Generating a random solution for each iteration
         for (int i = 0; i < populationSize; i ++) {
-            int illegalMoves = 0;  //number of moves made that exceeds duration and load limits
 
             Depot[] depots = processFile.getDepots();
+            final ProposedSolution proposedSolution = new ProposedSolution(depots);
 
-            //Giving every customer a random car
+            // Giving every customer a random car
             for (Customer customer : processFile.customers) {
 
-
-                //Finding the closest depot
+                // Finding the closest depot
                 double bestDistance = Double.MAX_VALUE;
                 Depot bestDepot = null;
                 for (Depot depot : depots) {
@@ -32,38 +33,27 @@ public class Population {
                     }
                 }
 
-                //Selecting a random Car
+                // Selecting a random car
                 int randomIndex = new Random().nextInt(bestDepot.getCars().length);
                 Car car = bestDepot.getCars()[randomIndex];
 
-                //duration needed for car to drive home from customer
-//                double duration_to_get_home = eucledianDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY());
+                // Updating statistics for the car
                 car.addCustomerVisited(customer);
-                car.addLoad(customer.getCustomer_demand());
+                car.addLoad(customer.getCustomerDemand());
                 car.addDuration(euclideanDistance(customer.getX(), customer.getY(), car.getX(), car.getY()));
+
+                // Updating the new car position
                 car.setX(customer.getX());
                 car.setY(customer.getY());
-
-                //The car driving to the customer is actually an illegal move
-//                if((car.getMaximumDuration() != 0 && car.getMaximumDuration() < car.getCurrentDuration() + duration_to_get_home) || car.getMaximumDuration() < car.getCurrentDuration()){
-//                    illigal_moves += 1;
-//                }
             }
 
-            //Driving all cars home
-            for (Depot depot : depots) {
-                for (Car car : depot.getCars()) {
-                    car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
-
-                    //Checking how many Customers that cannot be visited by the car assigned
-                    if (car.getCurrentDuration() > car.getMaximumDuration() || car.getCurrentLoad() > car.getMaximumLoad()) {
-                        illegalMoves += car.getCustomerSequence().size();
-                    }
-                }
+            // Driving all cars back to the depots from their current positions
+            for (Car car : proposedSolution.cars) {
+                car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
             }
 
             //Add the solution to the solutions list
-            proposedSolutions[i] = new ProposedSolution(depots, illegalMoves);
+            proposedSolutions[i] = new ProposedSolution(depots);
         }
 
         return proposedSolutions;
@@ -78,7 +68,7 @@ public class Population {
         double score_sum = 0.0;
 
         for(ProposedSolution solution: solutions){
-            score_sum += 1/solution.fitnessScore;
+            score_sum += 1/solution.getFitness();
         }
 
         //for each iteration add a parent
@@ -88,7 +78,7 @@ public class Population {
 
             double cumulativeProbability = 0.0;
             for (ProposedSolution solution : solutions) {
-                cumulativeProbability +=  (1 / solution.fitnessScore) / score_sum;    //add to the cumulative probability
+                cumulativeProbability +=  (1 / solution.getFitness()) / score_sum;    //add to the cumulative probability
 
                 if (p <= cumulativeProbability) {
                     selected_parents[i] = solution;

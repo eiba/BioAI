@@ -42,7 +42,7 @@ public class Main extends Application{
         BorderPane.setAlignment(statistic, Pos.CENTER);
         double fitness = 0;
         for (ProposedSolution proposedSolution : solutions) {
-            fitness += proposedSolution.fitnessScore;
+            fitness += proposedSolution.getFitness();
         }
         fitness /= solutions.length;
         statistic.setDistance(fitness);
