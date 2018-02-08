@@ -3,14 +3,12 @@ import java.util.Random;
 public class Population {
 
     private final ProcessFile processFile;
-    private final int populationSize;
 
-    Population(ProcessFile processFile, int populationSize) {
+    Population(ProcessFile processFile) {
         this.processFile = processFile;
-        this.populationSize = populationSize;
     }
 
-    ProposedSolution[] generateInitialPopulation() {
+    ProposedSolution[] generateInitialPopulation(int populationSize) {
         final ProposedSolution[] proposedSolutions = new ProposedSolution[populationSize];
 
         //Generating a random solution for each iteration

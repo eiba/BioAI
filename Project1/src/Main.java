@@ -21,15 +21,14 @@ public class Main extends Application{
         primaryStage.setScene(scene);
         primaryStage.setTitle("IT3708 - Assignment 1");
 
-        //Execute the evolutionary algorithm
+        //Initiate the evolutionary algorithm
+        EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/p01");
 
-        EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/p01",100);
+        //Run the evolutionary algorithm
+        ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 100);
 
         //Get all the data from the data set
         ProcessFile processFile = evolutionaryAlgorithm.processFile;
-
-        //Print one of the solutions found
-        //new PrintSolution().Print(e.proposedSolutions[0]);
 
         //Create a new graph
         Graph graph = new Graph(700, 500, processFile.minX, processFile.minY, processFile.maxX, processFile.maxY);
@@ -42,14 +41,15 @@ public class Main extends Application{
         Statistic statistic = new Statistic();
         BorderPane.setAlignment(statistic, Pos.CENTER);
         double fitness = 0;
-        for (ProposedSolution proposedSolution : evolutionaryAlgorithm.proposedSolutions) {
+        for (ProposedSolution proposedSolution : solutions) {
             fitness += proposedSolution.fitnessScore;
         }
-        fitness /= evolutionaryAlgorithm.proposedSolutions.length;
+        fitness /= solutions.length;
         statistic.setDistance(fitness);
         borderPane.setBottom(statistic);
 
-        graph.setRoutes(evolutionaryAlgorithm.proposedSolutions[0]);
+        //Display one of the solutions
+        graph.setRoutes(solutions[0]);
 
         primaryStage.getIcons().add(new Image("elster2.png"));
         primaryStage.show();
