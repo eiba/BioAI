@@ -43,7 +43,7 @@ public class ProposedSolution {
             String s = car.getDepot().getDepot_nr() + " " + car.getVehicleNumber() + " " + numberFormat.format(car.getCurrentDuration()) + " " + car.getCurrentLoad();
             StringBuilder customerSequence = new StringBuilder(" ");
             for(int m = 0; m < car.getCustomerSequence().size(); m++){
-                customerSequence.append(car.getCustomerSequence().get(m).getCustomer_nr()).append(" ");
+                customerSequence.append(car.getCustomerSequence().get(m).getCustomerNr()).append(" ");
             }
             stringBuilder.append(s).append(customerSequence.toString()).append("\n");
         }

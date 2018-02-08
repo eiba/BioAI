@@ -1,12 +1,15 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Population {
 
     private final ProcessFile processFile;
+    private final Random random;
 
     Population(ProcessFile processFile) {
         this.processFile = processFile;
+        random = new Random();
     }
 
     ProposedSolution[] generateInitialPopulation(int populationSize) {
@@ -17,47 +20,66 @@ public class Population {
         // Generating a random solution for each iteration
         for (int i = 0; i < populationSize; i ++) {
 
-            Depot[] depots = processFile.getDepots();
-            final ProposedSolution proposedSolution = new ProposedSolution(depots);
-
-            // Giving every customer a random car
-            for (Customer customer : processFile.customers) {
-
-                // Finding the closest depot
-                double bestDistance = Double.MAX_VALUE;
-                Depot bestDepot = null;
-                for (Depot depot : depots) {
-                    double distance = euclideanDistance(customer.getX(), customer.getY(), depot.getX(), depot.getY());
-                    if (distance < bestDistance || bestDepot == null) {
-                        bestDistance = distance;
-                        bestDepot = depot;
-                    }
-                }
-
-                // Selecting a random car
-                int randomIndex = new Random().nextInt(bestDepot.getCars().length);
-                Car car = bestDepot.getCars()[randomIndex];
-
-                // Updating statistics for the car
-                car.addCustomerVisited(customer);
-                car.addLoad(customer.getCustomerDemand());
-                car.addDuration(euclideanDistance(customer.getX(), customer.getY(), car.getX(), car.getY()));
-
-                // Updating the new car position
-                car.setX(customer.getX());
-                car.setY(customer.getY());
-            }
-
-            // Driving all cars back to the depots from their current positions
-            for (Car car : proposedSolution.cars) {
-                car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
-            }
-
             //Add the solution to the solutions list
-            proposedSolutions[i] = new ProposedSolution(depots);
+            ProposedSolution proposedSolution;
+            do {
+                proposedSolution = generateSolution();
+            }
+            while (proposedSolution == null);
+            proposedSolutions[i] = generateSolution();
         }
 
         return proposedSolutions;
+    }
+
+    private ProposedSolution generateSolution() {
+
+        final Depot[] depots = processFile.getDepots();
+        final ProposedSolution proposedSolution = new ProposedSolution(depots);
+
+        final ArrayList<Customer> customers = new ArrayList<>(Arrays.asList(processFile.customers));
+        while (!customers.isEmpty()) {
+
+            // Selecting a random customer
+            Customer customer = customers.remove(random.nextInt(customers.size()));
+
+            // Finding the closest eligible car
+            double bestDistance = Double.MAX_VALUE;
+            Car bestCar = null;
+            for (Car car : proposedSolution.cars) {
+
+                double distance = euclideanDistance(customer.getX(), customer.getY(), car.getX(), car.getY());
+                if (distance < bestDistance || bestCar == null) {
+
+                    // Check if the car currently in consideration is actually eligible to serve the customer
+                    if (car.isEligible(customer)) {
+                        bestDistance = distance;
+                        bestCar = car;
+                    }
+                }
+            }
+
+            // Check if no car was eligible to serve the customer
+            if (bestCar == null) {
+                return null;
+            }
+
+            // Updating statistics for the car
+            bestCar.addCustomerVisited(customer);
+            bestCar.addLoad(customer.getDemand());
+            bestCar.addDuration(euclideanDistance(customer.getX(), customer.getY(), bestCar.getX(), bestCar.getY()));
+
+            // Updating the new car position
+            bestCar.setX(customer.getX());
+            bestCar.setY(customer.getY());
+        }
+
+        // Driving all cars back to the depots from their current positions
+        for (Car car : proposedSolution.cars) {
+            car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
+        }
+
+        return proposedSolution;
     }
 
     public ProposedSolution[] selectParent(ProposedSolution[] solutions){
@@ -170,7 +192,7 @@ public class Population {
     }
 
     //calculates the euclidean distance from a to b
-    private static double euclideanDistance(int x1, int y1, int x2, int y2){
+    static double euclideanDistance(int x1, int y1, int x2, int y2){
 
         double x_travelled = Math.abs(x1 - x2);
         double y_travelled = Math.abs(y1 - y2);
