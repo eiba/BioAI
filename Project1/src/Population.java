@@ -79,8 +79,8 @@ public class Population {
         // Driving all cars back to the depots from their current positions
         for (Car car : proposedSolution.cars) {
             car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
-            //car.setX(car.getDepot().getX());
-            //car.setY(car.getDepot().getY());
+            car.setX(car.getDepot().getX());
+            car.setY(car.getDepot().getY());
         }
 
         return proposedSolution;
@@ -143,46 +143,80 @@ public class Population {
     //@TODO proper copulate method. Create new ProposedSolution objects as we need the old ones for survivor selection
     public ProposedSolution copulate(ProposedSolution parent1, ProposedSolution parent2){
 
-        //Random rand = new Random();
-
         Depot[] depotsParent1 = new Depot[processFile.depot_count]; //all depots in the first parent
         Depot[] depotsParent2 = new Depot[processFile.depot_count]; //all depots in second parent
 
-
+        //We need to create depots for a new solution without altering the old one.
         for(int i=0;i<parent1.depots.length;i++){
             depotsParent1[i] = new Depot(parent1.depots[i]);
             depotsParent2[i] = new Depot(parent2.depots[i]);
         }
 
-        Car route1 = depotsParent1[random.nextInt(processFile.depot_count)].getCars()[random.nextInt(processFile.vehicle_count)];   //random route frm first parent
-        Car route2 = depotsParent2[random.nextInt(processFile.depot_count)].getCars()[random.nextInt(processFile.vehicle_count)];   //random route from second parent
+        Car route1Car = parent1.cars[random.nextInt(parent1.cars.length)];   //random route from first parent
+        Car route2Car = parent2.cars[random.nextInt(parent2.cars.length)];
 
-        //sequence of customers from random route in parent 1
-        ArrayList<Customer> customerSequence1 = route1.getCustomerSequence();
-        //System.out.println(customerSequence1.size());
+        ArrayList<Customer> route1Sequence = route1Car.getCustomerSequence();
+        ArrayList<Customer> route2Sequence = route2Car.getCustomerSequence();
 
-        for(int j=0;j<customerSequence1.size();j++){
-            Customer customer = customerSequence1.get(j);
+        ArrayList<Car> route1List = new ArrayList<>();
 
-            //sequence of customers from random route in parent 2
-            ArrayList<Customer> customerSequence2 = route2.getCustomerSequence();
+        Car bestCar = null;
+        Customer insertedCustomer = null;
+        Double bestDuration = Double.MAX_VALUE;
 
-            for(int k=0; k<customerSequence2.size();k++){
-                customerSequence2.add(k,customer);
-                //compute stuff;
-                customerSequence2.remove(k);
+        for(int k=0;k<route2Sequence.size();k++){
+            Customer insertionElement = route2Sequence.get(k);
+
+            for(int j=0;j<route1Sequence.size()+1;j++){
+                //int insertionIndex = 0;
+                ArrayList<Customer> newRoute = new ArrayList<>();
+
+                for(int i=0;i<route1Sequence.size();i++){
+                    if(i == j){
+                        newRoute.add(insertionElement);
+                        newRoute.add(route1Sequence.get(i));
+                    }else{
+                        newRoute.add(route1Sequence.get(i));
+                    }
+                    if(j == route1Sequence.size()){
+                        newRoute.add(insertionElement);
+                    }
+                }
+
+                Car car = evaluateRoute(newRoute,route1Car);
+                if(car.getCurrentDuration() < bestDuration){
+                    bestDuration = car.getCurrentDuration();
+                    bestCar = car;
+                    insertedCustomer = insertionElement;
+                }
+                //insertionIndex +=1;
+                //route1List.add(car);
             }
         }
 
+        ProposedSolution child = new ProposedSolution(depotsParent1);
 
-        //Car[] parent1Cars = Car.createCopy(parent1.cars,);
-        //Car[] parent2Cars = Car.createCopy(parent2.getCars());
+        return parent1;
+    }
+
+    //evaluates one customer route
+    public Car evaluateRoute(ArrayList<Customer> route, Car car){
+
+        Car newCar = new Car(car.getVehicleNumber(),car.getMaximumLoad(),car.getMaximumDuration(),car.getDepot());
+
+        for(Customer customer: route){
+            newCar.addDuration(euclideanDistance(newCar.getX(),newCar.getY(),customer.getX(),customer.getY()));
+            newCar.addLoad(customer.getDemand());
+            newCar.setX(customer.getX());
+            newCar.setY(customer.getY());
+            newCar.addCustomerVisited(customer);
+        }
+        newCar.addDuration(euclideanDistance(car.getX(),car.getY(),car.getDepot().getX(),car.getDepot().getY()));
+        newCar.setX(car.getDepot().getX());
+        newCar.setY(car.getDepot().getY());
 
 
-        //Car route1 = Car.createCopy(parent1Cars[rand.nextInt(parent1Cars.length)]);
-        //Car route2 = parent2Cars[rand.nextInt(parent2Cars.length)];
-
-        return null;
+        return newCar;
     }
 
     //Mutate children
@@ -308,6 +342,8 @@ public class Population {
 
             //Driving the car home :)
             car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
+            car.setX(car.getDepot().getX());
+            car.setY(car.getDepot().getY());
         }
 
         //evaluate the total fitness of the population

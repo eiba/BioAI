@@ -22,7 +22,7 @@ public class Main extends Application{
         primaryStage.setTitle("IT3708 - Assignment 1");
 
         //Initiate the evolutionary algorithm
-        EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/p02");
+        EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/p01");
 
         //Run the evolutionary algorithm
         ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,100);
