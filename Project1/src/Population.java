@@ -167,6 +167,54 @@ public class Population {
     public void inverseMutation(ProposedSolution solution){
 
         //implement inverse mutation
+        Random rand = new Random();
+
+        //get random car
+        Car car = solution.cars[rand.nextInt(solution.cars.length)];
+
+        //route of selected car
+        ArrayList<Customer> customerSequence = car.getCustomerSequence();
+
+        //if there is only one car, two cars or no cars in the sequence, no point in inversing, we just return
+        if(customerSequence.size() < 3){
+            return;
+        }
+
+        int startIndex = rand.nextInt(customerSequence.size()); //startindex of reverse
+        int endIndex = rand.nextInt(customerSequence.size());   //end index
+
+        //if start index is greater than the end index we selected, swap them
+        if(startIndex > endIndex){
+            int tmp = startIndex;
+            startIndex = endIndex;
+            endIndex = tmp;
+        }
+        else if(startIndex == endIndex){  //if they are equal we increase the end index by one if possible (as long as it's not already at the last array element, then we decrease the start index instead)
+            if(endIndex < customerSequence.size() - 1){
+                endIndex++;
+            }
+            else{
+                startIndex--;
+            }
+        }
+        //no point in reversing the whole route. Start index should then be
+        if(startIndex == 0 && endIndex == customerSequence.size() -1){
+            startIndex ++;
+        }
+
+        //create an array with the inverse route section.
+        Customer[] inverseCustomerArray = new Customer[endIndex-startIndex + 1];
+        int count = 0;
+        for(int i=endIndex; i > startIndex-1; i--){
+            inverseCustomerArray[count] = customerSequence.get(i);
+            count++;
+        }
+        count = 0;
+        //add all the elements to the arraylist in reverse order.
+        for(int i=startIndex; i < endIndex+1; i++){
+           customerSequence.add(i,inverseCustomerArray[count]);
+           count ++;
+        }
     }
 
     //calculates the euclidean distance from a to b
