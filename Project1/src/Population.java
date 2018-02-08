@@ -79,6 +79,8 @@ public class Population {
         // Driving all cars back to the depots from their current positions
         for (Car car : proposedSolution.cars) {
             car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
+            //car.setX(car.getDepot().getX());
+            //car.setY(car.getDepot().getY());
         }
 
         return proposedSolution;
@@ -129,6 +131,11 @@ public class Population {
 
         // mutate the children
         mutate(children, mutationRate);
+
+        //after creating and mutating children, we score them.
+        for(ProposedSolution child: children){
+            scoreSolution(child);
+        }
 
         return children;
     }
@@ -189,7 +196,6 @@ public class Population {
                 inverseMutation(solution);
             }
         }
-        //return soulutions;
     }
 
     public void inverseMutation(ProposedSolution solution){
@@ -245,7 +251,7 @@ public class Population {
         }
     }
 
-    //selects the populationsize best individuals
+    //selects the population size best individuals
     public ProposedSolution[] select(ProposedSolution[] parents, ProposedSolution[] offspring){
 
         //list of survivors, need to be as big as the initial population count
@@ -284,6 +290,28 @@ public class Population {
         }
 
         return survivors;
+    }
+
+    //Score a solution. Calculate durations, loads and fitness score
+    public void scoreSolution(ProposedSolution solution){
+
+        //iterate over all cars in solution, and all customers in each car and add the loads and durations.
+        for(Car car: solution.cars){
+            ArrayList<Customer> customerSequence = car.getCustomerSequence();
+
+            for (Customer customer:customerSequence){
+                car.addLoad(customer.getDemand());
+                car.addDuration(euclideanDistance(customer.getX(), customer.getY(), car.getX(), car.getY()));
+                car.setX(customer.getX());
+                car.setY(customer.getY());
+            }
+
+            //Driving the car home :)
+            car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
+        }
+
+        //evaluate the total fitness of the population
+        solution.evaluateFitness();
     }
 
     //calculates the euclidean distance from a to b

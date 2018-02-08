@@ -47,7 +47,7 @@ public class EvolutionaryAlgorithm {
 
             // Evaluate the individual fitness of new individuals.
 
-            //We probably don't need to do this here, as we need to do it for survivor selection anyway
+            //We probably don't need to do this here, as we need to do it after crossover anyway.
 //            for (ProposedSolution proposedSolution : offspring) {
             /*for (ProposedSolution proposedSolution : proposedSolutions) {
                 proposedSolution.evaluateFitness();
