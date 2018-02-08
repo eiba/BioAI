@@ -23,7 +23,7 @@ public class EvolutionaryAlgorithm {
 
     }
 
-    ProposedSolution[] iterate(int populationSize, int iterations) {
+    ProposedSolution[] iterate(int populationSize, double mutationRate, int iterations) {
 
         // Step One: Generate the initial population of individuals randomly. (First generation)
         ProposedSolution[] proposedSolutions = population.generateInitialPopulation(populationSize);
@@ -39,8 +39,8 @@ public class EvolutionaryAlgorithm {
             ProposedSolution[] selectedParents = population.selectParent(proposedSolutions);
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
-            // @TODO Change Crossover from Class to method inside Population class
-            ProposedSolution[] offspring = new Crossover(processFile).Crossover(selectedParents);
+            // @TODO make crossover method work!
+            ProposedSolution[] offspring = population.Crossover(selectedParents);
 
             // Evaluate the individual fitness of new individuals.
             for (ProposedSolution proposedSolution : offspring) {
