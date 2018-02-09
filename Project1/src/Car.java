@@ -15,7 +15,7 @@ public class Car {
         this.currentDuration = 0.0;
         this.x = depot.getX();
         this.y = depot.getY();
-        this.customerSequence = new ArrayList<>();
+        this.customerSequence = new ArrayList<Customer>();
 
         if(maximumDuration == 0){
             this.maximumDuration = Integer.MAX_VALUE;

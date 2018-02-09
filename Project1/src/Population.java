@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 
 public class Population {
 
@@ -135,6 +132,7 @@ public class Population {
 
         //after creating and mutating children, we score them.
         for(ProposedSolution child: children){
+
             scoreSolution(child);
         }
 
@@ -163,9 +161,61 @@ public class Population {
         int route2Index = random.nextInt(parent2Copy.cars.length);
         Car route2Car = parent1Copy.cars[route2Index];   //random route from second parent
 
+        ArrayList<Customer> route1Sequence = route1Car.getCustomerSequence();
+        ArrayList<Customer> route2Sequence = route2Car.getCustomerSequence();
+/*
+        route1Sequence.removeAll(route2Sequence);
+        if(route1Sequence.size() == 0 || route2Sequence.size() == 0){
+            return parent1Copy;
+        }
+
+        Car[] newCars = new Car[route1Sequence.size() +1];
+        for(int i=0;i<route1Sequence.size()+1;i++){
+
+            route1Sequence.addAll(i,route2Sequence);
+            newCars[i] = evaluateRoute(route1Sequence,route1Car);
+            route1Sequence.removeAll(route2Sequence);
+
+        }
+
+        Car bestCar = route1Car;
+        Double bestDuration = Double.MAX_VALUE;
+
+        for(Car car: newCars){
+            if( car != null && car.getCurrentDuration() < bestDuration){
+                bestDuration = car.getCurrentDuration();
+                bestCar = car;
+            }
+        }
+
+        for(Car car: parent1Copy.cars){
+            car.getCustomerSequence().removeAll(bestCar.getCustomerSequence());
+        }
+
+        parent1Copy.cars[route1Index] = bestCar;*/
+
+        return parent1Copy;
+    }
 
 
-        return parent1;
+
+    //evaluates one customer route
+    public Car evaluateRoute(ArrayList<Customer> route, Car car){
+
+        Car newCar = new Car(car.getVehicleNumber(),car.getMaximumLoad(),car.getMaximumDuration(),car.getDepot());
+
+        for(Customer customer: route){
+            newCar.addDuration(euclideanDistance(newCar.getX(),newCar.getY(),customer.getX(),customer.getY()));
+            newCar.addLoad(customer.getDemand());
+            newCar.setX(customer.getX());
+            newCar.setY(customer.getY());
+            newCar.addCustomerVisited(customer);
+        }
+        newCar.addDuration(euclideanDistance(car.getX(),car.getY(),car.getDepot().getX(),car.getDepot().getY()));
+        newCar.setX(car.getDepot().getX());
+        newCar.setY(car.getDepot().getY());
+
+        return newCar;
     }
 
     public HashMap<Customer,Car> convertToGenotype(ProposedSolution solution){
@@ -191,27 +241,6 @@ public class Population {
     public ProposedSolution convertToPhenotype(HashMap<Customer,Car> genotype){
 
         return null;
-    }
-
-
-    //evaluates one customer route
-    public Car evaluateRoute(ArrayList<Customer> route, Car car){
-
-        Car newCar = new Car(car.getVehicleNumber(),car.getMaximumLoad(),car.getMaximumDuration(),car.getDepot());
-
-        for(Customer customer: route){
-            newCar.addDuration(euclideanDistance(newCar.getX(),newCar.getY(),customer.getX(),customer.getY()));
-            newCar.addLoad(customer.getDemand());
-            newCar.setX(customer.getX());
-            newCar.setY(customer.getY());
-            newCar.addCustomerVisited(customer);
-        }
-        newCar.addDuration(euclideanDistance(car.getX(),car.getY(),car.getDepot().getX(),car.getDepot().getY()));
-        newCar.setX(car.getDepot().getX());
-        newCar.setY(car.getDepot().getY());
-
-
-        return newCar;
     }
 
     //Mutate children
