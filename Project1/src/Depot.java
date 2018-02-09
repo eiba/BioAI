@@ -12,13 +12,18 @@ public class Depot {
         this.maximum_load = maximum_load;
     }
 
-    Depot(Depot depot) {
+    Depot(Depot depot, boolean cleanCopy) {
         this.maximum_duration = depot.maximum_duration;
         this.maximum_load = depot.maximum_load;
         this.x = depot.x;
         this.y = depot.y;
         this.depot_nr = depot.depot_nr;
-        this.cars = Car.createCopy(depot.cars, this);
+        if(cleanCopy) {
+            this.cars = Car.createCopy(depot.cars, this);
+        }
+        else{
+            this.cars = Car.createCopyWithCustomers(depot.cars,this);
+        }
     }
 
     public int getMaximum_duration() {

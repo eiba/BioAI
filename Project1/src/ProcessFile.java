@@ -163,7 +163,7 @@ public class ProcessFile {
 
         for (int i = 0; i < depots.length; i ++) {
             Depot depot = depots[i];
-            copy[i] = new Depot(depot);
+            copy[i] = new Depot(depot,true);
         }
 
         return copy;

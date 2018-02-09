@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 
 public class Population {
@@ -119,7 +120,7 @@ public class Population {
 
     public ProposedSolution[] Crossover(ProposedSolution[] solutions, double mutationRate){
 
-        ProposedSolution[] children = new ProposedSolution[solutions.length*5];
+        ProposedSolution[] children = new ProposedSolution[solutions.length];
         Random rand = new Random();
 
         for(int i=0;i<children.length;i++){
@@ -130,7 +131,7 @@ public class Population {
         }
 
         // mutate the children
-        mutate(children, mutationRate);
+        mutate(solutions, mutationRate);
 
         //after creating and mutating children, we score them.
         for(ProposedSolution child: children){
@@ -143,61 +144,55 @@ public class Population {
     //@TODO proper copulate method. Create new ProposedSolution objects as we need the old ones for survivor selection
     public ProposedSolution copulate(ProposedSolution parent1, ProposedSolution parent2){
 
+
         Depot[] depotsParent1 = new Depot[processFile.depot_count]; //all depots in the first parent
-        Depot[] depotsParent2 = new Depot[processFile.depot_count]; //all depots in second parent
+        Depot[] depotsParent2 = new Depot[processFile.depot_count]; //all depots in the second parent
 
         //We need to create depots for a new solution without altering the old one.
         for(int i=0;i<parent1.depots.length;i++){
-            depotsParent1[i] = new Depot(parent1.depots[i]);
-            depotsParent2[i] = new Depot(parent2.depots[i]);
+            depotsParent1[i] = new Depot(parent1.depots[i],false);
+            depotsParent2[i] = new Depot(parent2.depots[i],false);
+
         }
+        ProposedSolution parent1Copy = new ProposedSolution(depotsParent1);
+        ProposedSolution parent2Copy = new ProposedSolution(depotsParent2);
 
-        Car route1Car = parent1.cars[random.nextInt(parent1.cars.length)];   //random route from first parent
-        Car route2Car = parent2.cars[random.nextInt(parent2.cars.length)];
+        int route1Index = random.nextInt(parent1Copy.cars.length);
+        Car route1Car = parent1Copy.cars[route1Index];   //random route from first parent
 
-        ArrayList<Customer> route1Sequence = route1Car.getCustomerSequence();
-        ArrayList<Customer> route2Sequence = route2Car.getCustomerSequence();
+        int route2Index = random.nextInt(parent2Copy.cars.length);
+        Car route2Car = parent1Copy.cars[route2Index];   //random route from second parent
 
-        ArrayList<Car> route1List = new ArrayList<>();
 
-        Car bestCar = null;
-        Customer insertedCustomer = null;
-        Double bestDuration = Double.MAX_VALUE;
-
-        for(int k=0;k<route2Sequence.size();k++){
-            Customer insertionElement = route2Sequence.get(k);
-
-            for(int j=0;j<route1Sequence.size()+1;j++){
-                //int insertionIndex = 0;
-                ArrayList<Customer> newRoute = new ArrayList<>();
-
-                for(int i=0;i<route1Sequence.size();i++){
-                    if(i == j){
-                        newRoute.add(insertionElement);
-                        newRoute.add(route1Sequence.get(i));
-                    }else{
-                        newRoute.add(route1Sequence.get(i));
-                    }
-                    if(j == route1Sequence.size()){
-                        newRoute.add(insertionElement);
-                    }
-                }
-
-                Car car = evaluateRoute(newRoute,route1Car);
-                if(car.getCurrentDuration() < bestDuration){
-                    bestDuration = car.getCurrentDuration();
-                    bestCar = car;
-                    insertedCustomer = insertionElement;
-                }
-                //insertionIndex +=1;
-                //route1List.add(car);
-            }
-        }
-
-        ProposedSolution child = new ProposedSolution(depotsParent1);
 
         return parent1;
     }
+
+    public HashMap<Customer,Car> convertToGenotype(ProposedSolution solution){
+
+        HashMap<Customer,Car> genotype = new HashMap<>();
+        Depot[] depotsParent = new Depot[processFile.depot_count]; //all depots in the parent
+
+        for(int i=0;i<solution.depots.length;i++){
+            depotsParent[i] = new Depot(solution.depots[i],false);
+        }
+
+        for(Depot depot: depotsParent){
+            for(Car car: depot.getCars()){
+                for(Customer customer: car.getCustomerSequence()){
+                    genotype.put(customer,car);
+                }
+            }
+        }
+
+        return genotype;
+    }
+
+    public ProposedSolution convertToPhenotype(HashMap<Customer,Car> genotype){
+
+        return null;
+    }
+
 
     //evaluates one customer route
     public Car evaluateRoute(ArrayList<Customer> route, Car car){
@@ -233,7 +228,6 @@ public class Population {
     }
 
     public void inverseMutation(ProposedSolution solution){
-
         //implement inverse mutation
         Random rand = new Random();
 
@@ -280,6 +274,7 @@ public class Population {
         count = 0;
         //add all the elements to the arraylist in reverse order.
         for(int i=startIndex; i < endIndex+1; i++){
+            customerSequence.remove(i);
            customerSequence.add(i,inverseCustomerArray[count]);
            count ++;
         }

@@ -35,6 +35,21 @@ public class Car {
         return copy;
     }
 
+    static Car[] createCopyWithCustomers(Car[] cars, Depot depot) {
+        Car[] copy = new Car[cars.length];
+        for (int i = 0; i < cars.length; i ++) {
+            Car car = cars[i];
+            copy[i] = new Car(car.vehicleNumber, car.maximumLoad, car.maximumDuration, depot);
+
+            ArrayList<Customer> customerList = car.getCustomerSequence();
+
+            for (Customer customer: customerList){
+                copy[i].getCustomerSequence().add(customer);
+            }
+        }
+        return copy;
+    }
+
     void addDuration(double duration) {
         currentDuration += duration;
     }
