@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.stream.Stream;
 
 public class ProcessFile {
@@ -10,8 +9,8 @@ public class ProcessFile {
     private int depots_finished = 0;
 
     public int vehicle_count;
-    public int customer_count;
-    public int depot_count;
+    public int customerCount;
+    public int depotCount;
     public Depot depots[];
     public Customer customers[];
     public Car cars[];
@@ -41,19 +40,19 @@ public class ProcessFile {
             String[] first_line = line.split(" ");
 
             this.vehicle_count = Integer.parseInt(first_line[0]);
-            this.customer_count = Integer.parseInt(first_line[1]);
-            this.depot_count = Integer.parseInt(first_line[2]);
-            this.depots = new Depot[this.depot_count];
-            this.customers = new Customer[this.customer_count];
-            this.cars = new Car[this.vehicle_count*this.depot_count];
+            this.customerCount = Integer.parseInt(first_line[1]);
+            this.depotCount = Integer.parseInt(first_line[2]);
+            this.depots = new Depot[this.depotCount];
+            this.customers = new Customer[this.customerCount];
+            this.cars = new Car[this.vehicle_count*this.depotCount];
 
         }
-        else if(line_number > 0 && line_number < depot_count + 1){
+        else if(line_number > 0 && line_number < depotCount + 1){
             String[] depot_line = line.split(" ");
             Depot depot = new Depot(Integer.parseInt(depot_line[0]),Integer.parseInt(depot_line[1]));
             this.depots[line_number -1] = depot;
         }
-        else if(line_number > depot_count && line_number < depot_count + customer_count + 1){
+        else if(line_number > depotCount && line_number < depotCount + customerCount + 1){
             String[] customer_line_unprocessed = line.split(" ");
             int[] customer_line = new int[5];
             int count = 0;
@@ -85,9 +84,9 @@ public class ProcessFile {
                 this.minY = customerY;
             }
 
-            this.customers[line_number - depot_count - 1] = customer;
+            this.customers[line_number - depotCount - 1] = customer;
         }
-        else if(line_number > depot_count + customer_count && line_number < (depot_count*2) + customer_count + 1){
+        else if(line_number > depotCount + customerCount && line_number < (depotCount *2) + customerCount + 1){
             String[] depot_line_unprocessed = line.split(" ");
             int[] depot_line = new int[3];
 

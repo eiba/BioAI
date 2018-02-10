@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
+import java.util.*;
 
 public class Population {
 
@@ -16,6 +14,27 @@ public class Population {
 
         // Initiating variables
         final ProposedSolution[] proposedSolutions = new ProposedSolution[populationSize];
+
+        // Grouping customers to depots
+        final HashMap<Integer, int[]> preferedCustomerDepots = new HashMap<>();
+        for (Customer customer : processFile.customers) {
+            final Depot[] depots = processFile.getDepots();
+            final int[] depotNumbers = new int[processFile.depotCount];
+
+            Comparator<Depot> distanceComparator = new Comparator<Depot>() {
+                @Override
+                public int compare(Depot o1, Depot o2) {
+                    return (int) (euclideanDistance(customer.getX(), customer.getY(), o1.getX(), o1.getY()) - euclideanDistance(customer.getX(), customer.getY(), o2.getX(), o2.getY()));
+                }
+            };
+            Arrays.sort(depots, distanceComparator);
+            for (int i = 0; i < depotNumbers.length; i ++) {
+                depotNumbers[i] = depots[i].getDepot_nr();
+            }
+
+            preferedCustomerDepots.put(customer.getCustomerNr(), depotNumbers);
+        }
+
 
         // Generating a random solution for each iteration
         for (int i = 0; i < populationSize; i ++) {
@@ -133,8 +152,8 @@ public class Population {
 
         Random rand = new Random();
 
-        Depot[] depotsParent1 = new Depot[processFile.depot_count]; //all depots in the first parent
-        Depot[] depotsParent2 = new Depot[processFile.depot_count]; //all depots in second parent
+        Depot[] depotsParent1 = new Depot[processFile.depotCount]; //all depots in the first parent
+        Depot[] depotsParent2 = new Depot[processFile.depotCount]; //all depots in second parent
 
 
         for(int i=0;i<parent1.depots.length;i++){
@@ -142,8 +161,8 @@ public class Population {
             depotsParent2[i] = new Depot(parent2.depots[i]);
         }
 
-        Car route1 = depotsParent1[rand.nextInt(processFile.depot_count)].getCars()[rand.nextInt(processFile.vehicle_count)];   //random route frm first parent
-        Car route2 = depotsParent2[rand.nextInt(processFile.depot_count)].getCars()[rand.nextInt(processFile.vehicle_count)];   //random route from second parent
+        Car route1 = depotsParent1[rand.nextInt(processFile.depotCount)].getCars()[rand.nextInt(processFile.vehicle_count)];   //random route frm first parent
+        Car route2 = depotsParent2[rand.nextInt(processFile.depotCount)].getCars()[rand.nextInt(processFile.vehicle_count)];   //random route from second parent
 
         //sequence of customers from random route in parent 1
         ArrayList<Customer> customerSequence1 = route1.getCustomerSequence();
@@ -192,7 +211,7 @@ public class Population {
     }
 
     //calculates the euclidean distance from a to b
-    static double euclideanDistance(int x1, int y1, int x2, int y2){
+    static double euclideanDistance(double x1, double y1, double x2, double y2){
 
         double x_travelled = Math.abs(x1 - x2);
         double y_travelled = Math.abs(y1 - y2);

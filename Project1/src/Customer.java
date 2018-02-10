@@ -3,16 +3,15 @@ public class Customer {
     private int customerNr;
     private int x;
     private int y;
-    private int seriviceDuration;
+    private int serviceDuration;
     private int demand;
 
-    public Customer(int customerNr, int x, int y, int seriviceDuration, int demand){
+    public Customer(int customerNr, int x, int y, int serviceDuration, int demand){
         this.customerNr = customerNr;
         this.x = x;
         this.y = y;
-        this.seriviceDuration = seriviceDuration;
+        this.serviceDuration = serviceDuration;
         this.demand = demand;
-
     }
 
     public int getCustomerNr() {
@@ -31,12 +30,12 @@ public class Customer {
         this.demand = demand;
     }
 
-    public int getSeriviceDuration() {
-        return seriviceDuration;
+    public int getServiceDuration() {
+        return serviceDuration;
     }
 
-    public void setSeriviceDuration(int seriviceDuration) {
-        this.seriviceDuration = seriviceDuration;
+    public void setServiceDuration(int serviceDuration) {
+        this.serviceDuration = serviceDuration;
     }
 
     public int getY() {
