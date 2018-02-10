@@ -259,13 +259,9 @@ public class Population {
             return parent1Copy;
         }
 
-<<<<<<< HEAD
-        Car route1 = depotsParent1[rand.nextInt(processFile.depotCount)].getCars()[rand.nextInt(processFile.vehicle_count)];   //random route frm first parent
-        Car route2 = depotsParent2[rand.nextInt(processFile.depotCount)].getCars()[rand.nextInt(processFile.vehicle_count)];   //random route from second parent
-=======
         Car[] newCars = new Car[route1Sequence.size() +1];
         for(int i=0;i<route1Sequence.size()+1;i++){
->>>>>>> 7da11b9cdc069503fa602a79d6995197733f6905
+
 
             route1Sequence.addAll(i,insertionRoute);
             newCars[i] = evaluateRoute(route1Sequence,route1Car);
