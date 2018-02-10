@@ -66,7 +66,13 @@ public class Car {
         customerSequence.add(index, customer);
         currentDuration = checkDistance(customer, index);
     }
-
+    //Check wether a car is valid
+    Boolean checkValidity(){
+        if(this.currentDuration <= this.maximumDuration && this.currentLoad <= this.maximumLoad){
+            return true;
+        }
+        return false;
+    }
     /**
      * Check if a customer can be added to a route and where it will be of lowest extra duration
      * @param customer

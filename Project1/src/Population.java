@@ -259,16 +259,28 @@ public class Population {
             return parent1Copy;
         }
 
+
+        /*for(Car car: parent1Copy.cars){
+            ArrayList<Customer> customersToRemove = new ArrayList<>();
+            for(Customer customer1: car.getCustomerSequence()){
+                for(Customer customer2: insertionRoute){
+                    if(customer1 == customer2){
+                        customersToRemove.add(customer1);
+                    }
+                }
+            }
+            car.getCustomerSequence().removeAll(customersToRemove);
+        }*/
+
         Car[] newCars = new Car[route1Sequence.size() +1];
         for(int i=0;i<route1Sequence.size()+1;i++){
-
-
             route1Sequence.addAll(i,insertionRoute);
             newCars[i] = evaluateRoute(route1Sequence,route1Car);
             route1Sequence.removeAll(insertionRoute);
 
         }
-        Car bestCar = route1Car;
+
+        Car bestCar = null;
         Double bestDuration = Double.MAX_VALUE;
 
         for(Car car: newCars){
@@ -346,11 +358,21 @@ public class Population {
 
     public void inverseMutation(ProposedSolution solution){
         //implement inverse mutation
-        //Random rand = new Random();
 
         //get random car
         Car car = solution.cars[random.nextInt(solution.cars.length)];
 
+        int iter = 0;
+        //make sure that we get list with more than 2 customers or else there is no point in inverting
+        while (car.getCustomerSequence().size() < 3){
+            car = solution.cars[random.nextInt(solution.cars.length)];
+
+            //I give up, return.
+            if(iter > solution.cars.length){
+                return;
+            }
+            iter++;
+        }
         //route of selected car
         ArrayList<Customer> customerSequence = car.getCustomerSequence();
 
@@ -474,6 +496,8 @@ public class Population {
 
         //iterate over all cars in solution, and all customers in each car and add the loads and durations.
         for(Car car: solution.cars){
+            //car.setX(car.getDepot().getX());
+            //car.setY(car.getDepot().getY());
             ArrayList<Customer> customerSequence = car.getCustomerSequence();
 
             for (Customer customer:customerSequence){
@@ -485,8 +509,6 @@ public class Population {
 
             //Driving the car home :)
             car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
-            car.setX(car.getDepot().getX());
-            car.setY(car.getDepot().getY());
         }
 
         //evaluate the total fitness of the population
