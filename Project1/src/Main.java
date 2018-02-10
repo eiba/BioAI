@@ -5,6 +5,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class Main extends Application{
 
     private Stage primaryStage;
@@ -25,7 +27,7 @@ public class Main extends Application{
         EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/p01");
 
         //Run the evolutionary algorithm
-        ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(1, 0.02,100);
+        ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,100);
 
         //Get all the data from the data set
         ProcessFile processFile = evolutionaryAlgorithm.processFile;
@@ -50,6 +52,8 @@ public class Main extends Application{
 
         //Display one of the solutions
         graph.setRoutes(solutions[0]);
+        System.out.println("Solution 0 fitness value: "+solutions[0].getFitness());
+        System.out.println("Optimal known fitness value: "+processFile.optimalFitness);
 
         primaryStage.getIcons().add(new Image("elster2.png"));
         primaryStage.show();

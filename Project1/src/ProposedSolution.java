@@ -40,7 +40,7 @@ public class ProposedSolution {
 //        System.out.println(proposedSolution.customerScore);
 
         for (Car car : cars) {
-            String s = car.getDepot().getDepot_nr() + " " + car.getVehicleNumber() + " " + numberFormat.format(car.getCurrentDuration()) + " " + car.getCurrentLoad();
+            String s = car.getDepot().getDepotNr() + " " + car.getVehicleNumber() + " " + numberFormat.format(car.getCurrentDuration()) + " " + car.getCurrentLoad();
             StringBuilder customerSequence = new StringBuilder(" ");
             for(int m = 0; m < car.getCustomerSequence().size(); m++){
                 customerSequence.append(car.getCustomerSequence().get(m).getCustomerNr()).append(" ");

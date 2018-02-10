@@ -40,17 +40,19 @@ public class EvolutionaryAlgorithm {
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
             // @TODO make crossover method work!
-            ProposedSolution[] offspring = population.Crossover(selectedParents,mutationRate);
-
-
-            // Evaluate the individual fitness of new individuals.
-//            for (ProposedSolution proposedSolution : offspring) {
-            for (ProposedSolution proposedSolution : proposedSolutions) {
-                proposedSolution.evaluateFitness();
-            }
+            ProposedSolution[] offspring = population.crossover(selectedParents, mutationRate);
 
             // Replace least-fit population with new individuals.
-            // @TODO ProposedSolution[] population.select(ProposedSolution[] parents, ProposedSolution[] offspring)
+            proposedSolutions = population.select(selectedParents, offspring);
+
+            // Evaluate the individual fitness of new individuals.
+
+            //We probably don't need to do this here, as we need to do it after crossover anyway.
+//            for (ProposedSolution proposedSolution : offspring) {
+            /*for (ProposedSolution proposedSolution : proposedSolutions) {
+                proposedSolution.evaluateFitness();
+            }*/
+
         }
 
         return proposedSolutions;

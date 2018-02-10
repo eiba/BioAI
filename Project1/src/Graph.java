@@ -5,6 +5,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Graph extends Pane {
 
@@ -16,6 +17,7 @@ public class Graph extends Pane {
 
     private Depot[] depots;
     private Customer[] customers;
+    private final HashMap<Customer, Circle> customerCircleHashMap;
 
 
     Graph(double width, double height, int minX, int minY, int maxX, int maxY) {
@@ -32,6 +34,8 @@ public class Graph extends Pane {
         this.height = height;
         this.factorX = width / Math.abs(maxX - minX);
         this.factorY = height / Math.abs(maxY - minY);
+
+        customerCircleHashMap = new HashMap<>();
     }
 
     void setDepots(Depot[] depots) {
@@ -44,7 +48,7 @@ public class Graph extends Pane {
             depotRectangle.setLayoutY(-5);
             depotRectangle.setTranslateX(mapXToGraph(depot.getX()));
             depotRectangle.setTranslateY(mapYToGraph(depot.getY()));
-            depotRectangle.setStyle("-fx-fill: #04d403");
+            depotRectangle.setStyle("-fx-fill: #0ac5d4");
             depotPane.getChildren().add(depotRectangle);
         }
     }
@@ -57,7 +61,7 @@ public class Graph extends Pane {
             Circle customerCircle = new Circle(5);
             customerCircle.setTranslateX(mapXToGraph(customer.getX()));
             customerCircle.setTranslateY(mapYToGraph(customer.getY()));
-            customerCircle.setStyle("-fx-fill: #1eb0ff");
+            customerCircleHashMap.put(customer, customerCircle);
             customerPane.getChildren().add(customerCircle);
 
         }
@@ -78,6 +82,9 @@ public class Graph extends Pane {
 
                 ArrayList<Customer> customers = car.getCustomerSequence();
                 for (Customer customer : customers) {
+                    Circle customerCircle = customerCircleHashMap.get(customer);
+                    customerCircle.setFill(color);
+
                     Line lineRoute = new Line();
                     lineRoute.setStroke(color);
                     lineRoute.setStartX(mapXToGraph(currentX));

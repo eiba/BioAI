@@ -15,7 +15,7 @@ public class Car {
         this.currentDuration = 0.0;
         this.x = depot.getX();
         this.y = depot.getY();
-        this.customerSequence = new ArrayList<>();
+        this.customerSequence = new ArrayList<Customer>();
 
         if(maximumDuration == 0){
             this.maximumDuration = Integer.MAX_VALUE;
@@ -35,6 +35,21 @@ public class Car {
         return copy;
     }
 
+    static Car[] createCopyWithCustomers(Car[] cars, Depot depot) {
+        Car[] copy = new Car[cars.length];
+        for (int i = 0; i < cars.length; i ++) {
+            Car car = cars[i];
+            copy[i] = new Car(car.vehicleNumber, car.maximumLoad, car.maximumDuration, depot);
+
+            ArrayList<Customer> customerList = car.getCustomerSequence();
+
+            for (Customer customer: customerList){
+                copy[i].getCustomerSequence().add(customer);
+            }
+        }
+        return copy;
+    }
+
     void addDuration(double duration) {
         currentDuration += duration;
     }
@@ -45,6 +60,60 @@ public class Car {
 
     void addCustomerVisited(Customer customer) {
         customerSequence.add(customer);
+    }
+
+    void smartAddCustomerVisited(Customer customer, int index) {
+        customerSequence.add(index, customer);
+        currentDuration = checkDistance(customer, index);
+    }
+
+    /**
+     * Check if a customer can be added to a route and where it will be of lowest extra duration
+     * @param customer
+     * @return Index of where it is smartest to add the new customer
+     */
+    double[] smartCheckExtraDuration(Customer customer) {
+
+        double minDuration = Double.MAX_VALUE;
+        int index = -1;
+
+        for (int i = 0; i < customerSequence.size() + 1; i ++) {
+            final double duration = checkDistance(customer, i);
+            if (duration < minDuration) {
+                minDuration = duration;
+                index = i;
+            }
+        }
+
+        return new double[]{index, minDuration};
+    }
+
+    double checkDistance(Customer customer, int index) {
+        double distance = 0;
+        Customer previous = null;
+        int count = 0;
+        for (int i = 0; i < customerSequence.size() + 1; i ++) {
+            Customer current;
+            if (i == index) {
+                current = customer;
+            }
+            else {
+                current = customerSequence.get(count ++);
+            }
+
+            if (previous == null) {
+                distance += Population.euclideanDistance(depot.getX(), depot.getY(), current.getX(), current.getY());
+            }
+            else {
+                distance += Population.euclideanDistance(previous.getX(), previous.getY(), current.getX(), current.getY());
+            }
+
+            previous = current;
+        }
+
+        distance += Population.euclideanDistance(previous.getX(), previous.getY(), depot.getX(), depot.getY());
+
+        return distance;
     }
 
     /**

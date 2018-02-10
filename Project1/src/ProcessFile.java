@@ -1,4 +1,4 @@
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
@@ -18,19 +18,36 @@ public class ProcessFile {
     public int minY = Integer.MAX_VALUE;
     public int maxX = Integer.MIN_VALUE;
     public int maxY = Integer.MIN_VALUE;
+    public double optimalFitness;
 
     //This class processes a dataset, extracts the data and creates objects and variables
 
     ProcessFile(String Filename){
 
+        //read dataset
         try (Stream<String> stream = Files.lines(Paths.get(Filename))) {
 
             stream.forEach(this::processLine);
+
             //iterate over all the lines in the dataset
         }
         catch (IOException e) {
             e.printStackTrace();
         }
+
+        //read solution file and get the optimal fitness
+        try{
+            BufferedReader optimalFitnessLine = new BufferedReader(new FileReader(Filename+".res"));
+            try{
+                this.optimalFitness = Double.parseDouble(optimalFitnessLine.readLine());
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+
     }
 
     //process a line in the data set
@@ -128,9 +145,9 @@ public class ProcessFile {
             Car[] cars = new Car[this.vehicle_count];
 
             for(int i =0; i < this.vehicle_count;i++){
-                Car car = new Car(i +1,depot.getMaximum_load(),depot.getMaximum_duration(),depot);
+                Car car = new Car(i +1,depot.getMaximum_load(),depot.getMaximumDuration(),depot);
                 cars[i] = car;
-                this.cars[i + ((depot.getDepot_nr()-1)*this.vehicle_count)] = car;
+                this.cars[i + ((depot.getDepotNr()-1)*this.vehicle_count)] = car;
             }
             depot.setCars(cars);
 
@@ -145,7 +162,7 @@ public class ProcessFile {
 
         for (int i = 0; i < depots.length; i ++) {
             Depot depot = depots[i];
-            copy[i] = new Depot(depot);
+            copy[i] = new Depot(depot,true);
         }
 
         return copy;
