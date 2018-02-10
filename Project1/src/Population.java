@@ -221,7 +221,7 @@ public class Population {
         return children;
     }
 
-    //@TODO proper copulate method. Create new ProposedSolution objects as we need the old ones for survivor selection
+    // @TODO proper copulate method. Create new ProposedSolution objects as we need the old ones for survivor selection
     public ProposedSolution copulate(ProposedSolution parent1, ProposedSolution parent2){
 
 

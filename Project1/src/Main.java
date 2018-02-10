@@ -1,8 +1,12 @@
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -23,37 +27,51 @@ public class Main extends Application{
         primaryStage.setScene(scene);
         primaryStage.setTitle("IT3708 - Assignment 1");
 
-        //Initiate the evolutionary algorithm
-        EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/p01");
+        // Create a new menu for selecting the data sets
+        final ChoiceBox<String> taskMenu = new ChoiceBox<>(FXCollections.observableArrayList("p01", "p02", "p03", "p04", "p05", "p06", "p07", "p08", "p09",
+                "p10", "p11", "p12", "p13", "p14", "p15", "p16", "p17", "p18", "p19",
+                "p20", "p21", "p22", "p23"));
+        taskMenu.setOnAction(event -> {
 
-        //Run the evolutionary algorithm
-        ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,1000);
+            //Initiate the evolutionary algorithm
+            EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue());
 
-        //Get all the data from the data set
-        ProcessFile processFile = evolutionaryAlgorithm.processFile;
+            //Run the evolutionary algorithm
+            ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,1000);
 
-        //Create a new graph
-        Graph graph = new Graph(700, 500, processFile.minX, processFile.minY, processFile.maxX, processFile.maxY);
-        BorderPane.setAlignment(graph, Pos.CENTER);
-        graph.setDepots(processFile.depots);
-        graph.setCustomers(processFile.customers);
-        borderPane.setCenter(graph);
+            //Get all the data from the data set
+            ProcessFile processFile = evolutionaryAlgorithm.processFile;
 
-        //Create statistics for the graph
-        Statistic statistic = new Statistic();
-        BorderPane.setAlignment(statistic, Pos.CENTER);
-        double fitness = 0;
-        for (ProposedSolution proposedSolution : solutions) {
-            fitness += proposedSolution.getFitness();
-        }
-        fitness /= solutions.length;
-        statistic.setDistance(fitness);
-        borderPane.setBottom(statistic);
 
-        //Display one of the solutions
-        graph.setRoutes(solutions[0]);
-        System.out.println("Solution 0 fitness value: "+solutions[0].getFitness());
-        System.out.println("Optimal known fitness value: "+processFile.optimalFitness);
+            //Create a new graph
+            Graph graph = new Graph(700, 500, processFile.minX, processFile.minY, processFile.maxX, processFile.maxY);
+            BorderPane.setAlignment(graph, Pos.CENTER);
+            graph.setDepots(processFile.depots);
+            graph.setCustomers(processFile.customers);
+            borderPane.setCenter(graph);
+
+            //Create statistics for the graph
+            Statistic statistic = new Statistic();
+            BorderPane.setAlignment(statistic, Pos.CENTER);
+            double fitness = 0;
+            for (ProposedSolution proposedSolution : solutions) {
+                fitness += proposedSolution.getFitness();
+            }
+            fitness /= solutions.length;
+            statistic.setDistance(fitness);
+            borderPane.setBottom(statistic);
+
+            //Display one of the solutions
+            graph.setRoutes(solutions[0]);
+            System.out.println("Solution 0 fitness value: "+solutions[0].getFitness());
+            System.out.println("Optimal known fitness value: "+processFile.optimalFitness);
+        });
+
+        HBox hBox = new HBox(10);
+        hBox.setAlignment(Pos.CENTER);
+        hBox.getChildren().addAll(new Text("Select data set:"), taskMenu);
+        taskMenu.setValue("p01");
+        borderPane.setTop(hBox);
 
         primaryStage.getIcons().add(new Image("elster2.png"));
         primaryStage.show();
