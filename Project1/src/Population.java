@@ -152,6 +152,7 @@ public class Population {
             depotsParent2[i] = new Depot(parent2.depots[i],false);
 
         }
+
         ProposedSolution parent1Copy = new ProposedSolution(depotsParent1);
         ProposedSolution parent2Copy = new ProposedSolution(depotsParent2);
 
@@ -159,40 +160,43 @@ public class Population {
         Car route1Car = parent1Copy.cars[route1Index];   //random route from first parent
 
         int route2Index = random.nextInt(parent2Copy.cars.length);
-        Car route2Car = parent1Copy.cars[route2Index];   //random route from second parent
+        Car route2Car = parent2Copy.cars[route2Index];   //random route from second parent
 
         ArrayList<Customer> route1Sequence = route1Car.getCustomerSequence();
         ArrayList<Customer> route2Sequence = route2Car.getCustomerSequence();
-/*
-        route1Sequence.removeAll(route2Sequence);
-        if(route1Sequence.size() == 0 || route2Sequence.size() == 0){
+
+        //route1Sequence.removeAll(route2Sequence);
+        ArrayList<Customer> insertionRoute = new ArrayList<>();
+        for(Customer customer: route2Sequence){
+            if(!route1Sequence.contains(customer)){
+                insertionRoute.add(customer);
+            }
+        }
+        if(insertionRoute.size() == 0){
             return parent1Copy;
         }
 
         Car[] newCars = new Car[route1Sequence.size() +1];
         for(int i=0;i<route1Sequence.size()+1;i++){
 
-            route1Sequence.addAll(i,route2Sequence);
+            route1Sequence.addAll(i,insertionRoute);
             newCars[i] = evaluateRoute(route1Sequence,route1Car);
-            route1Sequence.removeAll(route2Sequence);
+            route1Sequence.removeAll(insertionRoute);
 
         }
-
         Car bestCar = route1Car;
         Double bestDuration = Double.MAX_VALUE;
 
         for(Car car: newCars){
-            if( car != null && car.getCurrentDuration() < bestDuration){
+            if(car.getCurrentDuration() < bestDuration){
                 bestDuration = car.getCurrentDuration();
                 bestCar = car;
             }
         }
+        bestCar.setCurrentLoad(0);
+        bestCar.setCurrentDuration(0.0);
 
-        for(Car car: parent1Copy.cars){
-            car.getCustomerSequence().removeAll(bestCar.getCustomerSequence());
-        }
-
-        parent1Copy.cars[route1Index] = bestCar;*/
+        parent1Copy.cars[route1Index] = bestCar;
 
         return parent1Copy;
     }

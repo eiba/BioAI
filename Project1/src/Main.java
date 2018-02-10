@@ -27,7 +27,7 @@ public class Main extends Application{
         EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/p01");
 
         //Run the evolutionary algorithm
-        ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,100);
+        ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,1000);
 
         //Get all the data from the data set
         ProcessFile processFile = evolutionaryAlgorithm.processFile;
