@@ -125,76 +125,68 @@ public class Population {
             }
             bestCar.smartAddCustomerVisited(customer, (int) bestIndex);
 
-//            // Finding the closest eligible car
-//            double bestDistance = Double.MAX_VALUE;
-//            Car bestCar = null;
-//            for (Car car : proposedSolution.cars) {
-//
-//                double distance = euclideanDistance(customer.getX(), customer.getY(), car.getX(), car.getY());
-//                if (distance < bestDistance || bestCar == null) {
-//
-//                    // Check if the car currently in consideration is actually eligible to serve the customer
-//                    if (car.isEligible(customer)) {
-//                        bestDistance = distance;
-//                        bestCar = car;
-//                    }
-//                }
-//            }
-
-//            // Check if no car was eligible to serve the customer
-//            if (bestCar == null) {
-//                return null;
-//            }
-//
-//            // Updating statistics for the car
-//            bestCar.addCustomerVisited(customer);
-//            bestCar.addLoad(customer.getDemand());
-//            bestCar.addDuration(euclideanDistance(customer.getX(), customer.getY(), bestCar.getX(), bestCar.getY()));
-//
-//            // Updating the new car position
-//            bestCar.setX(customer.getX());
-//            bestCar.setY(customer.getY());
         }
-
-        // Driving all cars back to the depots from their current positions
-//        for (Car car : proposedSolution.cars) {
-//            car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
-//            car.setX(car.getDepot().getX());
-//            car.setY(car.getDepot().getY());
-//        }
 
         return proposedSolution;
     }
 
-    public ProposedSolution[] selectParent(ProposedSolution[] solutions){
+    /**
+     * Parent Selection based on Tournament Selection
+     * @param solutions List of all possible participants
+     * @param numberOfTournaments Number of tournaments to be held
+     * @return a list of parents selected in the tournament selection
+     */
+    public ProposedSolution tournamentSelection(ProposedSolution[] solutions, int numberOfTournaments){
 
-        this.currentPopulation = solutions;
-        //list containing all selected parents
-        //There should be as many selected parents as there are specimen in the population as one parent can eb selected more than once
-        ProposedSolution[] selected_parents = new ProposedSolution[solutions.length];
+        final Random random = new Random();
+        ProposedSolution winner = null;
 
-        double score_sum = 0.0;
+        for (int i = 0; i < numberOfTournaments; i ++) {
+            final ProposedSolution participant = solutions[random.nextInt(solutions.length)];
 
-        for(ProposedSolution solution: solutions){
-            score_sum += 1/solution.getFitness();
-        }
-
-        //for each iteration add a parent
-        for(int i=0;i<solutions.length;i++){
-
-            double p = Math.random();   //random number from 0 to 1
-
-            double cumulativeProbability = 0.0;
-            for (ProposedSolution solution : solutions) {
-                cumulativeProbability +=  (1 / solution.getFitness()) / score_sum;    //add to the cumulative probability
-
-                if (p <= cumulativeProbability) {
-                    selected_parents[i] = solution;
-                    break;
-                }
+            if (winner == null || participant.getFitness() < winner.getFitness()) {
+                winner = participant;
             }
         }
-        return selected_parents;
+
+        return winner;
+
+//        func tournament_selection(pop, k):
+//        best = null
+//        for i=1 to k
+//        ind = pop[random(1, N)]
+//        if (best == null) or fitness(ind) > fitness(best)
+//        best = ind
+//        return best
+
+
+
+//        this.currentPopulation = solutions;
+//        //list containing all selected parents
+//        //There should be as many selected parents as there are specimen in the population as one parent can eb selected more than once
+//        ProposedSolution[] selected_parents = new ProposedSolution[solutions.length];
+//
+//        double score_sum = 0.0;
+//
+//        for(ProposedSolution solution : solutions){
+//            score_sum += 1/solution.getFitness();
+//        }
+//
+//        //for each iteration add a parent
+//        for(int i=0;i<solutions.length;i++){
+//
+//            double p = Math.random();   //random number from 0 to 1
+//
+//            double cumulativeProbability = 0.0;
+//            for (ProposedSolution solution : solutions) {
+//                cumulativeProbability +=  (1 / solution.getFitness()) / score_sum;    //add to the cumulative probability
+//
+//                if (p <= cumulativeProbability) {
+//                    selected_parents[i] = solution;
+//                    break;
+//                }
+//            }
+//        }
     }
 
     public ProposedSolution[] crossover(ProposedSolution[] solutions, double mutationRate){

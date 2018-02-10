@@ -35,8 +35,12 @@ public class EvolutionaryAlgorithm {
 
         // Step Three: Repeat the following regeneration steps until termination:
         for (int i = 0; i < iterations; i ++) {
+
             // Select the best-fit individuals for reproduction. (Parents)
-            ProposedSolution[] selectedParents = population.selectParent(proposedSolutions);
+            ProposedSolution[] selectedParents = new ProposedSolution[populationSize];
+            for (int j = 0; j < populationSize; j ++) {
+                selectedParents[j] = population.tournamentSelection(proposedSolutions, 20);
+            }
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
             // @TODO make crossover method work!
