@@ -58,18 +58,22 @@ public class Main extends Application{
                     //Create statistics for the graph
                     Statistic statistic = new Statistic();
                     BorderPane.setAlignment(statistic, Pos.CENTER);
-                    double fitness = 0;
-                    for (ProposedSolution proposedSolution : solutions) {
-                        fitness += proposedSolution.getFitness();
-                    }
-                    fitness /= solutions.length;
-                    statistic.setDistance(fitness);
+//                    double fitness = 0;
+//                    for (ProposedSolution proposedSolution : solutions) {
+//                        fitness += proposedSolution.getFitness();
+//                    }
+//                    fitness /= solutions.length;
+                    statistic.setDistance(solutions[0].getFitness());
                     borderPane.setBottom(statistic);
 
                     //Display one of the solutions
                     graph.setRoutes(solutions[0]);
                     System.out.println("Solution 0 fitness value: " + solutions[0].getFitness());
                     System.out.println("Optimal known fitness value: " + processFile.optimalFitness);
+
+//                    for (Car car : solutions[0].cars) {
+//                        System.out.println(car.getCurrentDuration());
+//                    }
                 });
             });
             thread.start();

@@ -15,7 +15,7 @@ public class Car {
         this.currentDuration = 0.0;
         this.x = depot.getX();
         this.y = depot.getY();
-        this.customerSequence = new ArrayList<Customer>();
+        this.customerSequence = new ArrayList<>();
 
         if(maximumDuration == 0){
             this.maximumDuration = Integer.MAX_VALUE;
@@ -46,6 +46,8 @@ public class Car {
             for (Customer customer: customerList){
                 copy[i].getCustomerSequence().add(customer);
             }
+            copy[i].updateDistance();
+            copy[i].updateLoad();
         }
         return copy;
     }
@@ -54,10 +56,9 @@ public class Car {
         currentDuration += duration;
     }
 
-    void addLoad(int load) {
-        currentLoad += load;
-    }
-
+//    void addLoad(int load) {
+//        currentLoad += load;
+//    }
     void addCustomerVisited(Customer customer) {
         customerSequence.add(customer);
     }
@@ -65,7 +66,16 @@ public class Car {
     void smartAddCustomerVisited(Customer customer, int index) {
         customerSequence.add(index, customer);
         currentDuration = checkDistance(customer, index);
+        currentLoad += customer.getDemand();
     }
+
+    void remove(Customer customer) {
+        customerSequence.remove(customer);
+        updateLoad();
+        updateDistance();
+    }
+
+
     //Check wether a car is valid
     Boolean checkValidity(){
         if(this.currentDuration <= this.maximumDuration && this.currentLoad <= this.maximumLoad){
@@ -147,13 +157,21 @@ public class Car {
         currentDuration = distance;
     }
 
+    void updateLoad() {
+        int load = 0;
+        for (Customer customer : customerSequence) {
+            load += customer.getDemand();
+        }
+        currentLoad = load;
+    }
+
     /**
      * This method is used to determine if the car is eligible to add a customer to its route or not
      * @param customer
      * @return True iff the car is eligible to serve the customer, False otherwise
      */
     boolean isEligible(Customer customer) {
-        final boolean durationCheck = currentDuration + Population.euclideanDistance(x, y, customer.getX(), customer.getY()) <= maximumDuration;
+        final boolean durationCheck = smartCheckExtraDuration(customer)[1] <= maximumDuration;
         final boolean loadCheck = currentLoad + customer.getDemand() <= maximumLoad;
         return durationCheck && loadCheck;
     }
@@ -202,9 +220,9 @@ public class Car {
         return currentLoad;
     }
 
-    public void setCurrentLoad(int currentLoad) {
-        this.currentLoad = currentLoad;
-    }
+//    public void setCurrentLoad(int currentLoad) {
+//        this.currentLoad = currentLoad;
+//    }
 
     public int getMaximumLoad() {
         return maximumLoad;

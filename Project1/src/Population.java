@@ -108,8 +108,8 @@ public class Population {
                 // Finding a car from the depot that can add the customer to its route
                 for (Car car : depot.getCars()) {
 
-                    // Check if the car has enough load to serve the additional customer
-                    if (car.getCurrentLoad() + customer.getDemand() <= car.getMaximumLoad()) {
+                    // Check if the car is eligible to serve an additional customer
+                    if (car.isEligible(customer)) {
                         final double[] carExtraDuration = car.smartCheckExtraDuration(customer);
                         if (carExtraDuration[1] < bestDistance) {
                             bestDistance = carExtraDuration[1];
@@ -118,11 +118,16 @@ public class Population {
                         }
                     }
                 }
+
+                if (bestCar != null) {
+                    break;
+                }
             }
 
             if (bestCar == null) {
                 return null;
             }
+
             bestCar.smartAddCustomerVisited(customer, (int) bestIndex);
 
         }
@@ -241,9 +246,8 @@ public class Population {
             for (Car childCar : child.cars) {
                 for (Customer childCustomer : childCar.getCustomerSequence()) {
                     if (parentCustomer.getCustomerNr() == childCustomer.getCustomerNr()) {
-                        childCar.getCustomerSequence().remove(childCustomer);
+                        childCar.remove(childCustomer);
                         childCustomers.add(childCustomer);
-                        childCar.updateDistance();
                         continue customerLoop;
                     }
                 }
@@ -260,14 +264,17 @@ public class Population {
             // Looping through all car routes
             for (Car car : child.cars) {
 
-                final double[] stats = car.smartCheckExtraDuration(customer);
+                if (car.isEligible(customer)) {
+                    final double[] stats = car.smartCheckExtraDuration(customer);
 
-                // Check if the additional distance required for adding the car is less than current best
-                if (stats[1] - car.getCurrentDuration() < bestDistance) {
-                    bestDistance = stats[1] - car.getCurrentDuration();
-                    bestCar = car;
-                    bestIndex = (int) stats[0];
+                    // Check if the additional distance required for adding the car is less than current best
+                    if (stats[1] - car.getCurrentDuration() < bestDistance) {
+                        bestDistance = stats[1] - car.getCurrentDuration();
+                        bestCar = car;
+                        bestIndex = (int) stats[0];
+                    }
                 }
+
             }
 
             bestCar.smartAddCustomerVisited(customer, bestIndex);
@@ -344,7 +351,7 @@ public class Population {
                 bestCar = car;
             }
         }
-        bestCar.setCurrentLoad(0);
+//        bestCar.setCurrentLoad(0);
         bestCar.setCurrentDuration(0.0);
 
         parent1Copy.cars[route1Index] = bestCar;
@@ -361,7 +368,7 @@ public class Population {
 
         for(Customer customer: route){
             newCar.addDuration(euclideanDistance(newCar.getX(),newCar.getY(),customer.getX(),customer.getY()));
-            newCar.addLoad(customer.getDemand());
+//            newCar.addLoad(customer.getDemand());
             newCar.setX(customer.getX());
             newCar.setY(customer.getY());
             newCar.addCustomerVisited(customer);
@@ -556,7 +563,7 @@ public class Population {
             ArrayList<Customer> customerSequence = car.getCustomerSequence();
 
             for (Customer customer:customerSequence){
-                car.addLoad(customer.getDemand());
+//                car.addLoad(customer.getDemand());
                 car.addDuration(euclideanDistance(customer.getX(), customer.getY(), car.getX(), car.getY()));
                 car.setX(customer.getX());
                 car.setY(customer.getY());
