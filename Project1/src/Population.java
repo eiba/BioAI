@@ -49,15 +49,13 @@ public class Population {
 
         // Generating a random solution for each iteration
         for (int i = 0; i < populationSize; i ++) {
-
             //Add the solution to the solutions list
             ProposedSolution proposedSolution;
             do {
                 proposedSolution = generateSolution();
-//                System.out.println(proposedSolution);
             }
             while (proposedSolution == null);
-            proposedSolutions[i] = generateSolution();
+            proposedSolutions[i] = proposedSolution;
         }
 
         return proposedSolutions;
@@ -107,7 +105,6 @@ public class Population {
 
                 // Finding a car from the depot that can add the customer to its route
                 for (Car car : depot.getCars()) {
-
                     // Check if the car is eligible to serve an additional customer
                     if (car.isEligible(customer)) {
                         final double[] carExtraDuration = car.smartCheckExtraDuration(customer);
@@ -119,16 +116,28 @@ public class Population {
                     }
                 }
 
+
+
                 if (bestCar != null) {
                     break;
                 }
             }
 
             if (bestCar == null) {
-                return null;
+                // Remove a random Customer from preferred depot in hope of fix
+                int depotNr = preferredDepots[0];
+                for (Depot depot1 : depots) {
+                    if (depot1.getDepotNr() == depotNr) {
+                        Car randomCar = depot1.getCars()[random.nextInt(depot1.getCars().length)];
+                        randomCar.remove(randomCar.getCustomerSequence().get(random.nextInt(randomCar.getCustomerSequence().size())));
+                        break;
+                    }
+                }
+            }
+            else {
+                bestCar.smartAddCustomerVisited(customer, (int) bestIndex);
             }
 
-            bestCar.smartAddCustomerVisited(customer, (int) bestIndex);
 
         }
 

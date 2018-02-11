@@ -54,8 +54,8 @@ public class ProposedSolution {
 //        System.out.println(proposedSolution.customerScore);
 
         for (Car car : cars) {
-            String s = car.getDepot().getDepotNr() + " " + car.getVehicleNumber() + " " + numberFormat.format(car.getCurrentDuration()) + " " + car.getCurrentLoad();
-            StringBuilder customerSequence = new StringBuilder(" ");
+            String s = car.getDepot().getDepotNr() + "\t" + car.getVehicleNumber() + "\t" + numberFormat.format(car.getCurrentDuration()) + "\t" + car.getCurrentLoad();
+            StringBuilder customerSequence = new StringBuilder("\t");
             for(int m = 0; m < car.getCustomerSequence().size(); m++){
                 customerSequence.append(car.getCustomerSequence().get(m).getCustomerNr()).append(" ");
             }
