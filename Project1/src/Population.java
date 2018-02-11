@@ -240,7 +240,6 @@ public class Population {
                 children[index ++] = child;
             }
         }
-
         mutate(children, mutationRate);
 
         return children;
@@ -441,7 +440,9 @@ public class Population {
         //implement inverse mutation
 
         //get random car
-        Car car = solution.cars[random.nextInt(solution.cars.length)];
+        Car originalCar = solution.cars[random.nextInt(solution.cars.length)];
+        Car car = Car.copyCar(originalCar);
+
         int iter = 0;
         //make sure that we get list with more than 2 customers or else there is no point in inverting
         while (car.getCustomerSequence().size() < 3){
@@ -498,6 +499,10 @@ public class Population {
            count ++;
         }
         car.updateDistance();
+        if(car.getMaximumDuration() >= car.getCurrentDuration()){
+            originalCar.customerSequence = car.getCustomerSequence();
+            originalCar.currentDuration = car.currentDuration;
+        }
         //solution.evaluateFitness();
     }
 

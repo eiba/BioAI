@@ -40,7 +40,7 @@ public class Main extends Application{
                 EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue());
 
                 // Run the evolutionary algorithm
-                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,100, 30);
+                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(200, 0.02,100, 10);
 
                 // Get all the data from the data set
                 ProcessFile processFile = evolutionaryAlgorithm.processFile;
@@ -80,7 +80,7 @@ public class Main extends Application{
         HBox hBox = new HBox(10);
         hBox.setAlignment(Pos.CENTER);
         hBox.getChildren().addAll(new Text("Select data set:"), taskMenu);
-        taskMenu.setValue("p23");
+        taskMenu.setValue("p01");
         borderPane.setTop(hBox);
 
         primaryStage.getIcons().add(new Image("elster2.png"));

@@ -4,9 +4,9 @@ public class Car {
 
     private Depot depot;
     private int currentLoad,  maximumLoad, vehicleNumber, maximumDuration, x, y;
-    private double currentDuration;
+    public double currentDuration;
 
-    private final ArrayList<Customer> customerSequence;
+    public ArrayList<Customer> customerSequence;
 
     Car(int vehicleNumber, int maximumLoad, int maximumDuration, Depot depot) {
         this.vehicleNumber = vehicleNumber;
@@ -49,6 +49,20 @@ public class Car {
             copy[i].updateDistance();
             copy[i].updateLoad();
         }
+        return copy;
+    }
+
+    static Car copyCar(Car car){
+        Car copy = new Car(car.vehicleNumber, car.maximumLoad, car.maximumDuration, car.getDepot());
+        copy.currentDuration = car.currentDuration;
+        copy.currentLoad = car.currentLoad;
+
+        ArrayList<Customer> customerList = car.getCustomerSequence();
+
+        for (Customer customer: customerList){
+            copy.getCustomerSequence().add(customer);
+        }
+
         return copy;
     }
 
