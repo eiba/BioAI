@@ -22,7 +22,7 @@ public class EvolutionaryAlgorithm {
      * @param iterations
      * @return the solutions found after the specified number of iterations
      */
-    ProposedSolution[] iterate(int populationSize, double mutationRate, int iterations, int numberOfTournaments) {
+    ProposedSolution[] iterate(int populationSize, double mutationRate, int iterations, int numberOfTournaments, int maximumAge) {
 
         // Step One: Generate the initial population of individuals randomly. (First generation)
         ProposedSolution[] proposedSolutions = population.generateInitialPopulation(populationSize);
@@ -47,7 +47,7 @@ public class EvolutionaryAlgorithm {
             }
 
             // Replace least-fit population with new individuals.
-            proposedSolutions = population.select(proposedSolutions, offspring);
+            proposedSolutions = population.select(proposedSolutions, offspring, maximumAge);
 
             //If the fitness of the best individual is within 5% of optimal fitness, return
             if(processFile.optimalFitness/proposedSolutions[0].getFitness() >= 0.95){

@@ -68,7 +68,6 @@ public class Population {
 
         final Depot[] depots = processFile.getDepots();
         final ProposedSolution proposedSolution = new ProposedSolution(depots);
-
         final ArrayList<Customer> customers = new ArrayList<>(Arrays.asList(processFile.customers));
         while (!customers.isEmpty()) {
 
@@ -255,7 +254,6 @@ public class Population {
 
         // Creating a child based on a deep copy of the parent1 object
         final ProposedSolution child = new ProposedSolution(parent1);
-
         // Selecting a random route from parent2
         final Random random = new Random();
         final ArrayList<Customer> parentCustomerSequence = parent2.cars[random.nextInt(parent2.cars.length)].getCustomerSequence();
@@ -544,7 +542,7 @@ public class Population {
     }
 
     //selects the population size best individuals
-    public ProposedSolution[] select(ProposedSolution[] parents, ProposedSolution[] offspring){
+    public ProposedSolution[] select(ProposedSolution[] parents, ProposedSolution[] offspring, int maximumAge){
 
         //list of survivors, need to be as big as the initial population count
         ProposedSolution[] survivors = new ProposedSolution[this.populationSize];
@@ -571,13 +569,15 @@ public class Population {
             for(int j=0;j<selectionPool.length;j++){
 
                 ProposedSolution solution = selectionPool[j];
-                if(solution != null && solution.getFitness() < bestFitness){
+
+                if(solution != null && solution.getFitness() < bestFitness && solution.age <= maximumAge){
                     bestSolution = solution;
                     bestFitness = solution.getFitness();
                     bestSolutionIndex = j;
                 }
             }
             survivors[i] = bestSolution;
+            survivors[i].age +=1;
             selectionPool[bestSolutionIndex] = null;
         }
 

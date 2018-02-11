@@ -5,11 +5,11 @@ public class ProposedSolution {
     final Depot[] depots;
     final Car[] cars;
     private double fitness = Double.MAX_VALUE;
+    public int age = 0;
 
     ProposedSolution(Depot[] depots) {
         this.depots = depots;
         this.cars = new Car[depots.length * depots[0].getCars().length];
-
         int count = 0;
         for (Depot depot : depots) {
             for (Car car : depot.getCars()) {
@@ -23,6 +23,7 @@ public class ProposedSolution {
         for (int i = 0; i < depots.length; i ++) {
             depots[i] = new Depot(proposedSolution.depots[i], false);
         }
+        age = 0;
         this.depots = depots;
         this.cars = new Car[depots.length * depots[0].getCars().length];
         int count = 0;
