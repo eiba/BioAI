@@ -3,7 +3,8 @@ import java.util.ArrayList;
 public class Car {
 
     private Depot depot;
-    private int currentLoad,  maximumLoad, vehicleNumber, maximumDuration, x, y;
+    private int maximumLoad, vehicleNumber, maximumDuration, x, y;
+    public int currentLoad;
     public double currentDuration;
 
     public ArrayList<Customer> customerSequence;
@@ -91,7 +92,7 @@ public class Car {
 
 
     //Check wether a car is valid
-    Boolean checkValidity(){
+    Boolean isValid(){
         if(this.currentDuration <= this.maximumDuration && this.currentLoad <= this.maximumLoad){
             return true;
         }

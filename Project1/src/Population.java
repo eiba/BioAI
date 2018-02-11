@@ -445,12 +445,11 @@ public class Population {
 
         //get random car
         Car originalCar = solution.cars[random.nextInt(solution.cars.length)];
-        Car car = Car.copyCar(originalCar);
 
         int iter = 0;
         //make sure that we get list with more than 2 customers or else there is no point in inverting
-        while (car.getCustomerSequence().size() < 3){
-            car = solution.cars[random.nextInt(solution.cars.length)];
+        while (originalCar.getCustomerSequence().size() < 3){
+            originalCar = solution.cars[random.nextInt(solution.cars.length)];
 
             //I give up, return.
             if(iter > solution.cars.length){
@@ -458,13 +457,9 @@ public class Population {
             }
             iter++;
         }
+        Car car = Car.copyCar(originalCar);
         //route of selected car
         ArrayList<Customer> customerSequence = car.getCustomerSequence();
-
-        //if there is only one car, two cars or no cars in the sequence, no point in inversing, we just return
-        /*if(customerSequence.size() < 3){
-            return;
-        }*/
 
         int startIndex = random.nextInt(customerSequence.size()); //startindex of reverse
         int endIndex = random.nextInt(customerSequence.size());   //end index
@@ -492,13 +487,13 @@ public class Population {
         Customer[] inverseCustomerArray = new Customer[endIndex-startIndex + 1];
         int count = 0;
         for(int i=endIndex; i > startIndex-1; i--){
-            inverseCustomerArray[count] = customerSequence.get(i);
+            inverseCustomerArray[count] = customerSequence.remove(i);
             count++;
         }
         count = 0;
         //add all the elements to the arraylist in reverse order.
         for(int i=startIndex; i < endIndex+1; i++){
-            customerSequence.remove(i);
+            //customerSequence.remove(i);
            customerSequence.add(i,inverseCustomerArray[count]);
            count ++;
         }
@@ -547,9 +542,15 @@ public class Population {
         car1.updateDistance();
         car2.updateDistance();
 
-        if(car1.currentDuration <= car1.getMaximumDuration() && car2.currentDuration <= car2.getMaximumDuration()){
+        car1.updateLoad();
+        car2.updateLoad();
+
+        if(car1.isValid() && car2.isValid()){
             car1Original.customerSequence = car1.customerSequence;
             car2Original.customerSequence = car2.customerSequence;
+
+            car1Original.currentLoad = car1.currentLoad;
+            car2Original.currentLoad = car2.currentLoad;
 
             car1Original.currentDuration = car1.currentDuration;
             car2Original.currentDuration = car2.currentDuration;
