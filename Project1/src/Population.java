@@ -502,12 +502,15 @@ public class Population {
            customerSequence.add(i,inverseCustomerArray[count]);
            count ++;
         }
+        //update the distance traveled for the new route
         car.updateDistance();
+
+        //if the new route is legal, we change the route and distance traveled of the original car, thus altering the solution
+        //if the route is not legal nothing is changed and we return
         if(car.getMaximumDuration() >= car.getCurrentDuration()){
             originalCar.customerSequence = car.getCustomerSequence();
             originalCar.currentDuration = car.currentDuration;
         }
-        //solution.evaluateFitness();
     }
 
     //Simple mutation method that takes a random customer from a random route
@@ -515,29 +518,38 @@ public class Population {
     public void swapMutation(ProposedSolution solution){
 
 
-        Car car1 = solution.cars[random.nextInt(solution.cars.length)];
-        Car car2 = solution.cars[random.nextInt(solution.cars.length)];
+        Car car1Original = solution.cars[random.nextInt(solution.cars.length)];
+        Car car2Original = solution.cars[random.nextInt(solution.cars.length)];
+
+        Car car1 = Car.copyCar(car1Original);
+        Car car2 = Car.copyCar(car2Original);
 
         ArrayList<Customer> car1Customers = car1.getCustomerSequence();
         ArrayList<Customer> car2Customers = car2.getCustomerSequence();
 
-        int car1RemovalIndex = random.nextInt(car1Customers.size());
-        int car2RemovalIndex = 0;
-        if(car1 == car2){
-            car2RemovalIndex = random.nextInt(car2Customers.size()-1);
-        }
-
-        if(car1Customers.size() == 0 || car2Customers.size() == 0) {
+        if(car1Customers.size() == 0 || car2Customers.size() == 0 || (car1Original == car2Original)) {
             return;
         }
 
+        int car1RemovalIndex = random.nextInt(car1Customers.size());
+        int car2RemovalIndex = random.nextInt(car2Customers.size());
 
-            Customer car1Customer = car1Customers.remove(car1RemovalIndex);
-            Customer car2Customer = car2Customers.remove(car2RemovalIndex);
+        Customer car1Customer = car1Customers.remove(car1RemovalIndex);
+        Customer car2Customer = car2Customers.remove(car2RemovalIndex);
 
-            car1Customers.add(car1RemovalIndex, car2Customer);
-            car2Customers.add(car2RemovalIndex, car1Customer);
+        car1Customers.add(car1RemovalIndex, car2Customer);
+        car2Customers.add(car2RemovalIndex, car1Customer);
 
+        car1.updateDistance();
+        car2.updateDistance();
+
+        if(car1.currentDuration <= car1.getMaximumDuration() && car2.currentDuration <= car2.getMaximumDuration()){
+            car1Original.customerSequence = car1.customerSequence;
+            car2Original.customerSequence = car2.customerSequence;
+
+            car1Original.currentDuration = car1.currentDuration;
+            car2Original.currentDuration = car2.currentDuration;
+        }
 
     }
 
