@@ -527,7 +527,7 @@ public class Population {
         ArrayList<Customer> car1Customers = car1.getCustomerSequence();
         ArrayList<Customer> car2Customers = car2.getCustomerSequence();
 
-        if(car1Customers.size() == 0 || car2Customers.size() == 0 || (car1Original == car2Original)) {
+        if(car1Customers.size() == 0 || car2Customers.size() == 0) {
             return;
         }
 
@@ -536,6 +536,10 @@ public class Population {
 
         Customer car1Customer = car1Customers.remove(car1RemovalIndex);
         Customer car2Customer = car2Customers.remove(car2RemovalIndex);
+
+        if(car1Customer == car2Customer){
+            return;
+        }
 
         car1Customers.add(car1RemovalIndex, car2Customer);
         car2Customers.add(car2RemovalIndex, car1Customer);
