@@ -12,7 +12,14 @@ public class EvolutionaryAlgorithm {
 
     }
 
-    ProposedSolution[] iterate(int populationSize, double mutationRate, int iterations) {
+    /**
+     * The core of the genetic algorithm
+     * @param populationSize initial population
+     * @param mutationRate
+     * @param iterations
+     * @return the solutions found after the specified number of iterations
+     */
+    ProposedSolution[] iterate(int populationSize, double mutationRate, int iterations, int numberOfTournaments) {
 
         // Step One: Generate the initial population of individuals randomly. (First generation)
         ProposedSolution[] proposedSolutions = population.generateInitialPopulation(populationSize);
@@ -26,9 +33,10 @@ public class EvolutionaryAlgorithm {
         for (int i = 0; i < iterations; i ++) {
 
             // Select the best-fit individuals for reproduction. (Parents)
-            ProposedSolution[] selectedParents = new ProposedSolution[populationSize];
+            ProposedSolution[][] selectedParents = new ProposedSolution[populationSize][2];
             for (int j = 0; j < populationSize; j ++) {
-                selectedParents[j] = population.tournamentSelection(proposedSolutions, 20);
+                selectedParents[j][0] = population.tournamentSelection(proposedSolutions, numberOfTournaments);
+                selectedParents[j][1] = population.tournamentSelection(proposedSolutions, numberOfTournaments);
             }
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.

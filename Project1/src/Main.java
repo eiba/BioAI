@@ -40,14 +40,15 @@ public class Main extends Application{
                 EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue());
 
                 // Run the evolutionary algorithm
-                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,1000);
+                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,1000, 30);
 
                 // Get all the data from the data set
                 ProcessFile processFile = evolutionaryAlgorithm.processFile;
 
-
-                //Create a new graph
+                // Calling Platform.runLater() for a Thread-safe call to update GUI
                 Platform.runLater(() -> {
+
+                    // Create a new graph
                     Graph graph = new Graph(700, 500, processFile.minX, processFile.minY, processFile.maxX, processFile.maxY);
                     BorderPane.setAlignment(graph, Pos.CENTER);
                     graph.setDepots(processFile.depots);
