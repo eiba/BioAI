@@ -219,7 +219,7 @@ public class Population {
     }
 
     
-    ProposedSolution[] crossoverMartin(ProposedSolution[][] parents) {
+    ProposedSolution[] crossoverMartin(ProposedSolution[][] parents, Double mutationRate) {
         final ProposedSolution[] children = new ProposedSolution[parents.length * 2];
 
         int index = 0;
@@ -227,7 +227,7 @@ public class Population {
             children[index ++] = bestCostRouteCrossover(parents[i][0], parents[i][1]);
             children[index ++] = bestCostRouteCrossover(parents[i][1], parents[i][0]);
         }
-
+        mutate(children,mutationRate);
         return children;
     }
 
@@ -423,7 +423,6 @@ public class Population {
 
         //get random car
         Car car = solution.cars[random.nextInt(solution.cars.length)];
-
         int iter = 0;
         //make sure that we get list with more than 2 customers or else there is no point in inverting
         while (car.getCustomerSequence().size() < 3){
