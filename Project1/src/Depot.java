@@ -23,7 +23,7 @@ public class Depot {
         this.x = depot.x;
         this.y = depot.y;
         this.depot_nr = depot.depot_nr;
-        if(cleanCopy) {
+        if (cleanCopy) {
             this.cars = Car.createCopy(depot.cars, this);
         }
         else{

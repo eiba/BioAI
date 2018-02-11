@@ -122,6 +122,31 @@ public class Car {
         return distance;
     }
 
+    void updateDistance() {
+        if (customerSequence.size() == 0) {
+            currentDuration = 0;
+            return;
+        }
+
+        double distance = 0;
+        Customer previous = null;
+        int count = 0;
+        for (int i = 0; i < customerSequence.size(); i ++) {
+            Customer current = customerSequence.get(i);
+            if (previous == null) {
+                distance += Population.euclideanDistance(depot.getX(), depot.getY(), current.getX(), current.getY());
+            }
+            else {
+                distance += Population.euclideanDistance(previous.getX(), previous.getY(), current.getX(), current.getY());
+            }
+
+            previous = current;
+        }
+
+        distance += Population.euclideanDistance(previous.getX(), previous.getY(), depot.getX(), depot.getY());
+        currentDuration = distance;
+    }
+
     /**
      * This method is used to determine if the car is eligible to add a customer to its route or not
      * @param customer

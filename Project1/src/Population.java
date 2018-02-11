@@ -213,6 +213,69 @@ public class Population {
         return children;
     }
 
+    
+    ProposedSolution[] crossoverMartin(ProposedSolution[][] parents) {
+        final ProposedSolution[] children = new ProposedSolution[parents.length * 2];
+
+        int index = 0;
+        for (int i = 0; i < parents.length; i ++) {
+            children[index ++] = bestCostRouteCrossover(parents[i][0], parents[i][1]);
+            children[index ++] = bestCostRouteCrossover(parents[i][1], parents[i][0]);
+        }
+
+        return children;
+    }
+
+    private ProposedSolution bestCostRouteCrossover(ProposedSolution parent1, ProposedSolution parent2) {
+
+        // Creating a child based on a deep copy of the parent1 object
+        final ProposedSolution child = new ProposedSolution(parent1);
+
+        // Selecting a random route from parent2
+        final Random random = new Random();
+        final ArrayList<Customer> parentCustomerSequence = parent2.cars[random.nextInt(parent2.cars.length)].getCustomerSequence();
+        final ArrayList<Customer> childCustomers = new ArrayList<>();
+
+        // Removing the customers from the child's routes
+        customerLoop: for (Customer parentCustomer : parentCustomerSequence) {
+            for (Car childCar : child.cars) {
+                for (Customer childCustomer : childCar.getCustomerSequence()) {
+                    if (parentCustomer.getCustomerNr() == childCustomer.getCustomerNr()) {
+                        childCar.getCustomerSequence().remove(childCustomer);
+                        childCustomers.add(childCustomer);
+                        childCar.updateDistance();
+                        continue customerLoop;
+                    }
+                }
+            }
+        }
+
+        // Finding the best route to add the customers
+        for (Customer customer : childCustomers) {
+
+            double bestDistance = Double.MAX_VALUE;
+            Car bestCar = null;
+            int bestIndex = -1;
+
+            // Looping through all car routes
+            for (Car car : child.cars) {
+
+                final double[] stats = car.smartCheckExtraDuration(customer);
+
+                // Check if the additional distance required for adding the car is less than current best
+                if (stats[1] - car.getCurrentDuration() < bestDistance) {
+                    bestDistance = stats[1] - car.getCurrentDuration();
+                    bestCar = car;
+                    bestIndex = (int) stats[0];
+                }
+            }
+
+            bestCar.smartAddCustomerVisited(customer, bestIndex);
+        }
+
+        return child;
+    }
+
     // @TODO proper copulate method. Create new ProposedSolution objects as we need the old ones for survivor selection
     public ProposedSolution copulate(ProposedSolution parent1, ProposedSolution parent2){
 
@@ -447,7 +510,7 @@ public class Population {
 
         //list of survivors, need to be as big as the initial population count
         ProposedSolution[] survivors = new ProposedSolution[this.populationSize];
-        ProposedSolution[] selectionPool = new ProposedSolution[parents.length+offspring.length];
+        ProposedSolution[] selectionPool = new ProposedSolution[parents.length + offspring.length];
 
         //add both parents and offspring into one combined array
         int index = offspring.length;

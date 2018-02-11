@@ -41,10 +41,10 @@ public class EvolutionaryAlgorithm {
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
             // @TODO make crossover method work!
-            ProposedSolution[] offspring = population.crossover(selectedParents, mutationRate);
+            ProposedSolution[] offspring = population.crossoverMartin(selectedParents);
 
             // Replace least-fit population with new individuals.
-            proposedSolutions = population.select(selectedParents, offspring);
+            proposedSolutions = population.select(proposedSolutions, offspring);
 
             //If the fitness of the best individual is within 5% of optimal fitness, return
             if(processFile.optimalFitness/proposedSolutions[0].getFitness() >= 0.95){

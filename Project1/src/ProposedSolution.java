@@ -16,7 +16,21 @@ public class ProposedSolution {
                 cars[count ++] = car;
             }
         }
-//        this.fitnessScore = (this.customerScore + 1)* durationScore;
+    }
+
+    ProposedSolution(ProposedSolution proposedSolution) {
+        final Depot[] depots = new Depot[proposedSolution.depots.length];
+        for (int i = 0; i < depots.length; i ++) {
+            depots[i] = new Depot(proposedSolution.depots[i], false);
+        }
+        this.depots = depots;
+        this.cars = new Car[depots.length * depots[0].getCars().length];
+        int count = 0;
+        for (Depot depot : depots) {
+            for (Car car : depot.getCars()) {
+                cars[count ++] = car;
+            }
+        }
     }
 
     void evaluateFitness() {
