@@ -1,15 +1,17 @@
 public class EvolutionaryAlgorithm {
 
     private final Population population;
+    private final Statistic statistic;
     final ProcessFile processFile;
     public int iterationsUsed;
 
-    EvolutionaryAlgorithm(String filename) {
+    EvolutionaryAlgorithm(String filename, Statistic statistic) {
         // Reading the Multiple Depot Vehicle Routing Problem - MDVRP
         processFile = new ProcessFile(filename);
+        this.statistic = statistic;
 
         // Initiating variables
-        population = new Population(processFile);
+        population = new Population(processFile, statistic);
 
     }
 
@@ -30,26 +32,19 @@ public class EvolutionaryAlgorithm {
             proposedSolution.evaluateFitness();
         }
 
-        //Iterations for diplay in GUI later
+        //Iterations for display in GUI later
         iterationsUsed = iterations;
 
         // Step Three: Repeat the following regeneration steps until termination:
         for (int i = 0; i < iterations; i ++) {
 
-            // Select the best-fit individuals for reproduction. (Parents)
-//            ProposedSolution[][] selectedParents = new ProposedSolution[populationSize][2];
-//            for (int j = 0; j < populationSize; j ++) {
-//                selectedParents[j][0] = population.tournamentSelection(proposedSolutions, numberOfTournaments);
-//                selectedParents[j][1] = population.tournamentSelection(proposedSolutions, numberOfTournaments);
-//            }
+            statistic.setUpdate("Crossover and Mutation iterations: " + (i+1) + "/" + iterations);
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
-            // @TODO make crossover method work!
             ProposedSolution[] offspring = population.crossoverMartin(proposedSolutions, numberOfTournaments, mutationRate, populationSize);
             for (ProposedSolution proposedSolution : offspring) {
                 proposedSolution.evaluateFitness();
             }
-
 
             // Replace least-fit population with new individuals.
             proposedSolutions = population.select(proposedSolutions, offspring);

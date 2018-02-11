@@ -36,11 +36,19 @@ public class Main extends Application{
 
             Thread thread = new Thread(() -> {
 
+                //Create statistics for the graph
+                Statistic statistic = new Statistic();
+                BorderPane.setAlignment(statistic, Pos.CENTER);
+                Platform.runLater(() -> {
+                    borderPane.setBottom(statistic);
+                });
+
                 // Initiate the evolutionary algorithm
-                EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue());
+                EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue(), statistic);
 
                 // Run the evolutionary algorithm
-                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(200, 0.02,100, 10);
+
+                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,100, 10);
 
                 // Get all the data from the data set
                 ProcessFile processFile = evolutionaryAlgorithm.processFile;
@@ -55,16 +63,12 @@ public class Main extends Application{
                     graph.setCustomers(processFile.customers);
                     borderPane.setCenter(graph);
 
-                    //Create statistics for the graph
-                    Statistic statistic = new Statistic();
-                    BorderPane.setAlignment(statistic, Pos.CENTER);
 //                    double fitness = 0;
 //                    for (ProposedSolution proposedSolution : solutions) {
 //                        fitness += proposedSolution.getFitness();
 //                    }
 //                    fitness /= solutions.length;
                     statistic.setDistance(solutions[0].getFitness(), processFile.optimalFitness, evolutionaryAlgorithm.iterationsUsed);
-                    borderPane.setBottom(statistic);
 
                     //Display one of the solutions
                     graph.setRoutes(solutions[0]);
@@ -81,6 +85,7 @@ public class Main extends Application{
         hBox.setAlignment(Pos.CENTER);
         hBox.getChildren().addAll(new Text("Select data set:"), taskMenu);
         taskMenu.setValue("p01");
+
         borderPane.setTop(hBox);
 
         primaryStage.getIcons().add(new Image("elster2.png"));
