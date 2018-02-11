@@ -3,13 +3,15 @@ import java.util.*;
 public class Population {
 
     private final ProcessFile processFile;
+    private final Statistic statistic;
     private final Random random;
     private int populationSize;
     private ProposedSolution[] currentPopulation;
     private HashMap<Integer, int[]> preferedCustomerDepots;
 
-    Population(ProcessFile processFile) {
+    Population(ProcessFile processFile, Statistic statistic) {
         this.processFile = processFile;
+        this.statistic = statistic;
         random = new Random();
     }
 
@@ -49,6 +51,7 @@ public class Population {
 
         // Generating a random solution for each iteration
         for (int i = 0; i < populationSize; i ++) {
+            statistic.setUpdate("Generating valid initial solutions: " + (i+1) + "/" + populationSize);
             //Add the solution to the solutions list
             ProposedSolution proposedSolution;
             do {
@@ -129,7 +132,10 @@ public class Population {
                 for (Depot depot1 : depots) {
                     if (depot1.getDepotNr() == depotNr) {
                         Car randomCar = depot1.getCars()[random.nextInt(depot1.getCars().length)];
-                        randomCar.remove(randomCar.getCustomerSequence().get(random.nextInt(randomCar.getCustomerSequence().size())));
+                        Customer customer1 = randomCar.getCustomerSequence().get(random.nextInt(randomCar.getCustomerSequence().size()));
+                        randomCar.remove(customer1);
+                        customers.add(customer);
+                        customers.add(customer1);
                         break;
                     }
                 }

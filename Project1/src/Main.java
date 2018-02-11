@@ -36,8 +36,13 @@ public class Main extends Application{
 
             Thread thread = new Thread(() -> {
 
+                //Create statistics for the graph
+                Statistic statistic = new Statistic();
+                BorderPane.setAlignment(statistic, Pos.CENTER);
+                borderPane.setBottom(statistic);
+
                 // Initiate the evolutionary algorithm
-                EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue());
+                EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue(), statistic);
 
                 // Run the evolutionary algorithm
                 ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,100, 30);
@@ -55,16 +60,12 @@ public class Main extends Application{
                     graph.setCustomers(processFile.customers);
                     borderPane.setCenter(graph);
 
-                    //Create statistics for the graph
-                    Statistic statistic = new Statistic();
-                    BorderPane.setAlignment(statistic, Pos.CENTER);
 //                    double fitness = 0;
 //                    for (ProposedSolution proposedSolution : solutions) {
 //                        fitness += proposedSolution.getFitness();
 //                    }
 //                    fitness /= solutions.length;
                     statistic.setDistance(solutions[0].getFitness(), processFile.optimalFitness, evolutionaryAlgorithm.iterationsUsed);
-                    borderPane.setBottom(statistic);
 
                     //Display one of the solutions
                     graph.setRoutes(solutions[0]);
@@ -80,7 +81,7 @@ public class Main extends Application{
         HBox hBox = new HBox(10);
         hBox.setAlignment(Pos.CENTER);
         hBox.getChildren().addAll(new Text("Select data set:"), taskMenu);
-        taskMenu.setValue("p23");
+        taskMenu.setValue("p22");
         borderPane.setTop(hBox);
 
         primaryStage.getIcons().add(new Image("elster2.png"));
