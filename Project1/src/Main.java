@@ -63,7 +63,7 @@ public class Main extends Application{
 //                        fitness += proposedSolution.getFitness();
 //                    }
 //                    fitness /= solutions.length;
-                    statistic.setDistance(solutions[0].getFitness(), processFile.optimalFitness);
+                    statistic.setDistance(solutions[0].getFitness(), processFile.optimalFitness, evolutionaryAlgorithm.iterationsUsed);
                     borderPane.setBottom(statistic);
 
                     //Display one of the solutions
