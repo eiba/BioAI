@@ -68,8 +68,6 @@ public class Main extends Application{
 
                     //Display one of the solutions
                     graph.setRoutes(solutions[0]);
-                    System.out.println("Solution 0 fitness value: " + solutions[0].getFitness());
-                    System.out.println("Optimal known fitness value: " + processFile.optimalFitness);
 
 //                    for (Car car : solutions[0].cars) {
 //                        System.out.println(car.getCurrentDuration());

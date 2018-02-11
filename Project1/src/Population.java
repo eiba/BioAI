@@ -150,7 +150,7 @@ public class Population {
      * @param numberOfTournaments Number of tournaments to be held
      * @return a list of parents selected in the tournament selection
      */
-    public ProposedSolution tournamentSelection(ProposedSolution[] solutions, int numberOfTournaments){
+    private ProposedSolution tournamentSelection(ProposedSolution[] solutions, int numberOfTournaments){
 
         final Random random = new Random();
         ProposedSolution winner = null;
@@ -228,15 +228,20 @@ public class Population {
     }
 
     
-    ProposedSolution[] crossoverMartin(ProposedSolution[][] parents, Double mutationRate) {
-        final ProposedSolution[] children = new ProposedSolution[parents.length * 2];
+    ProposedSolution[] crossoverMartin(ProposedSolution[] parents, int numberOfTournaments, double mutationRate, int populationSize) {
+        final ProposedSolution[] children = new ProposedSolution[populationSize];
 
         int index = 0;
-        for (int i = 0; i < parents.length; i ++) {
-            children[index ++] = bestCostRouteCrossover(parents[i][0], parents[i][1]);
-            children[index ++] = bestCostRouteCrossover(parents[i][1], parents[i][0]);
+        while (index != populationSize) {
+            final ProposedSolution parent1 = tournamentSelection(parents, numberOfTournaments);
+            final ProposedSolution parent2 = tournamentSelection(parents, numberOfTournaments);
+            final ProposedSolution child = bestCostRouteCrossover(parent1, parent2);
+            if (child != null) {
+                children[index ++] = child;
+            }
         }
-        mutate(children,mutationRate);
+
+        mutate(children, mutationRate);
 
         return children;
     }
@@ -285,6 +290,10 @@ public class Population {
                     }
                 }
 
+            }
+
+            if (bestCar == null) {
+                return null;
             }
 
             bestCar.smartAddCustomerVisited(customer, bestIndex);

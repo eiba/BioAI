@@ -37,15 +37,15 @@ public class EvolutionaryAlgorithm {
         for (int i = 0; i < iterations; i ++) {
 
             // Select the best-fit individuals for reproduction. (Parents)
-            ProposedSolution[][] selectedParents = new ProposedSolution[populationSize][2];
-            for (int j = 0; j < populationSize; j ++) {
-                selectedParents[j][0] = population.tournamentSelection(proposedSolutions, numberOfTournaments);
-                selectedParents[j][1] = population.tournamentSelection(proposedSolutions, numberOfTournaments);
-            }
+//            ProposedSolution[][] selectedParents = new ProposedSolution[populationSize][2];
+//            for (int j = 0; j < populationSize; j ++) {
+//                selectedParents[j][0] = population.tournamentSelection(proposedSolutions, numberOfTournaments);
+//                selectedParents[j][1] = population.tournamentSelection(proposedSolutions, numberOfTournaments);
+//            }
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
             // @TODO make crossover method work!
-            ProposedSolution[] offspring = population.crossoverMartin(selectedParents,mutationRate);
+            ProposedSolution[] offspring = population.crossoverMartin(proposedSolutions, numberOfTournaments, mutationRate, populationSize);
             for (ProposedSolution proposedSolution : offspring) {
                 proposedSolution.evaluateFitness();
             }
