@@ -10,17 +10,6 @@ public class EvolutionaryAlgorithm {
         // Initiating variables
         population = new Population(processFile);
 
-//        double totalPopulation = 0.0;
-//        double totalParent = 0.0;
-//
-//        for (int i=0; i<proposedSolutions.length;i++){
-//            //System.out.println(proposedSolutions[i].getFitnessScore());
-//            totalPopulation += proposedSolutions[i].fitnessScore;
-//            totalParent += selectedParents[i].fitnessScore;
-//        }
-//        System.out.println(totalPopulation);
-//        System.out.println(totalParent);
-
     }
 
     ProposedSolution[] iterate(int populationSize, double mutationRate, int iterations) {

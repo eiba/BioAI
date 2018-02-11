@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -33,38 +34,44 @@ public class Main extends Application{
                 "p20", "p21", "p22", "p23"));
         taskMenu.setOnAction(event -> {
 
-            //Initiate the evolutionary algorithm
-            EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue());
+            Thread thread = new Thread(() -> {
 
-            //Run the evolutionary algorithm
-            ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,1000);
+                // Initiate the evolutionary algorithm
+                EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue());
 
-            //Get all the data from the data set
-            ProcessFile processFile = evolutionaryAlgorithm.processFile;
+                // Run the evolutionary algorithm
+                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,1000);
+
+                // Get all the data from the data set
+                ProcessFile processFile = evolutionaryAlgorithm.processFile;
 
 
-            //Create a new graph
-            Graph graph = new Graph(700, 500, processFile.minX, processFile.minY, processFile.maxX, processFile.maxY);
-            BorderPane.setAlignment(graph, Pos.CENTER);
-            graph.setDepots(processFile.depots);
-            graph.setCustomers(processFile.customers);
-            borderPane.setCenter(graph);
+                //Create a new graph
+                Platform.runLater(() -> {
+                    Graph graph = new Graph(700, 500, processFile.minX, processFile.minY, processFile.maxX, processFile.maxY);
+                    BorderPane.setAlignment(graph, Pos.CENTER);
+                    graph.setDepots(processFile.depots);
+                    graph.setCustomers(processFile.customers);
+                    borderPane.setCenter(graph);
 
-            //Create statistics for the graph
-            Statistic statistic = new Statistic();
-            BorderPane.setAlignment(statistic, Pos.CENTER);
-            double fitness = 0;
-            for (ProposedSolution proposedSolution : solutions) {
-                fitness += proposedSolution.getFitness();
-            }
-            fitness /= solutions.length;
-            statistic.setDistance(fitness);
-            borderPane.setBottom(statistic);
+                    //Create statistics for the graph
+                    Statistic statistic = new Statistic();
+                    BorderPane.setAlignment(statistic, Pos.CENTER);
+                    double fitness = 0;
+                    for (ProposedSolution proposedSolution : solutions) {
+                        fitness += proposedSolution.getFitness();
+                    }
+                    fitness /= solutions.length;
+                    statistic.setDistance(fitness);
+                    borderPane.setBottom(statistic);
 
-            //Display one of the solutions
-            graph.setRoutes(solutions[0]);
-            System.out.println("Solution 0 fitness value: "+solutions[0].getFitness());
-            System.out.println("Optimal known fitness value: "+processFile.optimalFitness);
+                    //Display one of the solutions
+                    graph.setRoutes(solutions[0]);
+                    System.out.println("Solution 0 fitness value: " + solutions[0].getFitness());
+                    System.out.println("Optimal known fitness value: " + processFile.optimalFitness);
+                });
+            });
+            thread.start();
         });
 
         HBox hBox = new HBox(10);
