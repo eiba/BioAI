@@ -39,13 +39,15 @@ public class Main extends Application{
                 //Create statistics for the graph
                 Statistic statistic = new Statistic();
                 BorderPane.setAlignment(statistic, Pos.CENTER);
-                borderPane.setBottom(statistic);
+                Platform.runLater(() -> {
+                    borderPane.setBottom(statistic);
+                });
 
                 // Initiate the evolutionary algorithm
                 EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue(), statistic);
 
                 // Run the evolutionary algorithm
-                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,100, 30);
+                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.02,100, 10);
 
                 // Get all the data from the data set
                 ProcessFile processFile = evolutionaryAlgorithm.processFile;
