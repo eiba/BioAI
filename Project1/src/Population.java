@@ -228,7 +228,7 @@ public class Population {
     }
 
     
-    ProposedSolution[] crossoverMartin(ProposedSolution[][] parents) {
+    ProposedSolution[] crossoverMartin(ProposedSolution[][] parents, Double mutationRate) {
         final ProposedSolution[] children = new ProposedSolution[parents.length * 2];
 
         int index = 0;
@@ -236,6 +236,7 @@ public class Population {
             children[index ++] = bestCostRouteCrossover(parents[i][0], parents[i][1]);
             children[index ++] = bestCostRouteCrossover(parents[i][1], parents[i][0]);
         }
+        mutate(children,mutationRate);
 
         return children;
     }
@@ -432,7 +433,6 @@ public class Population {
 
         //get random car
         Car car = solution.cars[random.nextInt(solution.cars.length)];
-
         int iter = 0;
         //make sure that we get list with more than 2 customers or else there is no point in inverting
         while (car.getCustomerSequence().size() < 3){
@@ -448,9 +448,9 @@ public class Population {
         ArrayList<Customer> customerSequence = car.getCustomerSequence();
 
         //if there is only one car, two cars or no cars in the sequence, no point in inversing, we just return
-        if(customerSequence.size() < 3){
+        /*if(customerSequence.size() < 3){
             return;
-        }
+        }*/
 
         int startIndex = random.nextInt(customerSequence.size()); //startindex of reverse
         int endIndex = random.nextInt(customerSequence.size());   //end index
@@ -488,6 +488,8 @@ public class Population {
            customerSequence.add(i,inverseCustomerArray[count]);
            count ++;
         }
+        car.updateDistance();
+        //solution.evaluateFitness();
     }
 
     //Simple mutation method that takes a random customer from a random route

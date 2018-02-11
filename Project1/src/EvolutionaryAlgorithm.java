@@ -2,6 +2,7 @@ public class EvolutionaryAlgorithm {
 
     private final Population population;
     final ProcessFile processFile;
+    public int iterationsUsed;
 
     EvolutionaryAlgorithm(String filename) {
         // Reading the Multiple Depot Vehicle Routing Problem - MDVRP
@@ -29,6 +30,9 @@ public class EvolutionaryAlgorithm {
             proposedSolution.evaluateFitness();
         }
 
+        //Iterations for diplay in GUI later
+        iterationsUsed = iterations;
+
         // Step Three: Repeat the following regeneration steps until termination:
         for (int i = 0; i < iterations; i ++) {
 
@@ -41,7 +45,7 @@ public class EvolutionaryAlgorithm {
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
             // @TODO make crossover method work!
-            ProposedSolution[] offspring = population.crossoverMartin(selectedParents);
+            ProposedSolution[] offspring = population.crossoverMartin(selectedParents,mutationRate);
             for (ProposedSolution proposedSolution : offspring) {
                 proposedSolution.evaluateFitness();
             }
@@ -52,6 +56,7 @@ public class EvolutionaryAlgorithm {
 
             //If the fitness of the best individual is within 5% of optimal fitness, return
             if(processFile.optimalFitness/proposedSolutions[0].getFitness() >= 0.95){
+                iterationsUsed = i+1;   //update the iterations we used
                 return proposedSolutions;
             }
             // Evaluate the individual fitness of new individuals.
@@ -63,7 +68,6 @@ public class EvolutionaryAlgorithm {
             }*/
 
         }
-
         return proposedSolutions;
     }
 }

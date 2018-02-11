@@ -18,9 +18,9 @@ public class Statistic extends HBox{
         super.getChildren().addAll(distanceBox);
     }
 
-    void setDistance(double solutionDistance, double optimalDistance) {
+    void setDistance(double solutionDistance, double optimalDistance,int iterationsUsed) {
         double percent = optimalDistance / solutionDistance * 100;
-        distanceText.setText(String.format(Locale.US, "%.2f%%, Solution: %.4f, Optimal: %.4f", percent, solutionDistance, optimalDistance));
+        distanceText.setText(String.format(Locale.US, "%.2f%%, Solution: %.4f, Optimal: %.4f, Iterations: %d", percent, solutionDistance, optimalDistance,iterationsUsed));
     }
 
 
