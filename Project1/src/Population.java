@@ -167,8 +167,6 @@ public class Population {
      * @return a list of parents selected in the tournament selection
      */
     private ProposedSolution tournamentSelection(ProposedSolution[] solutions, int numberOfTournaments){
-
-        final Random random = new Random();
         ProposedSolution winner = null;
 
         for (int i = 0; i < numberOfTournaments; i ++) {
@@ -205,7 +203,6 @@ public class Population {
         // Creating a child based on a deep copy of the parent1 object
         final ProposedSolution child = new ProposedSolution(parent1);
         // Selecting a random route from parent2
-        final Random random = new Random();
         final ArrayList<Customer> parentCustomerSequence = parent2.cars[random.nextInt(parent2.cars.length)].getCustomerSequence();
         final ArrayList<Customer> childCustomers = new ArrayList<>();
 
@@ -250,13 +247,10 @@ public class Population {
                         }
                     }
                 }
-
             }
-
             if (bestCar == null) {
                 return null;
             }
-
             bestCar.smartAddCustomerVisited(customer, bestIndex);
         }
 
