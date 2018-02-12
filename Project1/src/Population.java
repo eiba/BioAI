@@ -576,7 +576,7 @@ public class Population {
 
             Double p = Math.random();
             //make survival selection more random as we go
-            if(iteration/maxIterations + 0.1 >= p){
+            /*if(iteration/maxIterations + 0.1 >= p){
                 ProposedSolution solution = priorityQueue.remove(random.nextInt(priorityQueue.size()));
                 if(bestFitness > solution.getFitness()){
                     bestFitness = solution.getFitness();
@@ -587,7 +587,7 @@ public class Population {
                 solution.age++;
                 survivors[index ++] = solution;
                 continue;
-            }
+            }*/
 
             int rank = priorityQueue.size();
             int rankSum = 0;
