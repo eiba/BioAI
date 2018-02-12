@@ -17,7 +17,7 @@ public class Main extends Application{
     private Stage primaryStage;
 
     private static final int POPULATION_SIZE = 100;
-    private static final int ITERATIONS = 3000;
+    private static final int ITERATIONS = 1000;
     private static final int NUMBER_OF_TOURNAMENTS = 2;
     private static final int MAXIMUM_AGE = 2;
     private static final double MUTATION_RATE = 0.05;
@@ -98,7 +98,7 @@ public class Main extends Application{
         HBox hBox = new HBox(10);
         hBox.setAlignment(Pos.CENTER);
         hBox.getChildren().addAll(new Text("Select data set:"), taskMenu);
-        taskMenu.setValue("p04");
+        taskMenu.setValue("p08");
 
 
         borderPane.setTop(hBox);

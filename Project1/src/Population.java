@@ -10,8 +10,7 @@ public class Population {
     private final Comparator<ProposedSolution> selectionComparator;
     private final int maxIterations;
     private int populationSize;
-    private ProposedSolution[] currentPopulation;
-    private HashMap<Integer, int[]> preferedCustomerDepots;
+    private HashMap<Integer, int[]> preferredCustomerDepots;
 
     Population(ProcessFile processFile, Statistic statistic, int maxIterations) {
         this.processFile = processFile;
@@ -36,7 +35,7 @@ public class Population {
         final ProposedSolution[] proposedSolutions = new ProposedSolution[populationSize];
 
         // Grouping customers to depots
-        preferedCustomerDepots = new HashMap<>();
+        preferredCustomerDepots = new HashMap<>();
         for (Customer customer : processFile.customers) {
             final Depot[] depots = processFile.getDepots();
             final int[] depotNumbers = new int[processFile.depotCount];
@@ -60,10 +59,10 @@ public class Population {
                 }
             }
 
-            preferedCustomerDepots.put(customer.getCustomerNr(), depotNumbers);
+            preferredCustomerDepots.put(customer.getCustomerNr(), depotNumbers);
         }
 
-        final ExecutorService executor = Executors.newFixedThreadPool(8);
+        final ExecutorService executor = Executors.newFixedThreadPool(4);
         // Generating a random solution for each iteration
         for (int i = 0; i < populationSize; i ++) {
             final int index = i;
@@ -98,7 +97,7 @@ public class Population {
             // Selecting a random customer
             Customer customer = customers.remove(random.nextInt(customers.size()));
 
-            final int[] preferredDepots = preferedCustomerDepots.get(customer.getCustomerNr());
+            final int[] preferredDepots = preferredCustomerDepots.get(customer.getCustomerNr());
 //                System.out.println(preferredDepots[0]);
 
             double bestDistance = Double.MAX_VALUE;
@@ -198,7 +197,7 @@ public class Population {
     ProposedSolution[] crossover(ProposedSolution[] parents, int numberOfTournaments, double mutationRate, int populationSize, int iteration) {
         final ProposedSolution[] children = new ProposedSolution[populationSize];
 
-        final ExecutorService executor = Executors.newFixedThreadPool(8);
+        final ExecutorService executor = Executors.newFixedThreadPool(4);
 
         for (int i = 0; i < populationSize; i ++) {
 
@@ -290,7 +289,7 @@ public class Population {
     //Mutate children
     private void mutate(ProposedSolution[] solutions, double mutationRate, int iteration){
 
-        final ExecutorService executor = Executors.newFixedThreadPool(8);
+        final ExecutorService executor = Executors.newFixedThreadPool(4);
 
         for (int i = 0; i < solutions.length; i ++) {
             final int index = i;
@@ -516,7 +515,9 @@ public class Population {
                 rank--;
             }
         }
-        
+
+        Arrays.sort(survivors, selectionComparator);
+
         return survivors;
     }
 
