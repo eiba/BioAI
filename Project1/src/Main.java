@@ -86,6 +86,7 @@ public class Main extends Application{
         hBox.getChildren().addAll(new Text("Select data set:"), taskMenu);
         taskMenu.setValue("p01");
 
+
         borderPane.setTop(hBox);
 
         primaryStage.getIcons().add(new Image("elster2.png"));
