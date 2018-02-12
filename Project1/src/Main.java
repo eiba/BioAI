@@ -98,7 +98,7 @@ public class Main extends Application{
         HBox hBox = new HBox(10);
         hBox.setAlignment(Pos.CENTER);
         hBox.getChildren().addAll(new Text("Select data set:"), taskMenu);
-        taskMenu.setValue("p23");
+        taskMenu.setValue("p04");
 
 
         borderPane.setTop(hBox);

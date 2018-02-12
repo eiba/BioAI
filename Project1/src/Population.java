@@ -198,15 +198,26 @@ public class Population {
     ProposedSolution[] crossover(ProposedSolution[] parents, int numberOfTournaments, double mutationRate, int populationSize, int iteration) {
         final ProposedSolution[] children = new ProposedSolution[populationSize];
 
-        int index = 0;
-        while (index != populationSize) {
-            final ProposedSolution parent1 = tournamentSelection(parents, numberOfTournaments);
-            final ProposedSolution parent2 = tournamentSelection(parents, numberOfTournaments);
-            final ProposedSolution child = bestCostRouteCrossover(parent1, parent2, iteration);
-            if (child != null) {
-                children[index ++] = child;
-            }
+        final ExecutorService executor = Executors.newFixedThreadPool(8);
+
+        for (int i = 0; i < populationSize; i ++) {
+
+            final int index = i;
+            executor.execute(() -> {
+                ProposedSolution child = null;
+                do {
+                    final ProposedSolution parent1 = tournamentSelection(parents, numberOfTournaments);
+                    final ProposedSolution parent2 = tournamentSelection(parents, numberOfTournaments);
+                    child = bestCostRouteCrossover(parent1, parent2, iteration);
+                }
+                while (child == null);
+                children[index] = child;
+            });
         }
+
+        executor.shutdown();
+        while (!executor.isTerminated());
+
         mutate(children, mutationRate);
 
         return children;
@@ -279,24 +290,29 @@ public class Population {
     //Mutate children
     private void mutate(ProposedSolution[] solutions, double mutationRate){
 
-        for(ProposedSolution solution: solutions){
-            double p = Math.random();
+        final ExecutorService executor = Executors.newFixedThreadPool(8);
 
-            // Mutate with a probability of mutationRate
-            if(mutationRate >= p){
-//                final double mutationAlgorithm = Math.random();
-//                if (mutationAlgorithm < 0.33) {
-//                    stealMutation(solution);
-//                }
-//                else if (mutationAlgorithm < 0.66) {
-//                    inverseMutation(solution);
-//                }
-//                else {
-//                    swapMutation(solution);
-//                }
-                stealMutation(solution);
-            }
+        for (int i = 0; i < solutions.length; i ++) {
+            final int index = i;
+            executor.execute(() -> {
+                double p = Math.random();
+                // Mutate with a probability of mutationRate
+                if(mutationRate >= p){
+                    stealMutation(solutions[index]);
+                }
+            });
         }
+        executor.shutdown();
+        while (!executor.isTerminated());
+
+//        for(ProposedSolution solution: solutions){
+//            double p = Math.random();
+//
+//            // Mutate with a probability of mutationRate
+//            if(mutationRate >= p){
+//                stealMutation(solution);
+//            }
+//        }
     }
 
     private void inverseMutation(ProposedSolution solution){
