@@ -332,8 +332,8 @@ public class Population {
                 double p = Math.random();
                 // Mutate with a probability of mutationRate
                 if(mutationRate >= p){
-                    stealMutation(solutions[index], iteration);
-//                    mergeMutation(solutions[index]);
+//                    stealMutation(solutions[index], iteration);
+                    mergeMutation(solutions[index]);
                 }
             });
         }
@@ -528,6 +528,7 @@ public class Population {
                         bestCar = car1;
                         bestIndex = (int) smartCheck[0];
                         bestDistance = smartCheck[1] - car1.currentDuration;
+                        break;
                     }
                 }
             }
