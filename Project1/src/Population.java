@@ -131,7 +131,7 @@ public class Population {
                     // Check if the car is eligible to serve an additional customer
                     final double[] smartCheck = car.isEligible(customer);
                     if (smartCheck[0] != -1) {
-                        final double newDistance = smartCheck[1] - car.getCurrentDuration();
+                        final double newDistance = smartCheck[1];
                         if (newDistance < bestDistance) {
                             bestDistance = newDistance;
                             bestCar = car;

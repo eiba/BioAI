@@ -62,7 +62,7 @@ public class EvolutionaryAlgorithm {
             }
 
             // Stuck for over 20 iterations
-            if (i - bestIteration > 20 ) {
+            if (((double) i - bestIteration) / iterations > 0.05 ) {
                 bestIteration = i;
                 bestFitness = Double.MAX_VALUE;
                 final int size = (int) (populationSize * 0.9);
