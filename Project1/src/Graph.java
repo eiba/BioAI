@@ -13,7 +13,7 @@ public class Graph extends Pane {
     private final int minX, minY;
     private final double height, factorX, factorY;
 
-    private final Color[] colors = {Color.GREEN, Color.RED, Color.ORANGE, Color.BLUE, Color.PURPLE};
+    private final Color[] colors = {Color.GREEN, Color.RED, Color.ORANGE, Color.BLUE, Color.PURPLE, Color.PINK, Color.AQUA, Color.GOLDENROD};
 
     private Depot[] depots;
     private Customer[] customers;
@@ -70,9 +70,8 @@ public class Graph extends Pane {
     void setRoutes(ProposedSolution solution) {
         routePane.getChildren().clear();
 
-        int counter = 0;
-
         for (Depot depot : solution.depots) {
+            int counter = 0;
             for (Car car : depot.getCars()) {
                 Color color = colors[counter % colors.length];
                 counter ++;

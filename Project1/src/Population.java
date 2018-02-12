@@ -190,7 +190,7 @@ public class Population {
         while (index != populationSize) {
             final ProposedSolution parent1 = tournamentSelection(parents, numberOfTournaments);
             final ProposedSolution parent2 = tournamentSelection(parents, numberOfTournaments);
-            final ProposedSolution child = bestCostRouteCrossover(parent1, parent2, threshold);
+            final ProposedSolution child = bestCostRouteCrossover(parent1, parent2);
             if (child != null) {
                 children[index ++] = child;
             }
@@ -200,13 +200,15 @@ public class Population {
         return children;
     }
 
-    private ProposedSolution bestCostRouteCrossover(ProposedSolution parent1, ProposedSolution parent2, double threshold) {
+    private ProposedSolution bestCostRouteCrossover(ProposedSolution parent1, ProposedSolution parent2) {
 
         // Creating a child based on a deep copy of the parent1 object
         final ProposedSolution child = new ProposedSolution(parent1);
         // Selecting a random route from parent2
-        final Random random = new Random();
-        final ArrayList<Customer> parentCustomerSequence = parent2.cars[random.nextInt(parent2.cars.length)].getCustomerSequence();
+        final HashMap<Integer, Integer> customerCarMap = new HashMap<>();
+        final Car randomCar =  parent2.cars[random.nextInt(parent2.cars.length)];
+        final int depotNr = randomCar.getDepot().getDepotNr();
+        final ArrayList<Customer> parentCustomerSequence =randomCar.getCustomerSequence();
         final ArrayList<Customer> childCustomers = new ArrayList<>();
 
         // Removing the customers from the child's routes
@@ -214,6 +216,7 @@ public class Population {
             for (Car childCar : child.cars) {
                 for (Customer childCustomer : childCar.getCustomerSequence()) {
                     if (parentCustomer.getCustomerNr() == childCustomer.getCustomerNr()) {
+                        customerCarMap.put(childCustomer.getCustomerNr(), childCar.getVehicleNumber());
                         childCar.remove(childCustomer);
                         childCustomers.add(childCustomer);
                         continue customerLoop;
@@ -225,17 +228,18 @@ public class Population {
         // Finding the best route to add the customers
         for (Customer customer : childCustomers) {
 
-            boolean optimal = true;
-            if (Math.random() > threshold) {
-                optimal = false;
-            }
-
             double bestDistance = Double.MAX_VALUE;
             Car bestCar = null;
             int bestIndex = -1;
 
             // Looping through all car routes
             for (Car car : child.cars) {
+
+                if (car.getDepot().getDepotNr() == depotNr) {
+                    if (customerCarMap.get(customer.getCustomerNr()) == car.getVehicleNumber()) {
+                        continue;
+                    }
+                }
 
                 final double[] smartCheck = car.isEligible(customer);
                 if (smartCheck[0] != -1) {
@@ -245,9 +249,6 @@ public class Population {
                         bestDistance = smartCheck[1] - car.getCurrentDuration();
                         bestCar = car;
                         bestIndex = (int) smartCheck[0];
-                        if (!optimal) {
-                            break;
-                        }
                     }
                 }
 
@@ -271,7 +272,16 @@ public class Population {
 
             // Mutate with a probability of mutationRate
             if(mutationRate >= p){
-                stealMutation(solution);
+                final double mutationAlgorithm = Math.random();
+                if (mutationAlgorithm < 0.33) {
+                    stealMutation(solution);
+                }
+                else if (mutationAlgorithm < 0.66) {
+                    inverseMutation(solution);
+                }
+                else {
+                    swapMutation(solution);
+                }
             }
         }
     }
@@ -421,6 +431,7 @@ public class Population {
                     bestCar = car1;
                     bestIndex = (int) smartCheck[0];
                     bestDistance = smartCheck[1] - car1.currentDuration;
+                    break;
                 }
             }
         }

@@ -2,6 +2,7 @@ import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 
 public class StatGraph extends Pane {
 
@@ -20,13 +21,6 @@ public class StatGraph extends Pane {
         this.height = height;
         this.iterations = iterations;
 
-        final Line optimalLine = new Line();
-        optimalLine.setStroke(Color.GREEN);
-        optimalLine.setStartX(0);
-        optimalLine.setStartY(height);
-        optimalLine.setEndX(width);
-        optimalLine.setEndY(height);
-
         final Line approvedLine = new Line();
         approvedLine.setStroke(Color.YELLOW);
         approvedLine.setStartX(0);
@@ -34,7 +28,23 @@ public class StatGraph extends Pane {
         approvedLine.setEndX(width);
         approvedLine.setEndY(height * 0.95);
 
-        super.getChildren().addAll(approvedLine, optimalLine);
+        final Line optimalLine = new Line();
+        optimalLine.setStroke(Color.GREEN);
+        optimalLine.setStartX(0);
+        optimalLine.setStartY(height);
+        optimalLine.setEndX(width);
+        optimalLine.setEndY(height);
+
+
+        Text approvedText = new Text("95%");
+        approvedText.setY(approvedLine.getEndY());
+        approvedText.setX(-25);
+
+        Text optimalText = new Text("100%");
+        optimalText.setY(optimalLine.getEndY());
+        optimalText.setX(-32);
+
+        super.getChildren().addAll(approvedLine, optimalLine, approvedText, optimalText);
     }
 
     void addIteration(double fitness) {
