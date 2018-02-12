@@ -41,7 +41,7 @@ public class EvolutionaryAlgorithm {
             statistic.setUpdate("Crossover and Mutation iterations: " + (i+1) + "/" + iterations);
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
-            ProposedSolution[] offspring = population.crossoverMartin(proposedSolutions, numberOfTournaments, mutationRate, populationSize);
+            ProposedSolution[] offspring = population.crossover(proposedSolutions, numberOfTournaments, mutationRate, populationSize);
             for (ProposedSolution proposedSolution : offspring) {
                 proposedSolution.evaluateFitness();
             }
