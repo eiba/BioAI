@@ -167,8 +167,6 @@ public class Population {
      * @return a list of parents selected in the tournament selection
      */
     private ProposedSolution tournamentSelection(ProposedSolution[] solutions, int numberOfTournaments){
-
-        final Random random = new Random();
         ProposedSolution winner = null;
 
         for (int i = 0; i < numberOfTournaments; i ++) {
@@ -208,7 +206,7 @@ public class Population {
         final HashMap<Integer, Integer> customerCarMap = new HashMap<>();
         final Car randomCar =  parent2.cars[random.nextInt(parent2.cars.length)];
         final int depotNr = randomCar.getDepot().getDepotNr();
-        final ArrayList<Customer> parentCustomerSequence =randomCar.getCustomerSequence();
+        final ArrayList<Customer> parentCustomerSequence = randomCar.getCustomerSequence();
         final ArrayList<Customer> childCustomers = new ArrayList<>();
 
         // Removing the customers from the child's routes
@@ -251,13 +249,10 @@ public class Population {
                         bestIndex = (int) smartCheck[0];
                     }
                 }
-
             }
-
             if (bestCar == null) {
                 return null;
             }
-
             bestCar.smartAddCustomerVisited(customer, bestIndex);
         }
 
