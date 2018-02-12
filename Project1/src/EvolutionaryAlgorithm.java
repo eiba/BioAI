@@ -6,14 +6,14 @@ public class EvolutionaryAlgorithm {
     final ProcessFile processFile;
     public int iterationsUsed;
 
-    EvolutionaryAlgorithm(String filename, Statistic statistic, StatGraph statGraph) {
+    EvolutionaryAlgorithm(String filename, Statistic statistic, StatGraph statGraph, int iterations) {
         // Reading the Multiple Depot Vehicle Routing Problem - MDVRP
         processFile = new ProcessFile(filename);
         this.statistic = statistic;
         this.statGraph = statGraph;
 
         // Initiating variables
-        population = new Population(processFile, statistic);
+        population = new Population(processFile, statistic, iterations);
 
     }
 
@@ -43,7 +43,7 @@ public class EvolutionaryAlgorithm {
             statistic.setUpdate("Crossover and Mutation iterations: " + (i+1) + "/" + iterations);
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
-            ProposedSolution[] offspring = population.crossover(proposedSolutions, numberOfTournaments, mutationRate, populationSize, threshold);
+            ProposedSolution[] offspring = population.crossover(proposedSolutions, numberOfTournaments, mutationRate, populationSize, i);
             for (ProposedSolution proposedSolution : offspring) {
                 proposedSolution.evaluateFitness();
             }
@@ -54,10 +54,10 @@ public class EvolutionaryAlgorithm {
             statGraph.addIteration(processFile.optimalFitness / proposedSolutions[0].getFitness());
 
             //If the fitness of the best individual is within 5% of optimal fitness, return
-//            if(processFile.optimalFitness/proposedSolutions[0].getFitness() >= 0.95){
-//                iterationsUsed = i+1;   //update the iterations we used
-//                return proposedSolutions;
-//            }
+            if(processFile.optimalFitness/proposedSolutions[0].getFitness() >= 0.95){
+                iterationsUsed = i+1;   //update the iterations we used
+                return proposedSolutions;
+            }
             // Evaluate the individual fitness of new individuals.
 
             //We probably don't need to do this here, as we need to do it after crossover anyway.
