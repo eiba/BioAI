@@ -49,7 +49,7 @@ public class EvolutionaryAlgorithm {
             }
 
             // Replace least-fit population with new individuals.
-            proposedSolutions = population.select(proposedSolutions, offspring, maximumAge);
+            proposedSolutions = population.select(proposedSolutions, offspring, maximumAge, i);
 //            proposedSolutions = population.selectParentOffspring(offspring);
 //            proposedSolutions = offspring;
 

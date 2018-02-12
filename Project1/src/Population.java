@@ -193,11 +193,41 @@ public class Population {
         return winner;
 
     }
+
+    //select based on the rank in the population
+    private ProposedSolution rankSelection(ProposedSolution[] solutions, int iteration){
+        ProposedSolution selected = null;
+
+        int rank = solutions.length;
+        int rankSum = 0;
+        for(int i=solutions.length;i>0;i--){
+            rankSum += i;
+        }
+        Double p = Math.random();
+        Double cumulativeProbability = 0.0;
+
+        //select more random as we go
+        if(iteration/maxIterations + 0.1 >= p){
+            return solutions[random.nextInt(solutions.length)];
+        }
+        for(ProposedSolution solution: solutions){
+
+            cumulativeProbability += (double) rank/rankSum;
+
+            if(p <= cumulativeProbability){
+                selected = solution;
+                break;
+            }
+            rank--;
+        }
+
+        return selected;
+    }
     
     ProposedSolution[] crossover(ProposedSolution[] parents, int numberOfTournaments, double mutationRate, int populationSize, int iteration) {
         final ProposedSolution[] children = new ProposedSolution[populationSize];
         final ExecutorService executor = Executors.newFixedThreadPool(Main.PROCESSORS);
-
+        Arrays.sort(parents,selectionComparator);   //used for rand selection
         for (int i = 0; i < populationSize; i ++) {
 
             final int index = i;
@@ -205,8 +235,14 @@ public class Population {
 
                 ProposedSolution child, parent1, parent2;
                 do {
-                    parent1 = tournamentSelection(parents, numberOfTournaments);
-                    parent2 = tournamentSelection(parents, numberOfTournaments);
+                    //rank selection
+                    parent1 = rankSelection(parents,iteration);
+                    parent2 = rankSelection(parents,iteration);
+
+                    //tournament selection
+                    //parent1 = tournamentSelection(parents, numberOfTournaments);
+                    //parent2 = tournamentSelection(parents, numberOfTournaments);
+
                     child = bestCostRouteCrossover(parent1, parent2, iteration);
                 }
                 while (child == null);
@@ -511,7 +547,7 @@ public class Population {
     }
 
     //selects the population size best individuals
-    public ProposedSolution[] select(ProposedSolution[] parents, ProposedSolution[] offspring, int maximumAge){
+    public ProposedSolution[] select(ProposedSolution[] parents, ProposedSolution[] offspring, int maximumAge, int iteration){
 
         final ArrayList<ProposedSolution> priorityQueue = new ArrayList<>();
 
@@ -539,14 +575,30 @@ public class Population {
         Double bestFitness = Double.MAX_VALUE;
         int bestIndex = 0;
         while (index < survivors.length) {
+
+            Double p = Math.random();
+            //make survival selection more random as we go
+            if(iteration/maxIterations + 0.1 >= p){
+                ProposedSolution solution = priorityQueue.remove(random.nextInt(priorityQueue.size()));
+                if(bestFitness > solution.getFitness()){
+                    bestFitness = solution.getFitness();
+                    bestIndex = index;
+                    bestSolution = solution;
+                }
+
+                solution.age++;
+                survivors[index ++] = solution;
+                continue;
+            }
+
             int rank = priorityQueue.size();
             int rankSum = 0;
             for(int i=priorityQueue.size();i>0;i--){
                 rankSum += i;
             }
-            Double p = Math.random();
             Double cumulativeProbability = 0.0;
             int listIndex = 0;
+
             while (!priorityQueue.isEmpty()){
 
                 ProposedSolution solution = priorityQueue.get(listIndex);
@@ -574,7 +626,6 @@ public class Population {
         //Make best solution first in the list
         survivors[bestIndex] = survivors[0];
         survivors[0] = bestSolution;
-
         return survivors;
     }
 
