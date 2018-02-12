@@ -182,33 +182,8 @@ public class Population {
         return winner;
 
     }
-
-//    public ProposedSolution[] crossover(ProposedSolution[] solutions, double mutationRate){
-//
-//        ProposedSolution[] children = new ProposedSolution[solutions.length];
-//        Random rand = new Random();
-//
-//        for(int i=0;i<children.length;i++){
-//            ProposedSolution parent1 = solutions[rand.nextInt(solutions.length)];
-//            ProposedSolution parent2 = solutions[rand.nextInt(solutions.length)];
-//
-//            children[i] = copulate(parent1,parent2);
-//        }
-//
-//        // mutate the children
-//        mutate(solutions, mutationRate);
-//
-//        //after creating and mutating children, we score them.
-//        for(ProposedSolution child: children){
-//
-//            scoreSolution(child);
-//        }
-//
-//        return children;
-//    }
-
     
-    ProposedSolution[] crossoverMartin(ProposedSolution[] parents, int numberOfTournaments, double mutationRate, int populationSize) {
+    ProposedSolution[] crossover(ProposedSolution[] parents, int numberOfTournaments, double mutationRate, int populationSize) {
         final ProposedSolution[] children = new ProposedSolution[populationSize];
 
         int index = 0;
@@ -279,128 +254,6 @@ public class Population {
 
         return child;
     }
-
-    // @TODO proper copulate method. Create new ProposedSolution objects as we need the old ones for survivor selection
-//    public ProposedSolution copulate(ProposedSolution parent1, ProposedSolution parent2){
-//
-//
-//        Depot[] depotsParent1 = new Depot[processFile.depotCount]; //all depots in the first parent
-//        Depot[] depotsParent2 = new Depot[processFile.depotCount]; //all depots in second parent
-//
-//
-//        //We need to create depots for a new solution without altering the old one.
-//        for(int i=0;i<parent1.depots.length;i++){
-//            depotsParent1[i] = new Depot(parent1.depots[i],false);
-//            depotsParent2[i] = new Depot(parent2.depots[i],false);
-//
-//        }
-//
-//        ProposedSolution parent1Copy = new ProposedSolution(depotsParent1);
-//        ProposedSolution parent2Copy = new ProposedSolution(depotsParent2);
-//
-//        int route1Index = random.nextInt(parent1Copy.cars.length);
-//        Car route1Car = parent1Copy.cars[route1Index];   //random route from first parent
-//
-//        int route2Index = random.nextInt(parent2Copy.cars.length);
-//        Car route2Car = parent2Copy.cars[route2Index];   //random route from second parent
-//
-//        ArrayList<Customer> route1Sequence = route1Car.getCustomerSequence();
-//        ArrayList<Customer> route2Sequence = route2Car.getCustomerSequence();
-//
-//        //route1Sequence.removeAll(route2Sequence);
-//        ArrayList<Customer> insertionRoute = new ArrayList<>();
-//        for(Customer customer: route2Sequence){
-//            if(!route1Sequence.contains(customer)){
-//                insertionRoute.add(customer);
-//            }
-//        }
-//        if(insertionRoute.size() == 0){
-//            return parent1Copy;
-//        }
-//
-//
-//        /*for(Car car: parent1Copy.cars){
-//            ArrayList<Customer> customersToRemove = new ArrayList<>();
-//            for(Customer customer1: car.getCustomerSequence()){
-//                for(Customer customer2: insertionRoute){
-//                    if(customer1 == customer2){
-//                        customersToRemove.add(customer1);
-//                    }
-//                }
-//            }
-//            car.getCustomerSequence().removeAll(customersToRemove);
-//        }*/
-//
-//        Car[] newCars = new Car[route1Sequence.size() +1];
-//        for(int i=0;i<route1Sequence.size()+1;i++){
-//            route1Sequence.addAll(i,insertionRoute);
-//            newCars[i] = evaluateRoute(route1Sequence,route1Car);
-//            route1Sequence.removeAll(insertionRoute);
-//
-//        }
-//
-//        Car bestCar = null;
-//        Double bestDuration = Double.MAX_VALUE;
-//
-//        for(Car car: newCars){
-//            if(car.getCurrentDuration() < bestDuration){
-//                bestDuration = car.getCurrentDuration();
-//                bestCar = car;
-//            }
-//        }
-////        bestCar.setCurrentLoad(0);
-//        bestCar.setCurrentDuration(0.0);
-//
-//        parent1Copy.cars[route1Index] = bestCar;
-//
-//        return parent1Copy;
-//    }
-
-
-
-    //evaluates one customer route
-//    public Car evaluateRoute(ArrayList<Customer> route, Car car){
-//
-//        Car newCar = new Car(car.getVehicleNumber(),car.getMaximumLoad(),car.getMaximumDuration(),car.getDepot());
-//
-//        for(Customer customer: route){
-//            newCar.addDuration(euclideanDistance(newCar.getX(),newCar.getY(),customer.getX(),customer.getY()));
-////            newCar.addLoad(customer.getDemand());
-//            newCar.setX(customer.getX());
-//            newCar.setY(customer.getY());
-//            newCar.addCustomerVisited(customer);
-//        }
-//        newCar.addDuration(euclideanDistance(car.getX(),car.getY(),car.getDepot().getX(),car.getDepot().getY()));
-//        newCar.setX(car.getDepot().getX());
-//        newCar.setY(car.getDepot().getY());
-//
-//        return newCar;
-//    }
-//
-//    public HashMap<Customer,Car> convertToGenotype(ProposedSolution solution){
-//
-//        HashMap<Customer,Car> genotype = new HashMap<>();
-//        Depot[] depotsParent = new Depot[processFile.depotCount]; //all depots in the parent
-//
-//        for(int i=0;i<solution.depots.length;i++){
-//            depotsParent[i] = new Depot(solution.depots[i],false);
-//        }
-//
-//        for(Depot depot: depotsParent){
-//            for(Car car: depot.getCars()){
-//                for(Customer customer: car.getCustomerSequence()){
-//                    genotype.put(customer,car);
-//                }
-//            }
-//        }
-//
-//        return genotype;
-//    }
-//
-//    public ProposedSolution convertToPhenotype(HashMap<Customer,Car> genotype){
-//
-//        return null;
-//    }
 
     //Mutate children
     public void mutate(ProposedSolution[] solutions, double mutationRate){
@@ -555,30 +408,6 @@ public class Population {
         
         return survivors;
     }
-
-    //Score a solution. Calculate durations, loads and fitness score
-//    public void scoreSolution(ProposedSolution solution){
-//
-//        //iterate over all cars in solution, and all customers in each car and add the loads and durations.
-//        for(Car car: solution.cars){
-//            //car.setX(car.getDepot().getX());
-//            //car.setY(car.getDepot().getY());
-//            ArrayList<Customer> customerSequence = car.getCustomerSequence();
-//
-//            for (Customer customer:customerSequence){
-////                car.addLoad(customer.getDemand());
-//                car.addDuration(euclideanDistance(customer.getX(), customer.getY(), car.getX(), car.getY()));
-//                car.setX(customer.getX());
-//                car.setY(customer.getY());
-//            }
-//
-//            //Driving the car home :)
-//            car.addDuration(euclideanDistance(car.getX(), car.getY(), car.getDepot().getX(), car.getDepot().getY()));
-//        }
-//
-//        //evaluate the total fitness of the population
-//        solution.evaluateFitness();
-//    }
 
     //calculates the euclidean distance from a to b
     static double euclideanDistance(double x1, double y1, double x2, double y2){
