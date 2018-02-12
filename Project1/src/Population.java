@@ -1,4 +1,6 @@
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Population {
 
@@ -61,17 +63,27 @@ public class Population {
             preferedCustomerDepots.put(customer.getCustomerNr(), depotNumbers);
         }
 
+        final ExecutorService executor = Executors.newFixedThreadPool(8);
         // Generating a random solution for each iteration
         for (int i = 0; i < populationSize; i ++) {
-            statistic.setUpdate("Generating valid initial solutions: " + (i+1) + "/" + populationSize);
-            //Add the solution to the solutions list
-            ProposedSolution proposedSolution;
-            do {
-                proposedSolution = generateSolution();
-            }
-            while (proposedSolution == null);
-            proposedSolutions[i] = proposedSolution;
+            final int index = i;
+            executor.execute(() -> {
+                statistic.setUpdate("Generating valid initial solutions: " + (index+1) + "/" + populationSize);
+                //Add the solution to the solutions list
+                ProposedSolution proposedSolution;
+                do {
+                    proposedSolution = generateSolution();
+                }
+                while (proposedSolution == null);
+                proposedSolutions[index] = proposedSolution;
+            });
         }
+
+        executor.shutdown();
+        while (!executor.isTerminated()) {
+        }
+
+
 
         return proposedSolutions;
     }
