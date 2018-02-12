@@ -271,7 +271,7 @@ public class Population {
 
             // Mutate with a probability of mutationRate
             if(mutationRate >= p){
-                inverseMutation(solution);
+                stealMutation(solution);
             }
         }
     }

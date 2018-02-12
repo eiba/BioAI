@@ -16,6 +16,13 @@ public class Main extends Application{
 
     private Stage primaryStage;
 
+    private static final int POPULATION_SIZE = 100;
+    private static final int ITERATIONS = 1000;
+    private static final int NUMBER_OF_TOURNAMENTS = 3;
+    private static final int MAXIMUM_AGE = 2;
+    private static final double MUTATION_RATE = 0.4;
+    private static final double THRESHOLD = 1;
+
     public static void main(String[] args) {
         Application.launch(args);
     }
@@ -36,19 +43,26 @@ public class Main extends Application{
 
             Thread thread = new Thread(() -> {
 
-                //Create statistics for the graph
+                // Create statistics for the graph
                 Statistic statistic = new Statistic();
                 BorderPane.setAlignment(statistic, Pos.CENTER);
                 Platform.runLater(() -> {
                     borderPane.setBottom(statistic);
                 });
 
+                // Create new StatGraph for fitness graph
+                StatGraph statGraph = new StatGraph(700, 500, ITERATIONS);
+                BorderPane.setAlignment(statGraph, Pos.CENTER);
+                Platform.runLater(() -> {
+                    borderPane.setCenter(statGraph);
+                });
+
                 // Initiate the evolutionary algorithm
-                EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue(), statistic);
+                EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue(), statistic, statGraph);
 
                 // Run the evolutionary algorithm
 
-                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(1000, 0.5,100, 100,5, 0.5);
+                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(POPULATION_SIZE, MUTATION_RATE,ITERATIONS, NUMBER_OF_TOURNAMENTS,MAXIMUM_AGE, THRESHOLD);
 
                 // Get all the data from the data set
                 ProcessFile processFile = evolutionaryAlgorithm.processFile;
