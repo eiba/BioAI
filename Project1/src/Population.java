@@ -218,7 +218,7 @@ public class Population {
         executor.shutdown();
         while (!executor.isTerminated());
 
-        mutate(children, mutationRate);
+        mutate(children, mutationRate, iteration);
 
         return children;
     }
@@ -288,7 +288,7 @@ public class Population {
     }
 
     //Mutate children
-    private void mutate(ProposedSolution[] solutions, double mutationRate){
+    private void mutate(ProposedSolution[] solutions, double mutationRate, int iteration){
 
         final ExecutorService executor = Executors.newFixedThreadPool(8);
 
@@ -298,21 +298,13 @@ public class Population {
                 double p = Math.random();
                 // Mutate with a probability of mutationRate
                 if(mutationRate >= p){
-                    stealMutation(solutions[index]);
+                    stealMutation(solutions[index], iteration);
                 }
             });
         }
         executor.shutdown();
         while (!executor.isTerminated());
 
-//        for(ProposedSolution solution: solutions){
-//            double p = Math.random();
-//
-//            // Mutate with a probability of mutationRate
-//            if(mutationRate >= p){
-//                stealMutation(solution);
-//            }
-//        }
     }
 
     private void inverseMutation(ProposedSolution solution){
@@ -433,7 +425,7 @@ public class Population {
 
     }
 
-    private void stealMutation(ProposedSolution solution) {
+    private void stealMutation(ProposedSolution solution, int iteration) {
 
         // Get a random depot
 //        final Depot depot = solution.depots[random.nextInt(solution.depots.length)];
@@ -461,7 +453,10 @@ public class Population {
                     bestCar = car1;
                     bestIndex = (int) smartCheck[0];
                     bestDistance = smartCheck[1] - car1.currentDuration;
-//                    break;
+                    final double random = Math.random();
+                    if (random < (double) iteration / maxIterations) {
+                        break;
+                    }
                 }
             }
         }
