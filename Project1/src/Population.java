@@ -231,15 +231,15 @@ public class Population {
             final int index = i;
             executor.execute(() -> {
 
-                ProposedSolution child, parent1, parent2;
+                ProposedSolution child;
                 do {
                     //rank selection
-                    //parent1 = rankSelection(parents,iteration);
-                    //parent2 = rankSelection(parents,iteration);
+//                    final ProposedSolution parent1 = rankSelection(parents,iteration);
+//                    final ProposedSolution parent2 = rankSelection(parents,iteration);
 
                     //tournament selection
-                    parent1 = tournamentSelection(parents, numberOfTournaments);
-                    parent2 = tournamentSelection(parents, numberOfTournaments);
+                    final ProposedSolution parent1 = tournamentSelection(parents, numberOfTournaments);
+                    final ProposedSolution parent2 = tournamentSelection(parents, numberOfTournaments);
 
                     child = bestCostRouteCrossover(parent1, parent2, iteration);
                 }
@@ -329,12 +329,12 @@ public class Population {
         for (int i = 0; i < solutions.length; i ++) {
             final int index = i;
             executor.execute(() -> {
-                double p = Math.random();
+                final double p = Math.random();
                 // Mutate with a probability of mutationRate
-                if(mutationRate >= p){
+                if(mutationRate > p){
                     stealMutation(solutions[index], iteration);
-                    mergeMutation(solutions[index], iteration);
-                    inverseMutation(solutions[index]);
+//                    mergeMutation(solutions[index], iteration);
+//                    inverseMutation(solutions[index]);
 //                    swapMutation(solutions[index]);
                 }
             });

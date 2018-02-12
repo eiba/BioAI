@@ -44,10 +44,10 @@ public class EvolutionaryAlgorithm {
         // Step Three: Repeat the following regeneration steps until termination:
         for (int i = 0; i < iterations; i ++) {
 
-            statistic.setUpdate("Crossover and Mutation iterations: " + (i+1) + "/" + iterations);
+            statistic.setUpdate("Crossover and mutation iterations: " + (i+1) + "/" + iterations);
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
-            ProposedSolution[] offspring = population.crossover(proposedSolutions, numberOfTournaments, mutationRate, populationSize, i);
+            ProposedSolution[] offspring = population.crossover(proposedSolutions, numberOfTournaments, mutationRate, (int) (populationSize * 1.5), i);
             for (ProposedSolution proposedSolution : offspring) {
                 proposedSolution.evaluateFitness();
             }
