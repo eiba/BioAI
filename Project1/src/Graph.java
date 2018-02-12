@@ -94,6 +94,7 @@ public class Graph extends Pane {
                     currentY = customer.getY();
                     routePane.getChildren().add(lineRoute);
                 }
+
                 Line lineRoute = new Line();
                 lineRoute.setStroke(color);
                 lineRoute.setStartX(mapXToGraph(currentX));
