@@ -18,12 +18,12 @@ public class Main extends Application{
 
     public static final int PROCESSORS = Runtime.getRuntime().availableProcessors();
 
-    private static final int POPULATION_SIZE = 100;
+    private static final int POPULATION_SIZE = 300;
 
     private static final int ITERATIONS = 3000;
     private static final int NUMBER_OF_TOURNAMENTS = 2;
     private static final int MAXIMUM_AGE = 3;
-    private static final double MUTATION_RATE = 0.05;
+    private static final double MUTATION_RATE = 0.1;
     private static final double THRESHOLD = 1;
 
     public static void main(String[] args) {

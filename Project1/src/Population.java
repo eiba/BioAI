@@ -332,8 +332,10 @@ public class Population {
                 double p = Math.random();
                 // Mutate with a probability of mutationRate
                 if(mutationRate >= p){
-//                    stealMutation(solutions[index], iteration);
-                    mergeMutation(solutions[index]);
+                    stealMutation(solutions[index], iteration);
+                    mergeMutation(solutions[index], iteration);
+                    inverseMutation(solutions[index]);
+//                    swapMutation(solutions[index]);
                 }
             });
         }
@@ -502,21 +504,23 @@ public class Population {
         }
     }
 
-    void mergeMutation(ProposedSolution solution) {
+    void mergeMutation(ProposedSolution solution, int iteration) {
 
         final Car[] cars = solution.cars;
+        final int changes = random.nextInt((int) ((double) iteration / maxIterations * 10) + 1);
 
-        // Get a random car to steal customers from
-        Car car;
-        do {
-            car = cars[random.nextInt(cars.length)];
-        }
-        while (car == null || car.customerSequence.size() == 0);
+        for (int j = 0; j < changes; j ++) {
 
-        //Get a random customer to give away
-        int index = 0;
-        for (int i = 0; i < car.customerSequence.size(); i ++) {
-            Customer customer = car.customerSequence.get(index);
+            // Get a random car to steal customers from
+            Car car;
+            do {
+                car = cars[random.nextInt(cars.length)];
+            }
+            while (car == null || car.customerSequence.size() == 0);
+
+            //Get a random customer to give away
+            //Get a random customer to give away
+            final Customer customer = car.customerSequence.get(random.nextInt(car.customerSequence.size()));
             Car bestCar = null;
             int bestIndex = -1;
             double bestDistance = 0;
@@ -528,7 +532,7 @@ public class Population {
                         bestCar = car1;
                         bestIndex = (int) smartCheck[0];
                         bestDistance = smartCheck[1] - car1.currentDuration;
-                        break;
+//                        break;
                     }
                 }
             }
@@ -537,9 +541,7 @@ public class Population {
                 car.remove(customer);
                 bestCar.smartAddCustomerVisited(customer, bestIndex);
             }
-            else {
-                index ++;
-            }
+
         }
 
 
