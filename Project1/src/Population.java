@@ -491,6 +491,9 @@ public class Population {
 
         int index = 0;
 
+        ProposedSolution bestSolution = null;
+        Double bestFitness = Double.MAX_VALUE;
+        int bestIndex = 0;
         while (index < survivors.length) {
             int rank = priorityQueue.size();
             int rankSum = 0;
@@ -507,6 +510,14 @@ public class Population {
                 cumulativeProbability += (double) rank/rankSum;
 
                 if(p <= cumulativeProbability){
+
+                    //if the solution is the best solution we've seen, add as such
+                    if(bestFitness > solution.getFitness()){
+                        bestFitness = solution.getFitness();
+                        bestIndex = index;
+                        bestSolution = solution;
+                    }
+
                     solution.age++;
                     survivors[index ++] = priorityQueue.remove(listIndex);
                     break;
@@ -516,7 +527,9 @@ public class Population {
             }
         }
 
-        Arrays.sort(survivors, selectionComparator);
+        //Make best solution first in the list
+        survivors[bestIndex] = survivors[0];
+        survivors[0] = bestSolution;
 
         return survivors;
     }
