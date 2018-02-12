@@ -14,12 +14,21 @@ public class StatGraph extends Pane {
 
     StatGraph(double width, double height, int iterations) {
         super();
+        super.setTranslateY(-height);
         super.setMinSize(width, height);
         super.setMaxSize(width, height);
+        height *= 2;
 
         this.width = width;
         this.height = height;
         this.iterations = iterations;
+
+        final Line halfLine = new Line();
+        halfLine.setStroke(Color.GRAY);
+        halfLine.setStartX(0);
+        halfLine.setStartY(height * 0.5);
+        halfLine.setEndX(width);
+        halfLine.setEndY(height * 0.5);
 
         final Line approvedLine = new Line();
         approvedLine.setStroke(Color.YELLOW);
@@ -36,6 +45,10 @@ public class StatGraph extends Pane {
         optimalLine.setEndY(height);
 
 
+        Text halfText = new Text("50%");
+        halfText.setY(halfLine.getEndY());
+        halfText.setX(-25);
+
         Text approvedText = new Text("95%");
         approvedText.setY(approvedLine.getEndY());
         approvedText.setX(-25);
@@ -44,7 +57,7 @@ public class StatGraph extends Pane {
         optimalText.setY(optimalLine.getEndY());
         optimalText.setX(-32);
 
-        super.getChildren().addAll(approvedLine, optimalLine, approvedText, optimalText);
+        super.getChildren().addAll(halfLine, approvedLine, optimalLine, halfText,approvedText, optimalText);
     }
 
     void addIteration(double fitness) {
