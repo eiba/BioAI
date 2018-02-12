@@ -428,21 +428,65 @@ public class Population {
     //selects the population size best individuals
     public ProposedSolution[] select(ProposedSolution[] parents, ProposedSolution[] offspring, int maximumAge){
 
-        final PriorityQueue<ProposedSolution> priorityQueue = new PriorityQueue<>(selectionComparator);
+        final ArrayList<ProposedSolution> priorityQueue = new ArrayList<>();
 
         priorityQueue.addAll(Arrays.asList(parents));
         priorityQueue.addAll(Arrays.asList(offspring));
+        priorityQueue.sort(selectionComparator);
+        /*double score_sum = 0.0;
+
+        for(ProposedSolution solution: parents){
+            score_sum += solution.getFitness();
+        }
+        for(ProposedSolution solution: offspring){
+            score_sum += solution.getFitness();
+        }*/
 
         // List of survivors, need to be as big as the initial population count
         final ProposedSolution[] survivors = new ProposedSolution[this.populationSize];
 
         int index = 0;
+
         while (index < survivors.length) {
-            final ProposedSolution selected = priorityQueue.remove();
-            if (selected.age < maximumAge) {
+            int rank = priorityQueue.size()-1;
+            int rankSum = 0;
+            for(int i=priorityQueue.size()-1;i>0;i--){
+                rankSum += i;
+            }
+            Double p = Math.random();
+            Double cumulativeProbability = 0.0;
+            int listIndex = 0;
+            while (!priorityQueue.isEmpty()){
+
+                ProposedSolution solution = priorityQueue.get(listIndex);
+
+                cumulativeProbability += (double) rank/rankSum;
+
+                if(p <= cumulativeProbability){
+                    solution.age++;
+                    survivors[index ++] = priorityQueue.remove(listIndex);
+                    break;
+                }
+                listIndex++;
+                rank--;
+            }
+            /*for(ProposedSolution solution: priorityQueue){
+                cumulativeProbability += rank/rankSum;
+
+                if(p <= cumulativeProbability){
+                    solution.age++;
+                    survivors[index ++] = solution;
+                    break;
+                }
+
+                rank--;
+            }*/
+            //ProposedSolution selected = priorityQueue.remove();
+
+            /*if (selected.age < maximumAge) {
                 selected.age ++;
                 survivors[index ++] = selected;
-            }
+            }*/
         }
         
         return survivors;
