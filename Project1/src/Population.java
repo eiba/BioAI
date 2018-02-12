@@ -475,14 +475,14 @@ public class Population {
         priorityQueue.addAll(Arrays.asList(offspring));
 
         //Comment out if we want to remove based on age
-        /*ArrayList<ProposedSolution> solutions_to_remove = new ArrayList<>();
+        ArrayList<ProposedSolution> solutions_to_remove = new ArrayList<>();
 
         for(ProposedSolution solution: priorityQueue){
             if (solution.age > maximumAge){
                 solutions_to_remove.add(solution);
             }
         }
-        priorityQueue.removeAll(solutions_to_remove);*/
+        priorityQueue.removeAll(solutions_to_remove);
 
         priorityQueue.sort(selectionComparator);
 
