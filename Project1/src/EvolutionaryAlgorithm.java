@@ -37,6 +37,10 @@ public class EvolutionaryAlgorithm {
         //Iterations for display in GUI later
         iterationsUsed = iterations;
 
+        //Variables used to check if stuck in local minimum
+        int bestIteration = -1;
+        double bestFitness = Double.MAX_VALUE;
+
         // Step Three: Repeat the following regeneration steps until termination:
         for (int i = 0; i < iterations; i ++) {
 
@@ -49,9 +53,27 @@ public class EvolutionaryAlgorithm {
             }
 
             // Replace least-fit population with new individuals.
-            proposedSolutions = population.select(proposedSolutions, offspring, maximumAge, i);
+            proposedSolutions = population.select(proposedSolutions, offspring, maximumAge, populationSize, i);
 //            proposedSolutions = population.selectParentOffspring(offspring);
 //            proposedSolutions = offspring;
+            //proposedSolutions = population.select(proposedSolutions, offspring, maximumAge, populationSize);
+
+            // Check if stuck in local minimum
+            if (proposedSolutions[0].getFitness() < bestFitness) {
+                bestIteration = i;
+                bestFitness = proposedSolutions[0].getFitness();
+            }
+
+            // Stuck for over 20 iterations
+            if (i - bestIteration > 20 ) {
+                bestIteration = i;
+                bestFitness = Double.MAX_VALUE;
+                final int size = (int) (populationSize * 0.9);
+                final ProposedSolution[] newPopulation = population.generateInitialPopulation(size);
+//                proposedSolutions = population.generateInitialPopulation(populationSize);
+
+                System.arraycopy(newPopulation, 0, proposedSolutions, populationSize - size, size);
+            }
 
             statGraph.addIteration(processFile.optimalFitness / proposedSolutions[0].getFitness());
 

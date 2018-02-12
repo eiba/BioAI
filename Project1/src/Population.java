@@ -9,7 +9,6 @@ public class Population {
     private final Random random;
     private final Comparator<ProposedSolution> selectionComparator;
     private final int maxIterations;
-    private int populationSize;
     private HashMap<Integer, int[]> preferredCustomerDepots;
 
     Population(ProcessFile processFile, Statistic statistic, int maxIterations) {
@@ -29,7 +28,6 @@ public class Population {
     }
 
     ProposedSolution[] generateInitialPopulation(int populationSize) {
-        this.populationSize = populationSize;
 
         // Initiating variables
         final ProposedSolution[] proposedSolutions = new ProposedSolution[populationSize];
@@ -227,7 +225,7 @@ public class Population {
     ProposedSolution[] crossover(ProposedSolution[] parents, int numberOfTournaments, double mutationRate, int populationSize, int iteration) {
         final ProposedSolution[] children = new ProposedSolution[populationSize];
         final ExecutorService executor = Executors.newFixedThreadPool(Main.PROCESSORS);
-        Arrays.sort(parents,selectionComparator);   //used for rand selection
+        //Arrays.sort(parents,selectionComparator);   //used for rand selection
         for (int i = 0; i < populationSize; i ++) {
 
             final int index = i;
@@ -236,12 +234,12 @@ public class Population {
                 ProposedSolution child, parent1, parent2;
                 do {
                     //rank selection
-                    parent1 = rankSelection(parents,iteration);
-                    parent2 = rankSelection(parents,iteration);
+                    //parent1 = rankSelection(parents,iteration);
+                    //parent2 = rankSelection(parents,iteration);
 
                     //tournament selection
-                    //parent1 = tournamentSelection(parents, numberOfTournaments);
-                    //parent2 = tournamentSelection(parents, numberOfTournaments);
+                    parent1 = tournamentSelection(parents, numberOfTournaments);
+                    parent2 = tournamentSelection(parents, numberOfTournaments);
 
                     child = bestCostRouteCrossover(parent1, parent2, iteration);
                 }
@@ -547,7 +545,7 @@ public class Population {
     }
 
     //selects the population size best individuals
-    public ProposedSolution[] select(ProposedSolution[] parents, ProposedSolution[] offspring, int maximumAge, int iteration){
+    public ProposedSolution[] select(ProposedSolution[] parents, ProposedSolution[] offspring, int maximumAge, int populationSize, int iteration){
 
         final ArrayList<ProposedSolution> priorityQueue = new ArrayList<>();
 
@@ -567,7 +565,7 @@ public class Population {
         priorityQueue.sort(selectionComparator);
 
         // List of survivors, need to be as big as the initial population count
-        final ProposedSolution[] survivors = new ProposedSolution[this.populationSize];
+        final ProposedSolution[] survivors = new ProposedSolution[populationSize];
 
         int index = 0;
 
