@@ -5,6 +5,7 @@ public class Population {
     private final ProcessFile processFile;
     private final Statistic statistic;
     private final Random random;
+    private final Comparator<ProposedSolution> selectionComparator;
     private int populationSize;
     private ProposedSolution[] currentPopulation;
     private HashMap<Integer, int[]> preferedCustomerDepots;
@@ -13,6 +14,15 @@ public class Population {
         this.processFile = processFile;
         this.statistic = statistic;
         random = new Random();
+        selectionComparator = (o1, o2) -> {
+            if (o1.getFitness() < o2.getFitness()) {
+                return -1;
+            }
+            else if (o1.getFitness() > o2.getFitness()) {
+                return 1;
+            }
+            return 0;
+        };
     }
 
     ProposedSolution[] generateInitialPopulation(int populationSize) {
@@ -110,8 +120,9 @@ public class Population {
                     // Check if the car is eligible to serve an additional customer
                     if (car.isEligible(customer)) {
                         final double[] carExtraDuration = car.smartCheckExtraDuration(customer);
-                        if (carExtraDuration[1] < bestDistance) {
-                            bestDistance = carExtraDuration[1];
+                        final double newDistance = carExtraDuration[1] - car.getCurrentDuration();
+                        if (newDistance < bestDistance) {
+                            bestDistance = newDistance;
                             bestCar = car;
                             bestIndex = carExtraDuration[0];
                         }
@@ -525,43 +536,23 @@ public class Population {
     //selects the population size best individuals
     public ProposedSolution[] select(ProposedSolution[] parents, ProposedSolution[] offspring, int maximumAge){
 
-        //list of survivors, need to be as big as the initial population count
-        ProposedSolution[] survivors = new ProposedSolution[this.populationSize];
-        ProposedSolution[] selectionPool = new ProposedSolution[parents.length + offspring.length];
+        final PriorityQueue<ProposedSolution> priorityQueue = new PriorityQueue<>(selectionComparator);
 
-        //add both parents and offspring into one combined array
-        int index = offspring.length;
-        for (int i = 0; i < offspring.length; i++) {
-            selectionPool[i] = offspring[i];
-        }
-        for (int i = 0; i < parents.length; i++) {
-            selectionPool[i + index] = parents[i];
-        }
+        priorityQueue.addAll(Arrays.asList(parents));
+        priorityQueue.addAll(Arrays.asList(offspring));
 
-        //iterate over parent and offspring lists, each time select the best individual
-        for(int i=0; i<survivors.length;i++){
+        // List of survivors, need to be as big as the initial population count
+        final ProposedSolution[] survivors = new ProposedSolution[this.populationSize];
 
-            //current best solution
-            ProposedSolution bestSolution = null;
-            Double bestFitness = Double.MAX_VALUE;
-            int bestSolutionIndex = -1;
-
-            //iterate over the selectionPool (parents and offspring) and select the best one each time
-            for(int j=0;j<selectionPool.length;j++){
-
-                ProposedSolution solution = selectionPool[j];
-
-                if(solution != null && solution.getFitness() < bestFitness && solution.age <= maximumAge){
-                    bestSolution = solution;
-                    bestFitness = solution.getFitness();
-                    bestSolutionIndex = j;
-                }
+        int index = 0;
+        while (index < survivors.length) {
+            final ProposedSolution selected = priorityQueue.remove();
+            if (selected.age < maximumAge) {
+                selected.age ++;
+                survivors[index ++] = selected;
             }
-            survivors[i] = bestSolution;
-            survivors[i].age +=1;
-            selectionPool[bestSolutionIndex] = null;
         }
-
+        
         return survivors;
     }
 
