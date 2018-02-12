@@ -9,7 +9,6 @@ public class Population {
     private final Random random;
     private final Comparator<ProposedSolution> selectionComparator;
     private final int maxIterations;
-    private int populationSize;
     private HashMap<Integer, int[]> preferredCustomerDepots;
 
     Population(ProcessFile processFile, Statistic statistic, int maxIterations) {
@@ -29,7 +28,6 @@ public class Population {
     }
 
     ProposedSolution[] generateInitialPopulation(int populationSize) {
-        this.populationSize = populationSize;
 
         // Initiating variables
         final ProposedSolution[] proposedSolutions = new ProposedSolution[populationSize];
@@ -511,7 +509,7 @@ public class Population {
     }
 
     //selects the population size best individuals
-    public ProposedSolution[] select(ProposedSolution[] parents, ProposedSolution[] offspring, int maximumAge){
+    public ProposedSolution[] select(ProposedSolution[] parents, ProposedSolution[] offspring, int maximumAge, int populationSize){
 
         final ArrayList<ProposedSolution> priorityQueue = new ArrayList<>();
 
@@ -531,7 +529,7 @@ public class Population {
         priorityQueue.sort(selectionComparator);
 
         // List of survivors, need to be as big as the initial population count
-        final ProposedSolution[] survivors = new ProposedSolution[this.populationSize];
+        final ProposedSolution[] survivors = new ProposedSolution[populationSize];
 
         int index = 0;
 

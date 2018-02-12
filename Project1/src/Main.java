@@ -19,7 +19,7 @@ public class Main extends Application{
     public static final int PROCESSORS = Runtime.getRuntime().availableProcessors();
 
     private static final int POPULATION_SIZE = 100;
-    private static final int ITERATIONS = 1000;
+    private static final int ITERATIONS = 3000;
     private static final int NUMBER_OF_TOURNAMENTS = 2;
     private static final int MAXIMUM_AGE = 7;
     private static final double MUTATION_RATE = 0.05;
