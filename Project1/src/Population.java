@@ -155,15 +155,16 @@ public class Population {
      * @param numberOfTournaments Number of tournaments to be held
      * @return a list of parents selected in the tournament selection
      */
-    private ProposedSolution tournamentSelection(ProposedSolution[] solutions, int numberOfTournaments){
+    private ProposedSolution tournamentSelection(ProposedSolution[] solutions, int numberOfTournaments, Double threshold){
 
         final Random random = new Random();
         ProposedSolution winner = null;
+        Double p = Math.random();
 
         for (int i = 0; i < numberOfTournaments; i ++) {
             final ProposedSolution participant = solutions[random.nextInt(solutions.length)];
 
-            if (winner == null || participant.getFitness() < winner.getFitness()) {
+            if (winner == null || participant.getFitness() < winner.getFitness() || p > threshold) {
                 winner = participant;
             }
         }
@@ -172,13 +173,13 @@ public class Population {
 
     }
     
-    ProposedSolution[] crossover(ProposedSolution[] parents, int numberOfTournaments, double mutationRate, int populationSize) {
+    ProposedSolution[] crossover(ProposedSolution[] parents, int numberOfTournaments, double mutationRate, int populationSize, Double threshold) {
         final ProposedSolution[] children = new ProposedSolution[populationSize];
 
         int index = 0;
         while (index != populationSize) {
-            final ProposedSolution parent1 = tournamentSelection(parents, numberOfTournaments);
-            final ProposedSolution parent2 = tournamentSelection(parents, numberOfTournaments);
+            final ProposedSolution parent1 = tournamentSelection(parents, numberOfTournaments, threshold);
+            final ProposedSolution parent2 = tournamentSelection(parents, numberOfTournaments, threshold);
             final ProposedSolution child = bestCostRouteCrossover(parent1, parent2);
             if (child != null) {
                 children[index ++] = child;
@@ -346,10 +347,11 @@ public class Population {
         int car1RemovalIndex = random.nextInt(car1Customers.size());
         int car2RemovalIndex = random.nextInt(car2Customers.size());
 
-        Customer car1Customer = car1Customers.remove(car1RemovalIndex);
-        Customer car2Customer = car2Customers.remove(car2RemovalIndex);
+        Customer car1Customer = car1Customers.get(car1RemovalIndex);
+        Customer car2Customer = car2Customers.get(car2RemovalIndex);
 
         if(car1Customer == car2Customer){
+            car1Customers.add(car1RemovalIndex,car1Customer);
             return;
         }
 

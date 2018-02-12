@@ -22,7 +22,7 @@ public class EvolutionaryAlgorithm {
      * @param iterations
      * @return the solutions found after the specified number of iterations
      */
-    ProposedSolution[] iterate(int populationSize, double mutationRate, int iterations, int numberOfTournaments, int maximumAge) {
+    ProposedSolution[] iterate(int populationSize, double mutationRate, int iterations, int numberOfTournaments, int maximumAge, double threshold) {
 
         // Step One: Generate the initial population of individuals randomly. (First generation)
         ProposedSolution[] proposedSolutions = population.generateInitialPopulation(populationSize);
@@ -41,7 +41,7 @@ public class EvolutionaryAlgorithm {
             statistic.setUpdate("Crossover and Mutation iterations: " + (i+1) + "/" + iterations);
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
-            ProposedSolution[] offspring = population.crossover(proposedSolutions, numberOfTournaments, mutationRate, populationSize);
+            ProposedSolution[] offspring = population.crossover(proposedSolutions, numberOfTournaments, mutationRate, populationSize, threshold);
             for (ProposedSolution proposedSolution : offspring) {
                 proposedSolution.evaluateFitness();
             }
