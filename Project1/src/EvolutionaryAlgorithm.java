@@ -50,6 +50,8 @@ public class EvolutionaryAlgorithm {
 
             // Replace least-fit population with new individuals.
             proposedSolutions = population.select(proposedSolutions, offspring, maximumAge);
+//            proposedSolutions = population.selectParentOffspring(offspring);
+//            proposedSolutions = offspring;
 
             statGraph.addIteration(processFile.optimalFitness / proposedSolutions[0].getFitness());
 

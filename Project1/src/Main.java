@@ -18,9 +18,9 @@ public class Main extends Application{
 
     private static final int POPULATION_SIZE = 100;
     private static final int ITERATIONS = 1000;
-    private static final int NUMBER_OF_TOURNAMENTS = 2;
+    private static final int NUMBER_OF_TOURNAMENTS = 1;
     private static final int MAXIMUM_AGE = 2;
-    private static final double MUTATION_RATE = 0.05;
+    private static final double MUTATION_RATE = 0.2;
     private static final double THRESHOLD = 1;
 
     public static void main(String[] args) {
@@ -77,11 +77,7 @@ public class Main extends Application{
                     graph.setCustomers(processFile.customers);
                     borderPane.setCenter(graph);
 
-//                    double fitness = 0;
-//                    for (ProposedSolution proposedSolution : solutions) {
-//                        fitness += proposedSolution.getFitness();
-//                    }
-//                    fitness /= solutions.length;
+
                     statistic.setDistance(solutions[0].getFitness(), processFile.optimalFitness, evolutionaryAlgorithm.iterationsUsed);
 
                     //Display one of the solutions

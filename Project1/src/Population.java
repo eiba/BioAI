@@ -196,21 +196,22 @@ public class Population {
     
     ProposedSolution[] crossover(ProposedSolution[] parents, int numberOfTournaments, double mutationRate, int populationSize, int iteration) {
         final ProposedSolution[] children = new ProposedSolution[populationSize];
-
         final ExecutorService executor = Executors.newFixedThreadPool(4);
 
         for (int i = 0; i < populationSize; i ++) {
 
             final int index = i;
             executor.execute(() -> {
-                ProposedSolution child = null;
+
+                ProposedSolution child, parent1, parent2;
                 do {
-                    final ProposedSolution parent1 = tournamentSelection(parents, numberOfTournaments);
-                    final ProposedSolution parent2 = tournamentSelection(parents, numberOfTournaments);
+                    parent1 = tournamentSelection(parents, numberOfTournaments);
+                    parent2 = tournamentSelection(parents, numberOfTournaments);
                     child = bestCostRouteCrossover(parent1, parent2, iteration);
                 }
                 while (child == null);
                 children[index] = child;
+
             });
         }
 
@@ -520,6 +521,18 @@ public class Population {
 
         return survivors;
     }
+
+//    ProposedSolution[] selectParentOffspring(ProposedSolution[] offspring) {
+//        final ProposedSolution[] selection = new ProposedSolution[offspring.length + parentList.size()];
+//        System.arraycopy(offspring, 0, selection, 0, offspring.length);
+//        ProposedSolution[] parents = new ProposedSolution[parentList.size()];
+//        parents =  parentList.toArray(parents);
+//        System.arraycopy(parents, 0, selection, offspring.length, parents.length);
+//
+//        Arrays.sort(selection, selectionComparator);
+//
+//        return selection;
+//    }
 
     //calculates the euclidean distance from a to b
     static double euclideanDistance(double x1, double y1, double x2, double y2){
