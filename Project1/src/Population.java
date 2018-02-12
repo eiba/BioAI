@@ -299,6 +299,7 @@ public class Population {
                 // Mutate with a probability of mutationRate
                 if(mutationRate >= p){
                     stealMutation(solutions[index], iteration);
+//                    mergeMutation(solutions[index]);
                 }
             });
         }
@@ -465,6 +466,48 @@ public class Population {
             car.remove(customer);
             bestCar.smartAddCustomerVisited(customer, bestIndex);
         }
+    }
+
+    void mergeMutation(ProposedSolution solution) {
+
+        final Car[] cars = solution.cars;
+
+        // Get a random car to steal customers from
+        Car car;
+        do {
+            car = cars[random.nextInt(cars.length)];
+        }
+        while (car == null || car.customerSequence.size() == 0);
+
+        //Get a random customer to give away
+        int index = 0;
+        for (int i = 0; i < car.customerSequence.size(); i ++) {
+            Customer customer = car.customerSequence.get(index);
+            Car bestCar = null;
+            int bestIndex = -1;
+            double bestDistance = 0;
+
+            for (Car car1 : cars) {
+                final double[] smartCheck = car1.isEligible(customer);
+                if (smartCheck[0] != -1) {
+                    if (smartCheck[1] - car1.currentDuration < bestDistance) {
+                        bestCar = car1;
+                        bestIndex = (int) smartCheck[0];
+                        bestDistance = smartCheck[1] - car1.currentDuration;
+                    }
+                }
+            }
+
+            if (bestCar != null) {
+                car.remove(customer);
+                bestCar.smartAddCustomerVisited(customer, bestIndex);
+            }
+            else {
+                index ++;
+            }
+        }
+
+
     }
 
     //selects the population size best individuals
