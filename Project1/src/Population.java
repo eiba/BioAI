@@ -118,13 +118,13 @@ public class Population {
                 // Finding a car from the depot that can add the customer to its route
                 for (Car car : depot.getCars()) {
                     // Check if the car is eligible to serve an additional customer
-                    if (car.isEligible(customer)) {
-                        final double[] carExtraDuration = car.smartCheckExtraDuration(customer);
-                        final double newDistance = carExtraDuration[1] - car.getCurrentDuration();
+                    final double[] smartCheck = car.isEligible(customer);
+                    if (smartCheck[0] != -1) {
+                        final double newDistance = smartCheck[1] - car.getCurrentDuration();
                         if (newDistance < bestDistance) {
                             bestDistance = newDistance;
                             bestCar = car;
-                            bestIndex = carExtraDuration[0];
+                            bestIndex = smartCheck[0];
                         }
                     }
                 }
@@ -233,14 +233,14 @@ public class Population {
             // Looping through all car routes
             for (Car car : child.cars) {
 
-                if (car.isEligible(customer)) {
-                    final double[] stats = car.smartCheckExtraDuration(customer);
+                final double[] smartCheck = car.isEligible(customer);
+                if (smartCheck[0] != -1) {
 
                     // Check if the additional distance required for adding the car is less than current best
-                    if (stats[1] - car.getCurrentDuration() < bestDistance) {
-                        bestDistance = stats[1] - car.getCurrentDuration();
+                    if (smartCheck[1] - car.getCurrentDuration() < bestDistance) {
+                        bestDistance = smartCheck[1] - car.getCurrentDuration();
                         bestCar = car;
-                        bestIndex = (int) stats[0];
+                        bestIndex = (int) smartCheck[0];
                     }
                 }
 
@@ -257,30 +257,29 @@ public class Population {
     }
 
     //Mutate children
-    public void mutate(ProposedSolution[] solutions, double mutationRate){
+    private void mutate(ProposedSolution[] solutions, double mutationRate){
 
         for(ProposedSolution solution: solutions){
             double p = Math.random();
 
             // Mutate with a probability of mutationRate
             if(mutationRate >= p){
-                inverseMutation(solution);
+                stealMutation(solution);
             }
         }
     }
 
-    public void inverseMutation(ProposedSolution solution){
-        //implement inverse mutation
+    private void inverseMutation(ProposedSolution solution){
 
-        //get random car
+        // Get random car
         Car originalCar = solution.cars[random.nextInt(solution.cars.length)];
 
         int iteration = 0;
-        //make sure that we get list with more than 2 customers or else there is no point in inverting
+        // Make sure that we get list with more than 2 customers or else there is no point in inverting
         while (originalCar.getCustomerSequence().size() < 3){
             originalCar = solution.cars[random.nextInt(solution.cars.length)];
 
-            //I give up, return.
+            // I give up, return.
             if(iteration > solution.cars.length){
                 return;
             }
@@ -290,7 +289,7 @@ public class Population {
         //route of selected car
         ArrayList<Customer> customerSequence = car.getCustomerSequence();
 
-        int startIndex = random.nextInt(customerSequence.size()); //startindex of reverse
+        int startIndex = random.nextInt(customerSequence.size()); //start index of reverse
         int endIndex = random.nextInt(customerSequence.size());   //end index
 
         //if start index is greater than the end index we selected, swap them
@@ -386,6 +385,43 @@ public class Population {
             car2Original.currentDuration = car2.currentDuration;
         }
 
+    }
+
+    private void stealMutation(ProposedSolution solution) {
+
+        // Get a random depot
+        final Depot depot = solution.depots[random.nextInt(solution.depots.length)];
+        final Car[] cars = depot.getCars();
+
+        // Get a random car to steal a customer from
+        Car car = null;
+        do {
+            car = cars[random.nextInt(cars.length)];
+        }
+        while (car == null || car.customerSequence.size() == 0);
+
+        //Get a random customer to give away
+        final Customer customer = car.customerSequence.get(random.nextInt(car.customerSequence.size()));
+
+        Car bestCar = null;
+        int bestIndex = -1;
+        double bestDistance = 0;
+
+        for (Car car1 : cars) {
+            final double[] smartCheck = car1.isEligible(customer);
+            if (smartCheck[0] != -1) {
+                if (smartCheck[1] - car1.currentDuration < bestDistance) {
+                    bestCar = car1;
+                    bestIndex = (int) smartCheck[0];
+                    bestDistance = smartCheck[1] - car1.currentDuration;
+                }
+            }
+        }
+
+        if (bestCar != null) {
+            car.remove(customer);
+            bestCar.smartAddCustomerVisited(customer, bestIndex);
+        }
     }
 
     //selects the population size best individuals

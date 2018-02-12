@@ -182,13 +182,15 @@ public class Car {
 
     /**
      * This method is used to determine if the car is eligible to add a customer to its route or not
-     * @param customer
-     * @return True iff the car is eligible to serve the customer, False otherwise
      */
-    boolean isEligible(Customer customer) {
-        final boolean durationCheck = smartCheckExtraDuration(customer)[1] <= maximumDuration;
+    double[] isEligible(Customer customer) {
+        final double[] smartCheck = smartCheckExtraDuration(customer);
+        final boolean durationCheck = smartCheck[1] <= maximumDuration;
         final boolean loadCheck = currentLoad + customer.getDemand() <= maximumLoad;
-        return durationCheck && loadCheck;
+        if (!(durationCheck && loadCheck)) {
+            smartCheck[0] = -1;
+        }
+        return smartCheck;
     }
 
     public int getX() {
