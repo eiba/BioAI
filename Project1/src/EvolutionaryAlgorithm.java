@@ -2,13 +2,15 @@ public class EvolutionaryAlgorithm {
 
     private final Population population;
     private final Statistic statistic;
+    private final StatGraph statGraph;
     final ProcessFile processFile;
     public int iterationsUsed;
 
-    EvolutionaryAlgorithm(String filename, Statistic statistic) {
+    EvolutionaryAlgorithm(String filename, Statistic statistic, StatGraph statGraph) {
         // Reading the Multiple Depot Vehicle Routing Problem - MDVRP
         processFile = new ProcessFile(filename);
         this.statistic = statistic;
+        this.statGraph = statGraph;
 
         // Initiating variables
         population = new Population(processFile, statistic);
@@ -48,6 +50,8 @@ public class EvolutionaryAlgorithm {
 
             // Replace least-fit population with new individuals.
             proposedSolutions = population.select(proposedSolutions, offspring, maximumAge);
+
+            statGraph.addIteration(processFile.optimalFitness / proposedSolutions[0].getFitness());
 
             //If the fitness of the best individual is within 5% of optimal fitness, return
             if(processFile.optimalFitness/proposedSolutions[0].getFitness() >= 0.95){
