@@ -62,7 +62,7 @@ public class Population {
             preferredCustomerDepots.put(customer.getCustomerNr(), depotNumbers);
         }
 
-        final ExecutorService executor = Executors.newFixedThreadPool(4);
+        final ExecutorService executor = Executors.newFixedThreadPool(Main.PROCESSORS);
         // Generating a random solution for each iteration
         for (int i = 0; i < populationSize; i ++) {
             final int index = i;
@@ -196,7 +196,7 @@ public class Population {
     
     ProposedSolution[] crossover(ProposedSolution[] parents, int numberOfTournaments, double mutationRate, int populationSize, int iteration) {
         final ProposedSolution[] children = new ProposedSolution[populationSize];
-        final ExecutorService executor = Executors.newFixedThreadPool(4);
+        final ExecutorService executor = Executors.newFixedThreadPool(Main.PROCESSORS);
 
         for (int i = 0; i < populationSize; i ++) {
 
@@ -290,7 +290,7 @@ public class Population {
     //Mutate children
     private void mutate(ProposedSolution[] solutions, double mutationRate, int iteration){
 
-        final ExecutorService executor = Executors.newFixedThreadPool(4);
+        final ExecutorService executor = Executors.newFixedThreadPool(Main.PROCESSORS);
 
         for (int i = 0; i < solutions.length; i ++) {
             final int index = i;
