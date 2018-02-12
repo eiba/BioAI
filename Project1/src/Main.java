@@ -18,9 +18,9 @@ public class Main extends Application{
 
     private static final int POPULATION_SIZE = 100;
     private static final int ITERATIONS = 1000;
-    private static final int NUMBER_OF_TOURNAMENTS = 3;
+    private static final int NUMBER_OF_TOURNAMENTS = 2;
     private static final int MAXIMUM_AGE = 2;
-    private static final double MUTATION_RATE = 0.4;
+    private static final double MUTATION_RATE = 0.02;
     private static final double THRESHOLD = 1;
 
     public static void main(String[] args) {
