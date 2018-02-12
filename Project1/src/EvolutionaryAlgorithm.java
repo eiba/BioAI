@@ -53,7 +53,10 @@ public class EvolutionaryAlgorithm {
             }
 
             // Replace least-fit population with new individuals.
-            proposedSolutions = population.select(proposedSolutions, offspring, maximumAge, populationSize);
+            proposedSolutions = population.select(proposedSolutions, offspring, maximumAge, populationSize, i);
+//            proposedSolutions = population.selectParentOffspring(offspring);
+//            proposedSolutions = offspring;
+            //proposedSolutions = population.select(proposedSolutions, offspring, maximumAge, populationSize);
 
             // Check if stuck in local minimum
             if (proposedSolutions[0].getFitness() < bestFitness) {
