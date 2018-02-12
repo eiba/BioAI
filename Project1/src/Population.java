@@ -444,15 +444,18 @@ public class Population {
 
         priorityQueue.addAll(Arrays.asList(parents));
         priorityQueue.addAll(Arrays.asList(offspring));
-        priorityQueue.sort(selectionComparator);
-        /*double score_sum = 0.0;
 
-        for(ProposedSolution solution: parents){
-            score_sum += solution.getFitness();
+        //Comment out if we want to remove based on age
+        /*ArrayList<ProposedSolution> solutions_to_remove = new ArrayList<>();
+
+        for(ProposedSolution solution: priorityQueue){
+            if (solution.age > maximumAge){
+                solutions_to_remove.add(solution);
+            }
         }
-        for(ProposedSolution solution: offspring){
-            score_sum += solution.getFitness();
-        }*/
+        priorityQueue.removeAll(solutions_to_remove);*/
+
+        priorityQueue.sort(selectionComparator);
 
         // List of survivors, need to be as big as the initial population count
         final ProposedSolution[] survivors = new ProposedSolution[this.populationSize];
@@ -460,9 +463,9 @@ public class Population {
         int index = 0;
 
         while (index < survivors.length) {
-            int rank = priorityQueue.size()-1;
+            int rank = priorityQueue.size();
             int rankSum = 0;
-            for(int i=priorityQueue.size()-1;i>0;i--){
+            for(int i=priorityQueue.size();i>0;i--){
                 rankSum += i;
             }
             Double p = Math.random();
@@ -482,23 +485,6 @@ public class Population {
                 listIndex++;
                 rank--;
             }
-            /*for(ProposedSolution solution: priorityQueue){
-                cumulativeProbability += rank/rankSum;
-
-                if(p <= cumulativeProbability){
-                    solution.age++;
-                    survivors[index ++] = solution;
-                    break;
-                }
-
-                rank--;
-            }*/
-            //ProposedSolution selected = priorityQueue.remove();
-
-            /*if (selected.age < maximumAge) {
-                selected.age ++;
-                survivors[index ++] = selected;
-            }*/
         }
         
         return survivors;
