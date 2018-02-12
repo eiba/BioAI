@@ -48,7 +48,7 @@ public class Main extends Application{
 
                 // Run the evolutionary algorithm
 
-                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(100, 0.1,100, 10,5, 0.6);
+                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(1000, 0.5,100, 100,5, 0.5);
 
                 // Get all the data from the data set
                 ProcessFile processFile = evolutionaryAlgorithm.processFile;
@@ -84,7 +84,7 @@ public class Main extends Application{
         HBox hBox = new HBox(10);
         hBox.setAlignment(Pos.CENTER);
         hBox.getChildren().addAll(new Text("Select data set:"), taskMenu);
-        taskMenu.setValue("p01");
+        taskMenu.setValue("p04");
 
 
         borderPane.setTop(hBox);

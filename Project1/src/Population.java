@@ -166,16 +166,15 @@ public class Population {
      * @param numberOfTournaments Number of tournaments to be held
      * @return a list of parents selected in the tournament selection
      */
-    private ProposedSolution tournamentSelection(ProposedSolution[] solutions, int numberOfTournaments, Double threshold){
+    private ProposedSolution tournamentSelection(ProposedSolution[] solutions, int numberOfTournaments){
 
         final Random random = new Random();
         ProposedSolution winner = null;
-        Double p = Math.random();
 
         for (int i = 0; i < numberOfTournaments; i ++) {
             final ProposedSolution participant = solutions[random.nextInt(solutions.length)];
 
-            if (winner == null || participant.getFitness() < winner.getFitness() || p > threshold) {
+            if (winner == null || participant.getFitness() < winner.getFitness()) {
                 winner = participant;
             }
         }
@@ -189,9 +188,9 @@ public class Population {
 
         int index = 0;
         while (index != populationSize) {
-            final ProposedSolution parent1 = tournamentSelection(parents, numberOfTournaments, threshold);
-            final ProposedSolution parent2 = tournamentSelection(parents, numberOfTournaments, threshold);
-            final ProposedSolution child = bestCostRouteCrossover(parent1, parent2);
+            final ProposedSolution parent1 = tournamentSelection(parents, numberOfTournaments);
+            final ProposedSolution parent2 = tournamentSelection(parents, numberOfTournaments);
+            final ProposedSolution child = bestCostRouteCrossover(parent1, parent2, threshold);
             if (child != null) {
                 children[index ++] = child;
             }
@@ -201,7 +200,7 @@ public class Population {
         return children;
     }
 
-    private ProposedSolution bestCostRouteCrossover(ProposedSolution parent1, ProposedSolution parent2) {
+    private ProposedSolution bestCostRouteCrossover(ProposedSolution parent1, ProposedSolution parent2, double threshold) {
 
         // Creating a child based on a deep copy of the parent1 object
         final ProposedSolution child = new ProposedSolution(parent1);
@@ -226,6 +225,11 @@ public class Population {
         // Finding the best route to add the customers
         for (Customer customer : childCustomers) {
 
+            boolean optimal = true;
+            if (Math.random() > threshold) {
+                optimal = false;
+            }
+
             double bestDistance = Double.MAX_VALUE;
             Car bestCar = null;
             int bestIndex = -1;
@@ -241,6 +245,9 @@ public class Population {
                         bestDistance = smartCheck[1] - car.getCurrentDuration();
                         bestCar = car;
                         bestIndex = (int) smartCheck[0];
+                        if (!optimal) {
+                            break;
+                        }
                     }
                 }
 
@@ -264,7 +271,7 @@ public class Population {
 
             // Mutate with a probability of mutationRate
             if(mutationRate >= p){
-                stealMutation(solution);
+                inverseMutation(solution);
             }
         }
     }
