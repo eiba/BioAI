@@ -131,7 +131,7 @@ public class Population {
                     // Check if the car is eligible to serve an additional customer
                     final double[] smartCheck = car.isEligible(customer);
                     if (smartCheck[0] != -1) {
-                        final double newDistance = smartCheck[1];
+                        final double newDistance = smartCheck[1] - car.getCurrentDuration();
                         if (newDistance < bestDistance) {
                             bestDistance = newDistance;
                             bestCar = car;
@@ -222,10 +222,9 @@ public class Population {
         return selected;
     }
     
-    ProposedSolution[] crossover(ProposedSolution[] parents, int numberOfTournaments, double mutationRate, int populationSize, int iteration) {
+    ProposedSolution[] crossover(ProposedSolution[] parents, int numberOfTournaments, int populationSize, int iteration) {
         final ProposedSolution[] children = new ProposedSolution[populationSize];
         final ExecutorService executor = Executors.newFixedThreadPool(Main.PROCESSORS);
-        //Arrays.sort(parents,selectionComparator);   //used for rand selection
         for (int i = 0; i < populationSize; i ++) {
 
             final int index = i;
@@ -251,8 +250,6 @@ public class Population {
 
         executor.shutdown();
         while (!executor.isTerminated());
-
-        mutate(children, mutationRate, iteration);
 
         return children;
     }
@@ -282,8 +279,11 @@ public class Population {
             }
         }
 
+
         // Finding the best route to add the customers
-        for (Customer customer : childCustomers) {
+        while (!childCustomers.isEmpty()) {
+
+            final Customer customer = childCustomers.remove(0);
 
             double bestDistance = Double.MAX_VALUE;
             Car bestCar = null;
@@ -294,8 +294,8 @@ public class Population {
 
                 if (car.getDepot().getDepotNr() == depotNr) {
                     if (customerCarMap.get(customer.getCustomerNr()) == car.getVehicleNumber()) {
-                        double random = Math.random();
-                        if (random < (double) iteration / maxIterations) {
+                        double rand = Math.random();
+                        if (rand < (double) iteration / maxIterations) {
                             continue;
                         }
                     }
@@ -305,8 +305,9 @@ public class Population {
                 if (smartCheck[0] != -1) {
 
                     // Check if the additional distance required for adding the car is less than current best
-                    if (smartCheck[1] - car.getCurrentDuration() < bestDistance) {
-                        bestDistance = smartCheck[1] - car.getCurrentDuration();
+                    final double newDistance = smartCheck[1] - car.getCurrentDuration();
+                    if (newDistance < bestDistance) {
+                        bestDistance = newDistance;
                         bestCar = car;
                         bestIndex = (int) smartCheck[0];
                     }
@@ -315,14 +316,16 @@ public class Population {
             if (bestCar == null) {
                 return null;
             }
-            bestCar.smartAddCustomerVisited(customer, bestIndex);
+            else {
+                bestCar.smartAddCustomerVisited(customer, bestIndex);
+            }
         }
 
         return child;
     }
 
     //Mutate children
-    private void mutate(ProposedSolution[] solutions, double mutationRate, int iteration){
+    void mutate(ProposedSolution[] solutions, double mutationRate, int iteration){
 
         final ExecutorService executor = Executors.newFixedThreadPool(Main.PROCESSORS);
 
@@ -492,7 +495,7 @@ public class Population {
                     bestDistance = smartCheck[1] - car1.currentDuration;
                     final double random = Math.random();
                     if (random < (double) iteration / maxIterations) {
-                        break;
+//                        break;
                     }
                 }
             }
@@ -577,7 +580,7 @@ public class Population {
         int bestIndex = 0;
         while (index < survivors.length) {
 
-            Double p = Math.random();
+            double p = Math.random();
             //make survival selection more random as we go
             /*if(iteration/maxIterations + 0.1 >= p){
                 ProposedSolution solution = priorityQueue.remove(random.nextInt(priorityQueue.size()));
@@ -628,6 +631,23 @@ public class Population {
         survivors[bestIndex] = survivors[0];
         survivors[0] = bestSolution;
         return survivors;
+    }
+
+    ProposedSolution[] dynamicSelect(ProposedSolution[] parents, ProposedSolution[] offspring, int iteration, int maxAge) {
+
+        final ProposedSolution[] population = new ProposedSolution[parents.length + offspring.length];
+        System.arraycopy(parents, 0, population, 0, parents.length);
+        System.arraycopy(offspring, 0, population, parents.length, offspring.length);
+
+        final ProposedSolution[] selected = new ProposedSolution[parents.length];
+
+        for (int i = 0; i < selected.length; i ++) {
+            selected[i] = tournamentSelection(population, 2);
+        }
+
+        Arrays.sort(selected, selectionComparator);
+
+        return selected;
     }
 
 //    ProposedSolution[] selectParentOffspring(ProposedSolution[] offspring) {

@@ -3,6 +3,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
@@ -18,6 +19,8 @@ public class Main extends Application{
 
     public static final int PROCESSORS = Runtime.getRuntime().availableProcessors();
 
+    public static boolean RUN = true;
+
     private static final int POPULATION_SIZE = 300;
 
     private static final int ITERATIONS = 3000;
@@ -25,6 +28,13 @@ public class Main extends Application{
     private static final int MAXIMUM_AGE = 3;
     private static final double MUTATION_RATE = 0.02;
     private static final double THRESHOLD = 1;
+
+    private final Button stopButton = new Button("Stop");
+
+    private Thread thread;
+    private ProcessFile processFile;
+    private EvolutionaryAlgorithm evolutionaryAlgorithm;
+    private Statistic statistic;
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -44,10 +54,12 @@ public class Main extends Application{
                 "p20", "p21", "p22", "p23"));
         taskMenu.setOnAction(event -> {
 
-            Thread thread = new Thread(() -> {
+            thread = new Thread(() -> {
+
+                RUN = true;
 
                 // Create statistics for the graph
-                Statistic statistic = new Statistic();
+                statistic = new Statistic();
                 BorderPane.setAlignment(statistic, Pos.CENTER);
                 Platform.runLater(() -> {
                     borderPane.setBottom(statistic);
@@ -61,15 +73,15 @@ public class Main extends Application{
                 });
 
                 // Initiate the evolutionary algorithm
-                EvolutionaryAlgorithm evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue(), statistic, statGraph, ITERATIONS);
+                evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue(), statistic, statGraph, ITERATIONS);
+
+                processFile = evolutionaryAlgorithm.processFile;
 
                 // Run the evolutionary algorithm
-
                 ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(POPULATION_SIZE, MUTATION_RATE,ITERATIONS, NUMBER_OF_TOURNAMENTS,MAXIMUM_AGE, THRESHOLD);
 
                 // Get all the data from the data set
-                ProcessFile processFile = evolutionaryAlgorithm.processFile;
-                System.out.println(solutions[0]);
+                System.out.println(evolutionaryAlgorithm.currentBest);
                 // Calling Platform.runLater() for a Thread-safe call to update GUI
                 Platform.runLater(() -> {
 
@@ -81,28 +93,35 @@ public class Main extends Application{
                     borderPane.setCenter(graph);
 
 
-                    statistic.setDistance(solutions[0].getFitness(), processFile.optimalFitness, evolutionaryAlgorithm.iterationsUsed);
+                    statistic.setDistance(evolutionaryAlgorithm.currentBest.getFitness(), processFile.optimalFitness, evolutionaryAlgorithm.iterationsUsed);
 
                     //Display one of the solutions
-                    graph.setRoutes(solutions[0]);
+                    graph.setRoutes(evolutionaryAlgorithm.currentBest);
 
 //                    for (Car car : solutions[0].cars) {
 //                        System.out.println(car.getCurrentDuration());
 //                    }
                 });
             });
+            thread.setDaemon(true);
             thread.start();
         });
 
+        stopButton.setOnAction((e) -> RUN = false);
+
         HBox hBox = new HBox(10);
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(new Text("Select data set:"), taskMenu);
-//        taskMenu.setValue("p08");
+        hBox.getChildren().addAll(new Text("Select data set:"), taskMenu, stopButton);
+        taskMenu.setValue("p08");
 
 
         borderPane.setTop(hBox);
 
         primaryStage.getIcons().add(new Image("elster2.png"));
         primaryStage.show();
+    }
+
+    static synchronized boolean getRun() {
+        return RUN;
     }
 }
