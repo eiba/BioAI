@@ -32,6 +32,7 @@ public class Main extends Application{
     private static double OPTIMAL_VALUE = 0.0;
 
     private final Button stopButton = new Button("Stop");
+    private final Button startButton = new Button("Start");
 
     private Thread thread;
     private ProcessFile processFile;
@@ -61,12 +62,14 @@ public class Main extends Application{
         final ChoiceBox<String> taskMenu = new ChoiceBox<>(FXCollections.observableArrayList("p01", "p02", "p03", "p04", "p05", "p06", "p07", "p08", "p09",
                 "p10", "p11", "p12", "p13", "p14", "p15", "p16", "p17", "p18", "p19",
                 "p20", "p21", "p22", "p23"));
-        taskMenu.setOnAction(event -> {
+
+        startButton.setOnAction(event -> {
 
             thread = new Thread(() -> {
 
                 RUN = true;
-                taskMenu.setDisable(true);
+                startButton.setDisable(true);
+                stopButton.setDisable(false);
 
                 // Create statistics for the graph
                 statistic = new Statistic();
@@ -111,7 +114,8 @@ public class Main extends Application{
 //                        System.out.println(car.getCurrentDuration());
 //                    }
                 });
-                taskMenu.setDisable(false);
+                startButton.setDisable(false);
+                stopButton.setDisable(true);
             });
 
             thread.setDaemon(true);
@@ -120,8 +124,10 @@ public class Main extends Application{
 
         stopButton.setOnAction((e) -> {
             RUN = false;
-            taskMenu.setDisable(false);
+            stopButton.setDisable(true);
+            startButton.setDisable(false);
         });
+        stopButton.setDisable(true);
 
         VBox optionMenu = new VBox(5);
         optionMenu.setTranslateX(5);
@@ -149,8 +155,8 @@ public class Main extends Application{
 
         HBox hBox = new HBox(10);
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(new Text("Select data set:"), taskMenu, stopButton);
-//        taskMenu.setValue("p08");
+        hBox.getChildren().addAll(new Text("Select data set:"), taskMenu, startButton, stopButton);
+        taskMenu.setValue("p08");
 
 
         borderPane.setTop(hBox);
