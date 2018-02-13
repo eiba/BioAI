@@ -50,17 +50,18 @@ public class ProposedSolution {
     public String toString() {
         final DecimalFormat numberFormat = new DecimalFormat("#.00");
         final StringBuilder stringBuilder = new StringBuilder();
-
-//        System.out.println(proposedSolution.durationScore);
-//        System.out.println(proposedSolution.customerScore);
-
+        
+        stringBuilder.append(numberFormat.format(fitness)).append("\n");
         for (Car car : cars) {
-            String s = car.getDepot().getDepotNr() + "\t" + car.getVehicleNumber() + "\t" + numberFormat.format(car.getCurrentDuration()) + "\t" + car.getCurrentLoad();
-            StringBuilder customerSequence = new StringBuilder("\t");
-            for(int m = 0; m < car.getCustomerSequence().size(); m++){
-                customerSequence.append(car.getCustomerSequence().get(m).getCustomerNr()).append(" ");
+            if(car.customerSequence.size() > 0){
+                String s = car.getDepot().getDepotNr() + "\t" + car.getVehicleNumber() + "\t" + numberFormat.format(car.getCurrentDuration()) + "\t" + car.getCurrentLoad();
+                StringBuilder customerSequence = new StringBuilder(" ");
+                for(int m = 0; m < car.getCustomerSequence().size(); m++){
+                    customerSequence.append(car.getCustomerSequence().get(m).getCustomerNr()).append(" ");
+                }
+
+                stringBuilder.append(s).append("\t0").append(customerSequence.toString()).append("0").append("\n");
             }
-            stringBuilder.append(s).append(customerSequence.toString()).append("\n");
         }
         return stringBuilder.toString();
     }

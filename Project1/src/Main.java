@@ -69,7 +69,7 @@ public class Main extends Application{
 
                 // Get all the data from the data set
                 ProcessFile processFile = evolutionaryAlgorithm.processFile;
-
+                System.out.println(solutions[0]);
                 // Calling Platform.runLater() for a Thread-safe call to update GUI
                 Platform.runLater(() -> {
 

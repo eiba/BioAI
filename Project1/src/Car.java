@@ -133,10 +133,10 @@ public class Car {
             }
 
             if (previous == null) {
-                distance += Population.euclideanDistance(depot.getX(), depot.getY(), current.getX(), current.getY());
+                distance += Population.euclideanDistance(depot.getX(), depot.getY(), current.getX(), current.getY()) + current.getServiceDuration();
             }
             else {
-                distance += Population.euclideanDistance(previous.getX(), previous.getY(), current.getX(), current.getY());
+                distance += Population.euclideanDistance(previous.getX(), previous.getY(), current.getX(), current.getY()) + current.getServiceDuration();
             }
 
             previous = current;
@@ -159,10 +159,10 @@ public class Car {
         for (int i = 0; i < customerSequence.size(); i ++) {
             Customer current = customerSequence.get(i);
             if (previous == null) {
-                distance += Population.euclideanDistance(depot.getX(), depot.getY(), current.getX(), current.getY());
+                distance += Population.euclideanDistance(depot.getX(), depot.getY(), current.getX(), current.getY()) + current.getServiceDuration();
             }
             else {
-                distance += Population.euclideanDistance(previous.getX(), previous.getY(), current.getX(), current.getY());
+                distance += Population.euclideanDistance(previous.getX(), previous.getY(), current.getX(), current.getY()) + current.getServiceDuration();
             }
 
             previous = current;
