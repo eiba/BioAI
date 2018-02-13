@@ -57,6 +57,7 @@ public class Main extends Application{
             thread = new Thread(() -> {
 
                 RUN = true;
+                taskMenu.setDisable(true);
 
                 // Create statistics for the graph
                 statistic = new Statistic();
@@ -102,12 +103,16 @@ public class Main extends Application{
 //                        System.out.println(car.getCurrentDuration());
 //                    }
                 });
+                taskMenu.setDisable(false);
             });
             thread.setDaemon(true);
             thread.start();
         });
 
-        stopButton.setOnAction((e) -> RUN = false);
+        stopButton.setOnAction((e) -> {
+            RUN = false;
+            taskMenu.setDisable(false);
+        });
 
         HBox hBox = new HBox(10);
         hBox.setAlignment(Pos.CENTER);
