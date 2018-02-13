@@ -108,12 +108,12 @@ public class Main extends Application{
                     //Display one of the solutions
                     graph.setRoutes(evolutionaryAlgorithm.currentBest);
 
-//                    for (Car car : solutions[0].cars) {
 //                        System.out.println(car.getCurrentDuration());
 //                    }
                 });
                 taskMenu.setDisable(false);
             });
+
             thread.setDaemon(true);
             thread.start();
         });
