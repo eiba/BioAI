@@ -5,6 +5,7 @@ public class EvolutionaryAlgorithm {
     private final StatGraph statGraph;
     final ProcessFile processFile;
     public int iterationsUsed;
+    private Double mutationRate;
 
     EvolutionaryAlgorithm(String filename, Statistic statistic, StatGraph statGraph, int iterations) {
         // Reading the Multiple Depot Vehicle Routing Problem - MDVRP
@@ -25,7 +26,7 @@ public class EvolutionaryAlgorithm {
      * @return the solutions found after the specified number of iterations
      */
     ProposedSolution[] iterate(int populationSize, double mutationRate, int iterations, int numberOfTournaments, int maximumAge, double threshold) {
-
+        this.mutationRate = mutationRate;
         // Step One: Generate the initial population of individuals randomly. (First generation)
         ProposedSolution[] proposedSolutions = population.generateInitialPopulation(populationSize);
 
@@ -47,16 +48,14 @@ public class EvolutionaryAlgorithm {
             statistic.setUpdate("Crossover and mutation iterations: " + (i+1) + "/" + iterations);
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
-            ProposedSolution[] offspring = population.crossover(proposedSolutions, numberOfTournaments, mutationRate, (int) (populationSize * 1.5), i);
+            ProposedSolution[] offspring = population.crossover(proposedSolutions, numberOfTournaments, this.mutationRate, (int) (populationSize * 1.5), i);
             for (ProposedSolution proposedSolution : offspring) {
                 proposedSolution.evaluateFitness();
             }
 
             // Replace least-fit population with new individuals.
             proposedSolutions = population.select(proposedSolutions, offspring, maximumAge, populationSize, i);
-//            proposedSolutions = population.selectParentOffspring(offspring);
-//            proposedSolutions = offspring;
-            //proposedSolutions = population.select(proposedSolutions, offspring, maximumAge, populationSize);
+//
 
             // Check if stuck in local minimum
             if (proposedSolutions[0].getFitness() < bestFitness) {
@@ -64,8 +63,12 @@ public class EvolutionaryAlgorithm {
                 bestFitness = proposedSolutions[0].getFitness();
             }
 
-            // Stuck for over 20 iterations
+            // Stuck for over 5% iterations
             if (((double) i - bestIteration) / iterations > 0.05 ) {
+                if(this.mutationRate < 0.1){
+                    this.mutationRate += 0.01;
+                    System.out.println("Mutation rate: "+this.mutationRate);
+                }
                 bestIteration = i;
                 bestFitness = Double.MAX_VALUE;
                 final int size = (int) (populationSize * 0.9);
@@ -82,14 +85,6 @@ public class EvolutionaryAlgorithm {
                 iterationsUsed = i+1;   //update the iterations we used
                 return proposedSolutions;
             }
-            // Evaluate the individual fitness of new individuals.
-
-            //We probably don't need to do this here, as we need to do it after crossover anyway.
-//            for (ProposedSolution proposedSolution : offspring) {
-            /*for (ProposedSolution proposedSolution : proposedSolutions) {
-                proposedSolution.evaluateFitness();
-            }*/
-
         }
         return proposedSolutions;
     }

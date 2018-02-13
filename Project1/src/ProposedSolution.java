@@ -50,7 +50,7 @@ public class ProposedSolution {
     public String toString() {
         final DecimalFormat numberFormat = new DecimalFormat("#.00");
         final StringBuilder stringBuilder = new StringBuilder();
-        
+
         stringBuilder.append(numberFormat.format(fitness)).append("\n");
         for (Car car : cars) {
             if(car.customerSequence.size() > 0){
