@@ -5,13 +5,15 @@ public class EvolutionaryAlgorithm {
     private final StatGraph statGraph;
     final ProcessFile processFile;
     public int iterationsUsed;
-    private Double mutationRate;
+    private double mutationRate;
+    ProposedSolution currentBest;
 
     EvolutionaryAlgorithm(String filename, Statistic statistic, StatGraph statGraph, int iterations) {
         // Reading the Multiple Depot Vehicle Routing Problem - MDVRP
         processFile = new ProcessFile(filename);
         this.statistic = statistic;
         this.statGraph = statGraph;
+        currentBest = null;
 
         // Initiating variables
         population = new Population(processFile, statistic, iterations);
@@ -43,19 +45,25 @@ public class EvolutionaryAlgorithm {
         double bestFitness = Double.MAX_VALUE;
         int progressIterations = 0;
         // Step Three: Repeat the following regeneration steps until termination:
-        for (int i = 0; i < iterations; i ++) {
-
-            statistic.setUpdate("Crossover and mutation iterations: " + (i+1) + "/" + iterations);
+        int i = 0;
+        while (Main.getRun() && i < iterations) {
+            statistic.setUpdate("Crossover and mutation iterations: " + (i + 1) + "/" + iterations);
 
             // Breed new individuals through crossover and mutation operations to give birth to offspring.
-            ProposedSolution[] offspring = population.crossover(proposedSolutions, numberOfTournaments, this.mutationRate, (int) (populationSize * 1.5), i);
+            ProposedSolution[] offspring = population.crossover(proposedSolutions, numberOfTournaments, (int) (populationSize), i);
+
+            // Mutate
+            population.mutate(offspring, this.mutationRate, i);
+
+            //Update fitness
             for (ProposedSolution proposedSolution : offspring) {
                 proposedSolution.evaluateFitness();
             }
 
             // Replace least-fit population with new individuals.
             proposedSolutions = population.select(proposedSolutions, offspring, maximumAge, populationSize, i);
-//
+            //            proposedSolutions = population.dynamicSelect(proposedSolutions, offspring, i, maximumAge);
+            //
 
             // Check if stuck in local minimum
             if (proposedSolutions[0].getFitness() < bestFitness) {
@@ -65,17 +73,15 @@ public class EvolutionaryAlgorithm {
             }
 
             // Stuck for over 5% iterations
-            if (((double) i - bestIteration) / iterations > 0.03 ) {
-                //progressIterations = 0;
-                if(this.mutationRate < 0.1){
+
+            if (((double) i - bestIteration) / iterations > 0.03) {
+                if (this.mutationRate < 0.1) {
                     this.mutationRate += 0.01;
-                    System.out.println("Mutation rate: "+this.mutationRate);
                 }
                 bestIteration = i;
                 bestFitness = Double.MAX_VALUE;
                 final int size = (int) (populationSize * 0.9);
                 final ProposedSolution[] newPopulation = population.generateInitialPopulation(size);
-//                proposedSolutions = population.generateInitialPopulation(populationSize);
 
                 System.arraycopy(newPopulation, 0, proposedSolutions, populationSize - size, size);
             }
@@ -89,11 +95,17 @@ public class EvolutionaryAlgorithm {
 
             statGraph.addIteration(processFile.optimalFitness / proposedSolutions[0].getFitness());
 
+            if (currentBest == null || currentBest.getFitness() > proposedSolutions[0].getFitness()) {
+                currentBest = proposedSolutions[0];
+                statGraph.setBestSolution(currentBest.getFitness(), processFile.optimalFitness / currentBest.getFitness() * 100);
+            }
+
             //If the fitness of the best individual is within 5% of optimal fitness, return
-            if(processFile.optimalFitness/proposedSolutions[0].getFitness() >= 0.95){
-                iterationsUsed = i+1;   //update the iterations we used
+            if (processFile.optimalFitness / proposedSolutions[0].getFitness() >= 0.95) {
+                iterationsUsed = i + 1;   //update the iterations we used
                 return proposedSolutions;
             }
+            i ++;
         }
         return proposedSolutions;
     }

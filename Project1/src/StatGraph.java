@@ -4,6 +4,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
+import java.util.Locale;
+
 public class StatGraph extends Pane {
 
     private final double width, height;
@@ -12,8 +14,11 @@ public class StatGraph extends Pane {
     private int currentIteration = 0;
     private double previousX, previousY;
 
+    private Text bestSolutionText = new Text();
+
     StatGraph(double width, double height, int iterations) {
         super();
+        super.setMouseTransparent(true);
         super.setTranslateY(-height);
         super.setMinSize(width, height);
         super.setMaxSize(width, height);
@@ -57,7 +62,9 @@ public class StatGraph extends Pane {
         optimalText.setY(optimalLine.getEndY());
         optimalText.setX(-32);
 
-        super.getChildren().addAll(halfLine, approvedLine, optimalLine, halfText,approvedText, optimalText);
+        bestSolutionText.setY(height * 0.5 + 20);
+
+        super.getChildren().addAll(halfLine, approvedLine, optimalLine, halfText,approvedText, optimalText, bestSolutionText);
     }
 
     void addIteration(double fitness) {
@@ -78,5 +85,9 @@ public class StatGraph extends Pane {
         previousX = endX;
         previousY = endY;
         Platform.runLater(() -> super.getChildren().add(line));
+    }
+
+    void setBestSolution(double fitness, double percent) {
+        Platform.runLater(() -> bestSolutionText.setText(String.format(Locale.US, "Best distance: %.2f\nPercent: %.2f%%", fitness, percent)));
     }
 }
