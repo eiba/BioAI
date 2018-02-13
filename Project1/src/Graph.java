@@ -13,7 +13,7 @@ public class Graph extends Pane {
     private final int minX, minY;
     private final double height, factorX, factorY;
 
-    private final Color[] colors = {Color.GREEN, Color.RED, Color.ORANGE, Color.BLUE, Color.PURPLE, Color.PINK, Color.AQUA, Color.GOLDENROD, Color.LIME, Color.DARKRED, Color.HONEYDEW};
+    private final Color[] colors = {Color.GREEN, Color.RED, Color.ORANGE, Color.BLUE, Color.PURPLE, Color.PINK, Color.AQUA, Color.GOLDENROD, Color.LIME, Color.DARKRED, Color.DARKBLUE, Color.DARKOLIVEGREEN};
 
     private Depot[] depots;
     private Customer[] customers;

@@ -27,7 +27,7 @@ public class EvolutionaryAlgorithm {
      * @param iterations
      * @return the solutions found after the specified number of iterations
      */
-    ProposedSolution[] iterate(int populationSize, double mutationRate, int iterations, int numberOfTournaments, int maximumAge, double threshold) {
+    ProposedSolution[] iterate(int populationSize, double mutationRate, int iterations, int numberOfTournaments, int maximumAge, double optimalValue) {
         this.mutationRate = mutationRate;
         // Step One: Generate the initial population of individuals randomly. (First generation)
         ProposedSolution[] proposedSolutions = population.generateInitialPopulation(populationSize);

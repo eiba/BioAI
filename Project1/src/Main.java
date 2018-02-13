@@ -5,9 +5,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -21,13 +23,13 @@ public class Main extends Application{
 
     public static boolean RUN = true;
 
-    private static final int POPULATION_SIZE = 300;
-
-    private static final int ITERATIONS = 3000;
-    private static final int NUMBER_OF_TOURNAMENTS = 2;
-    private static final int MAXIMUM_AGE = 3;
-    private static final double MUTATION_RATE = 0.02;
-    private static final double THRESHOLD = 1;
+    // Default parameters
+    private static int POPULATION_SIZE = 300;
+    private static int ITERATIONS = 3000;
+    private static int NUMBER_OF_TOURNAMENTS = 2;
+    private static int MAXIMUM_AGE = 3;
+    private static double MUTATION_RATE = 0.02;
+    private static double OPTIMAL_VALUE = 0.0;
 
     private final Button stopButton = new Button("Stop");
 
@@ -35,6 +37,13 @@ public class Main extends Application{
     private ProcessFile processFile;
     private EvolutionaryAlgorithm evolutionaryAlgorithm;
     private Statistic statistic;
+
+    private TextField populationSizeInput = new TextField();
+    private TextField iterationsInput = new TextField();
+    private TextField tournamentInput = new TextField();
+    private TextField maxAgeInput = new TextField();
+    private TextField mutationRateInput = new TextField();
+    private TextField optimalValueInput = new TextField();
 
     public static void main(String[] args) {
         Application.launch(args);
@@ -44,7 +53,7 @@ public class Main extends Application{
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         BorderPane borderPane = new BorderPane();
-        Scene scene = new Scene(borderPane, 800, 600);
+        Scene scene = new Scene(borderPane, 900, 600);
         primaryStage.setScene(scene);
         primaryStage.setTitle("IT3708 - Assignment 1");
 
@@ -67,19 +76,19 @@ public class Main extends Application{
                 });
 
                 // Create new StatGraph for fitness graph
-                StatGraph statGraph = new StatGraph(700, 500, ITERATIONS);
+                StatGraph statGraph = new StatGraph(700, 500, getIterations());
                 BorderPane.setAlignment(statGraph, Pos.CENTER);
                 Platform.runLater(() -> {
                     borderPane.setCenter(statGraph);
                 });
 
                 // Initiate the evolutionary algorithm
-                evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue(), statistic, statGraph, ITERATIONS);
+                evolutionaryAlgorithm = new EvolutionaryAlgorithm("./TestData/" + taskMenu.getValue(), statistic, statGraph, getIterations());
 
                 processFile = evolutionaryAlgorithm.processFile;
 
                 // Run the evolutionary algorithm
-                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(POPULATION_SIZE, MUTATION_RATE,ITERATIONS, NUMBER_OF_TOURNAMENTS,MAXIMUM_AGE, THRESHOLD);
+                ProposedSolution[] solutions = evolutionaryAlgorithm.iterate(getPopulationSize(), getMutationRate(), getIterations(), getNumberOfTournaments(), getMaximumAge(), getOptimalValue());
 
                 // Get all the data from the data set
                 System.out.println(evolutionaryAlgorithm.currentBest);
@@ -114,16 +123,64 @@ public class Main extends Application{
             taskMenu.setDisable(false);
         });
 
+        VBox optionMenu = new VBox(5);
+        optionMenu.setTranslateX(5);
+        optionMenu.setAlignment(Pos.CENTER);
+
+        populationSizeInput.setText(String.valueOf(POPULATION_SIZE));
+        optionMenu.getChildren().addAll(new Text("Initial Population Size"), populationSizeInput);
+
+        iterationsInput.setText(String.valueOf(ITERATIONS));
+        optionMenu.getChildren().addAll(new Text("Total number of iterations"), iterationsInput);
+
+        tournamentInput.setText(String.valueOf(NUMBER_OF_TOURNAMENTS));
+        optionMenu.getChildren().addAll(new Text("Number of tournaments"), tournamentInput);
+
+        maxAgeInput.setText(String.valueOf(MAXIMUM_AGE));
+        optionMenu.getChildren().addAll(new Text("Maximum population age"), maxAgeInput);
+
+        mutationRateInput.setText(String.valueOf(MUTATION_RATE));
+        optionMenu.getChildren().addAll(new Text("Mutation rate"), mutationRateInput);
+
+        optimalValueInput.setText(String.valueOf(OPTIMAL_VALUE));
+        optionMenu.getChildren().addAll(new Text("Optimal value"), optimalValueInput);
+
+        borderPane.setLeft(optionMenu);
+
         HBox hBox = new HBox(10);
         hBox.setAlignment(Pos.CENTER);
         hBox.getChildren().addAll(new Text("Select data set:"), taskMenu, stopButton);
-        taskMenu.setValue("p08");
+//        taskMenu.setValue("p08");
 
 
         borderPane.setTop(hBox);
 
         primaryStage.getIcons().add(new Image("elster2.png"));
         primaryStage.show();
+    }
+
+    private int getPopulationSize() {
+        return Integer.valueOf(populationSizeInput.getText());
+    }
+
+    private int getIterations() {
+        return Integer.valueOf(iterationsInput.getText());
+    }
+
+    private int getNumberOfTournaments() {
+        return Integer.valueOf(tournamentInput.getText());
+    }
+
+    private int getMaximumAge() {
+        return Integer.valueOf(maxAgeInput.getText());
+    }
+
+    private double getMutationRate() {
+        return Double.valueOf(mutationRateInput.getText());
+    }
+
+    private double getOptimalValue() {
+        return Double.valueOf(optimalValueInput.getText());
     }
 
     static synchronized boolean getRun() {
