@@ -41,7 +41,7 @@ public class EvolutionaryAlgorithm {
         //Variables used to check if stuck in local minimum
         int bestIteration = -1;
         double bestFitness = Double.MAX_VALUE;
-
+        int progressIterations = 0;
         // Step Three: Repeat the following regeneration steps until termination:
         for (int i = 0; i < iterations; i ++) {
 
@@ -61,10 +61,12 @@ public class EvolutionaryAlgorithm {
             if (proposedSolutions[0].getFitness() < bestFitness) {
                 bestIteration = i;
                 bestFitness = proposedSolutions[0].getFitness();
+                progressIterations +=1;
             }
 
             // Stuck for over 5% iterations
-            if (((double) i - bestIteration) / iterations > 0.05 ) {
+            if (((double) i - bestIteration) / iterations > 0.03 ) {
+                //progressIterations = 0;
                 if(this.mutationRate < 0.1){
                     this.mutationRate += 0.01;
                     System.out.println("Mutation rate: "+this.mutationRate);
@@ -76,6 +78,13 @@ public class EvolutionaryAlgorithm {
 //                proposedSolutions = population.generateInitialPopulation(populationSize);
 
                 System.arraycopy(newPopulation, 0, proposedSolutions, populationSize - size, size);
+            }
+            else if((double)progressIterations/iterations > 0.01){
+                progressIterations = 0;
+                if(this.mutationRate > mutationRate){
+                    this.mutationRate -= 0.01;
+                    System.out.println("Mutation rate: "+this.mutationRate);
+                }
             }
 
             statGraph.addIteration(processFile.optimalFitness / proposedSolutions[0].getFitness());

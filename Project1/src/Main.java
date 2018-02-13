@@ -86,11 +86,11 @@ public class Main extends Application{
                     //Display one of the solutions
                     graph.setRoutes(solutions[0]);
 
-//                    for (Car car : solutions[0].cars) {
 //                        System.out.println(car.getCurrentDuration());
 //                    }
                 });
             });
+//                    for (Car car : solutions[0].cars) {
             thread.start();
         });
 
