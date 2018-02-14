@@ -18,7 +18,7 @@ public class ProcessFile {
     public int minY = Integer.MAX_VALUE;
     public int maxX = Integer.MIN_VALUE;
     public int maxY = Integer.MIN_VALUE;
-    public double optimalFitness;
+//    public double optimalFitness;
 
     //This class processes a dataset, extracts the data and creates objects and variables
 
@@ -35,18 +35,18 @@ public class ProcessFile {
             e.printStackTrace();
         }
 
-        //read solution file and get the optimal fitness
-        try{
-            BufferedReader optimalFitnessLine = new BufferedReader(new FileReader(Filename+".res"));
-            try{
-                this.optimalFitness = Double.parseDouble(optimalFitnessLine.readLine());
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-
-        }catch (FileNotFoundException e){
-            e.printStackTrace();
-        }
+//        //read solution file and get the optimal fitness
+//        try{
+//            BufferedReader optimalFitnessLine = new BufferedReader(new FileReader(Filename+".res"));
+//            try{
+//                this.optimalFitness = Double.parseDouble(optimalFitnessLine.readLine());
+//            }catch (IOException e){
+//                e.printStackTrace();
+//            }
+//
+//        }catch (FileNotFoundException e){
+//            e.printStackTrace();
+//        }
 
     }
 

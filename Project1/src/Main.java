@@ -14,6 +14,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main extends Application{
 
@@ -63,6 +64,38 @@ public class Main extends Application{
                 "p10", "p11", "p12", "p13", "p14", "p15", "p16", "p17", "p18", "p19",
                 "p20", "p21", "p22", "p23"));
 
+        final HashMap<String, Double> optimalMap = new HashMap<>();
+        optimalMap.put("p01", 576.87);
+        optimalMap.put("p02", 473.53);
+        optimalMap.put("p03", 641.19);
+        optimalMap.put("p04", 1001.59);
+        optimalMap.put("p05", 750.03);
+        optimalMap.put("p06", 876.50);
+        optimalMap.put("p07", 885.80);
+        optimalMap.put("p08", 4437.68);
+        optimalMap.put("p09", 3900.22);
+        optimalMap.put("p10", 3663.02);
+        optimalMap.put("p11", 3554.18);
+        optimalMap.put("p12", 1318.95);
+        optimalMap.put("p13", 1318.95);
+        optimalMap.put("p14", 1360.12);
+        optimalMap.put("p15", 2505.42);
+        optimalMap.put("p16", 2572.23);
+        optimalMap.put("p17", 2709.09);
+        optimalMap.put("p18", 3702.85);
+        optimalMap.put("p19", 3827.06);
+        optimalMap.put("p20", 4058.07);
+        optimalMap.put("p21", 5474.84);
+        optimalMap.put("p22", 5702.16);
+        optimalMap.put("p23", 6095.46);
+
+        taskMenu.setOnAction(e -> {
+            if (optimalMap.containsKey(taskMenu.getValue())) {
+                optimalValueInput.setText(String.valueOf(optimalMap.get(taskMenu.getValue())));
+            }
+            else optimalValueInput.setText("set optimal value");
+        });
+
         startButton.setOnAction(event -> {
 
             thread = new Thread(() -> {
@@ -106,7 +139,7 @@ public class Main extends Application{
                     borderPane.setCenter(graph);
 
 
-                    statistic.setDistance(evolutionaryAlgorithm.currentBest.getFitness(), processFile.optimalFitness, evolutionaryAlgorithm.iterationsUsed);
+                    statistic.setDistance(evolutionaryAlgorithm.currentBest.getFitness(), getOptimalValue(), evolutionaryAlgorithm.iterationsUsed);
 
                     //Display one of the solutions
                     graph.setRoutes(evolutionaryAlgorithm.currentBest);

@@ -93,15 +93,15 @@ public class EvolutionaryAlgorithm {
                 }
             }
 
-            statGraph.addIteration(processFile.optimalFitness / proposedSolutions[0].getFitness());
+            statGraph.addIteration(optimalValue / proposedSolutions[0].getFitness());
 
             if (currentBest == null || currentBest.getFitness() > proposedSolutions[0].getFitness()) {
                 currentBest = proposedSolutions[0];
-                statGraph.setBestSolution(currentBest.getFitness(), processFile.optimalFitness / currentBest.getFitness() * 100);
+                statGraph.setBestSolution(currentBest.getFitness(), optimalValue / currentBest.getFitness() * 100);
             }
 
             //If the fitness of the best individual is within 5% of optimal fitness, return
-            if (processFile.optimalFitness / proposedSolutions[0].getFitness() >= 0.95) {
+            if (optimalValue / proposedSolutions[0].getFitness() >= 0.95) {
                 iterationsUsed = i + 1;   //update the iterations we used
                 return proposedSolutions;
             }

@@ -67,17 +67,6 @@ public class Car {
         return copy;
     }
 
-    void addDuration(double duration) {
-        currentDuration += duration;
-    }
-
-//    void addLoad(int load) {
-//        currentLoad += load;
-//    }
-    void addCustomerVisited(Customer customer) {
-        customerSequence.add(customer);
-    }
-
     void smartAddCustomerVisited(Customer customer, int index) {
         customerSequence.add(index, customer);
         currentDuration = checkDistance(customer, index);
@@ -91,13 +80,14 @@ public class Car {
     }
 
 
-    //Check wether a car is valid
+    //Check weather a car is valid
     Boolean isValid(){
         if(this.currentDuration <= this.maximumDuration && this.currentLoad <= this.maximumLoad){
             return true;
         }
         return false;
     }
+
     /**
      * Check if a customer can be added to a route and where it will be of lowest extra duration
      * @param customer
@@ -132,11 +122,13 @@ public class Car {
                 current = customerSequence.get(count ++);
             }
 
+            distance += current.getServiceDuration();
+
             if (previous == null) {
-                distance += Population.euclideanDistance(depot.getX(), depot.getY(), current.getX(), current.getY()) + current.getServiceDuration();
+                distance += Population.euclideanDistance(depot.getX(), depot.getY(), current.getX(), current.getY());
             }
             else {
-                distance += Population.euclideanDistance(previous.getX(), previous.getY(), current.getX(), current.getY()) + current.getServiceDuration();
+                distance += Population.euclideanDistance(previous.getX(), previous.getY(), current.getX(), current.getY());
             }
 
             previous = current;
@@ -158,11 +150,12 @@ public class Car {
         int count = 0;
         for (int i = 0; i < customerSequence.size(); i ++) {
             Customer current = customerSequence.get(i);
+            distance += current.getServiceDuration();
             if (previous == null) {
-                distance += Population.euclideanDistance(depot.getX(), depot.getY(), current.getX(), current.getY()) + current.getServiceDuration();
+                distance += Population.euclideanDistance(depot.getX(), depot.getY(), current.getX(), current.getY());
             }
             else {
-                distance += Population.euclideanDistance(previous.getX(), previous.getY(), current.getX(), current.getY()) + current.getServiceDuration();
+                distance += Population.euclideanDistance(previous.getX(), previous.getY(), current.getX(), current.getY());
             }
 
             previous = current;
