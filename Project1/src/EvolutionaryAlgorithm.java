@@ -80,16 +80,16 @@ public class EvolutionaryAlgorithm {
                 }
                 bestIteration = i;
                 bestFitness = Double.MAX_VALUE;
-                final int size = (int) (populationSize * 0.9);
+                final int size = (int) (populationSize * 0.90);
                 final ProposedSolution[] newPopulation = population.generateInitialPopulation(size);
 
                 System.arraycopy(newPopulation, 0, proposedSolutions, populationSize - size, size);
+
             }
             else if((double)progressIterations/iterations > 0.01){
                 progressIterations = 0;
                 if(this.mutationRate > mutationRate){
                     this.mutationRate -= 0.01;
-                    System.out.println("Mutation rate: "+this.mutationRate);
                 }
             }
 
