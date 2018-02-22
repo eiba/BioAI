@@ -18,30 +18,41 @@ public class ImageSegmentation {
 
     /**
      * Using Prim's algorithm to generate initial segments
-     * @param individualCount Number of segments to be returned
+     * @param populationSize Number of segments to be returned
      * @return
      */
-    public Segment[] createInitialSegments(int individualCount){
-        //@TODO: use prim's algorithm to generate initial segments
-        final Segment[] segments = new Segment[individualCount];
+    public Solution[] createInitialSolutions(int populationSize, int minimumSegmentCount, int maximumSegmentCount){
+        //TODO: use prim's algorithm to generate initial segments
 
-        for (int i = 0; i < individualCount; i ++) {
-            // Selecting a random Pixel
-            final int rootRow = random.nextInt(imageParser.height);
-            final int rootColumn = random.nextInt(imageParser.width);
-            final Pixel rootPixel = pixels[rootRow][rootColumn];
+        //List of solutions to be returned from initial solution function
+        final Solution[] solutions = new Solution[populationSize];
 
-            // Creating a new segment
-            final Segment segment = new Segment(rootPixel);
-            final PriorityQueue<Pixel> priorityQueue = new PriorityQueue<>();
+        //Create one solution for each iteration
+        for (int i = 0; i < populationSize; i ++) {
 
-            // Using Prim's algorithm to fill the Segment
-            while (!priorityQueue.isEmpty()) {
-                final Pixel currentPixel = priorityQueue.remove();
+            //TODO number of segments in segment list should be between minimumSegmentCount and maximumSegmentCount, not populationsize
+            final Segment[] segments = new Segment[populationSize];
 
+            //Create one segment for each iteration. After the segments have been created we can create one solution form this.
+            for (int j=0; j< segments.length;j++) {
+                // Selecting a random Pixel
+                final int rootRow = random.nextInt(imageParser.height);
+                final int rootColumn = random.nextInt(imageParser.width);
+                final Pixel rootPixel = pixels[rootRow][rootColumn];
+
+                // Creating a new segment
+                final Segment segment = new Segment(rootPixel);
+                final PriorityQueue<Pixel> priorityQueue = new PriorityQueue<>();
+
+                // Using Prim's algorithm to fill the Segment
+                while (!priorityQueue.isEmpty()) {
+                    final Pixel currentPixel = priorityQueue.remove();
+
+                }
+
+                segments[i] = segment;
             }
-
-            segments[i] = segment;
+            solutions[i] = new Solution(segments);  //add the segments as one solution
         }
 //        final Comparator<Pixel> primPixelComparator = new Comparator<Pixel>() {
 //            @Override
@@ -53,7 +64,7 @@ public class ImageSegmentation {
 //        };
 //        final PriorityQueue<Pixel> priorityQueue = new PriorityQueue<>();
 
-        return segments;
+        return solutions;
     }
 
     //euclidean distance in RGB color space
