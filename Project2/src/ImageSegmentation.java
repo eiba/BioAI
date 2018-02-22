@@ -69,27 +69,27 @@ public class ImageSegmentation {
             for (int j = 0; j < imageParser.width; j ++) {
 
                 final Pixel currentPixel = pixels[i][j];
-                final Pixel[] neighbours = new Pixel[4];
-                final double[] neighbourDistances = new double[4];
-                int neighbourCount = 0;
 
                 // Pixel1 to Pixel2 distance for above and left will have been previously calculated by Pixel2 to Pixel1
                 // Has neighbour above
                 if (i > 0) {
-                    neighbours[0] = pixels[i-1][j];
-//                    neighbourDistances[neighbourCount ++] = pixels[i-1][j].neighbourDistances[]
+                    currentPixel.neighbours[0] = pixels[i-1][j];
+                    currentPixel.neighbourDistances[0] = pixels[i-1][j].neighbourDistances[2];
                 }
                 // Has neighbour left
                 if (j > 0) {
-                    neighbours[3] = pixels[i][j-1];
+                    currentPixel.neighbours[3] = pixels[i][j-1];
+                    currentPixel.neighbourDistances[3] = pixels[i-1][j].neighbourDistances[1];
                 }
                 // Has neighbour below
                 if (i < imageParser.height - 1) {
-                    neighbours[2] = pixels[i+1][j];
+                    currentPixel.neighbours[2] = pixels[i+1][j];
+                    currentPixel.neighbourDistances[2] = euclideanRGB(currentPixel.color, pixels[i+1][j].color);
                 }
                 // Has neighbour right
                 if (j < imageParser.width - 1) {
-                    neighbours[1] = pixels[i][j+1];
+                    currentPixel.neighbours[1] = pixels[i][j+1];
+                    currentPixel.neighbourDistances[1] = euclideanRGB(currentPixel.color, pixels[i][j+1].color);
                 }
             }
         }
