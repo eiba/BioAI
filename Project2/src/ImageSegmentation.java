@@ -23,22 +23,37 @@ public class ImageSegmentation {
      */
     public Segment[] createInitialSegments(int individualCount){
         //@TODO: use prim's algorithm to generate initial segments
+        final Segment[] segments = new Segment[individualCount];
 
-        // Initiating variables
-        final int rootRow = random.nextInt(imageParser.height);
-        final int rootColumn = random.nextInt(imageParser.width);
-        final Pixel rootPixel = pixels[rootRow][rootColumn];
-        final Comparator<Pixel> primPixelComparator = new Comparator<Pixel>() {
-            @Override
-            public int compare(Pixel pixel1, Pixel pixel2) {
+        for (int i = 0; i < individualCount; i ++) {
+            // Selecting a random Pixel
+            final int rootRow = random.nextInt(imageParser.height);
+            final int rootColumn = random.nextInt(imageParser.width);
+            final Pixel rootPixel = pixels[rootRow][rootColumn];
 
+            // Creating a new segment
+            final Segment segment = new Segment(rootPixel);
+            final PriorityQueue<Pixel> priorityQueue = new PriorityQueue<>();
 
-                return 0;
+            // Using Prim's algorithm to fill the Segment
+            while (!priorityQueue.isEmpty()) {
+                final Pixel currentPixel = priorityQueue.remove();
+
             }
-        };
-        final PriorityQueue<Pixel> priorityQueue = new PriorityQueue<>();
 
-        return null;
+            segments[i] = segment;
+        }
+//        final Comparator<Pixel> primPixelComparator = new Comparator<Pixel>() {
+//            @Override
+//            public int compare(Pixel pixel1, Pixel pixel2) {
+//
+//
+//                return 0;
+//            }
+//        };
+//        final PriorityQueue<Pixel> priorityQueue = new PriorityQueue<>();
+
+        return segments;
     }
 
     //euclidean distance in RGB color space
