@@ -21,13 +21,13 @@ public class ImageSegmentation {
      * @param individualCount Number of segments to be returned
      * @return
      */
-    public int[][] createInitialSegments(int individualCount){
+    public Segment[] createInitialSegments(int individualCount){
         //@TODO: use prim's algorithm to generate initial segments
 
         // Initiating variables
         final int rootRow = random.nextInt(imageParser.height);
         final int rootColumn = random.nextInt(imageParser.width);
-        final Pixel rootPixel = new Pixel(rootRow, rootColumn, imageParser.pixels[rootRow][rootColumn]);
+        final Pixel rootPixel = pixels[rootRow][rootColumn];
         final Comparator<Pixel> primPixelComparator = new Comparator<Pixel>() {
             @Override
             public int compare(Pixel pixel1, Pixel pixel2) {
