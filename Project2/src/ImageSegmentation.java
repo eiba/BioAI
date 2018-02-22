@@ -111,4 +111,16 @@ public class ImageSegmentation {
 
         return pixels;
     }
+
+    private double edgeValue(Segment[] segments){
+        //@TODO: Calculate edge value here.
+
+        return 0.0;
+    }
+
+    private double overallDeviation(Segment[] segments){
+        //@TODO: Calculate overall deviation here.
+
+        return 0.0;
+    }
 }
