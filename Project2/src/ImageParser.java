@@ -43,7 +43,8 @@ public class ImageParser {
                     row++;
                 }
             }
-        } else {
+        }
+        else {
             final int pixelLength = 3;
             for (int pixel = 0, row = 0, col = 0; pixel < pixels.length; pixel += pixelLength) {
                 int argb = 0;

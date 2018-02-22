@@ -19,7 +19,7 @@ public class MOOA {
         ImageSegmentation segmentation = new ImageSegmentation(img);
 
         //Step 2: Create Initial segments with Prim's algorithm
-        //@TODO: Implement Prim's algorithm to make individualCount number of minumum spanning trees. Each tree is used to create one initial segment.
+        //@TODO: Implement Prim's algorithm to make individualCount number of minimum spanning trees. Each tree is used to create one initial segment.
         int [][] initialGenotypes = segmentation.createInitialSegments(individualCount);
     }
 }
