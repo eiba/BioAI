@@ -5,6 +5,5 @@ public class Main {
         MOOA mooa = new MOOA("./TestImages/1/Test image.jpg");
 
 
-
     }
 }

@@ -5,22 +5,25 @@ public class MOOA {
 
     private ImageParser imageParser;
 
-    //Multi objective optimization algorithm goes here
+    /**
+     * Multi Objective Optimization Algorithm
+     * @param filename
+     */
     public MOOA(String filename){
 
         //parse the image
         try{
-        imageParser = new ImageParser(filename);
+            imageParser = new ImageParser(filename);
         }
         catch (IOException e){
             e.printStackTrace();
         }
 
-        System.out.println(eucledeanRGB(new Color(imageParser.pixels[0][0]),new Color(imageParser.pixels[250][250])));
+        System.out.println(euclideanRGB(new Color(imageParser.pixels[0][0]),new Color(imageParser.pixels[250][250])));
     }
 
     //eucledean distance in RGB color space
-    public double eucledeanRGB(Color Color1, Color Color2){
+    public double euclideanRGB(Color Color1, Color Color2){
 
         int differenceRed = Color1.getRed() - Color2.getRed();
         int differenceGreen = Color1.getGreen() - Color2.getGreen();
