@@ -6,7 +6,7 @@ public class MOOA {
     private ImageParser img;
 
     //Multi Objective Optimization Algorithm
-    public MOOA(String filename, int individualCount){
+    public MOOA(String filename, int individualCount, int minimumSegmentCount, int maximumSegmentCount, double edgeWeight, double deviationWeight){
 
         //Step 1: parse the image
         try {
