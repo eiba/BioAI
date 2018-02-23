@@ -64,6 +64,9 @@ public class ImageSegmentation {
             });
         }
 
+        executorService.shutdown();
+        while (!executorService.isTerminated()) {}
+
         return segments;
     }
 
