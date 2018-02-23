@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class PixelSegment {
+class PixelSegment {
 
     final Pixel parent;
     final ArrayList<Pixel> children;
@@ -10,8 +10,8 @@ public class PixelSegment {
         children = new ArrayList<>();
     }
 
-    void addChild(Pixel child) {
-
+    void add(Pixel child) {
+        children.add(child);
     }
 
 }

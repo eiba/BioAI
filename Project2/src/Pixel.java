@@ -1,14 +1,15 @@
-import java.awt.*;
+import java.awt.Color;
+import java.util.ArrayList;
 
 class Pixel {
 
     final int row, column, rgba;
     final Color color;
-    final Pixel[] neighbours;
-    final double[] neighbourDistances;
+    final PixelEdge[] edges;
+    final ArrayList<PixelEdge> edgeList;
 
     /*
-    neighbours and neighbourDistances index mapping:
+    edges index mapping:
     0 = Pixel object above
     1 = Pixel object right
     2 = Pixel object down
@@ -20,8 +21,18 @@ class Pixel {
         this.column = column;
         this.rgba = rgba;
         this.color = new Color(rgba);
-        neighbours = new Pixel[4];
-        neighbourDistances = new double[4];
+        edges = new PixelEdge[4];
+        edgeList = new ArrayList<>();
+//        neighbours = new Pixel[4];
+//        neighbourDistances = new double[4];
+    }
+
+    void createEdgeList() {
+        for (PixelEdge pixelEdge : edges) {
+            if (pixelEdge != null) {
+                edgeList.add(pixelEdge);
+            }
+        }
     }
 
 }

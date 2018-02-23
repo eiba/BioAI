@@ -3,6 +3,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class ImageSegmentation {
 
@@ -17,24 +20,21 @@ public class ImageSegmentation {
     }
 
     /**
-     * Using Prim's algorithm to generate initial segments
+     * Create initial segments that contains the entire image
      * @param populationSize Number of segments to be returned
-     * @return
+     * @return segments that each contains the entire image
      */
-    public Solution[] createInitialSolutions(int populationSize, int minimumSegmentCount, int maximumSegmentCount){
-        //TODO: use prim's algorithm to generate initial segments
+    Segment[] createInitialSegments(int populationSize){
 
-        //List of solutions to be returned from initial solution function
-        final Solution[] solutions = new Solution[populationSize];
+        final Segment[] segments = new Segment[populationSize];
 
         //Create one solution for each iteration
+        final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
         for (int i = 0; i < populationSize; i ++) {
+            final int index = i;
+            executorService.execute(() -> {
 
-            //TODO number of segments in segment list should be between minimumSegmentCount and maximumSegmentCount, not populationsize
-            final Segment[] segments = new Segment[populationSize];
-
-            //Create one segment for each iteration. After the segments have been created we can create one solution form this.
-            for (int j=0; j< segments.length;j++) {
                 // Selecting a random Pixel
                 final int rootRow = random.nextInt(imageParser.height);
                 final int rootColumn = random.nextInt(imageParser.width);
@@ -42,29 +42,37 @@ public class ImageSegmentation {
 
                 // Creating a new segment
                 final Segment segment = new Segment(rootPixel);
-                final PriorityQueue<Pixel> priorityQueue = new PriorityQueue<>();
+                final PriorityQueue<PixelEdge> priorityQueue = new PriorityQueue<>(rootPixel.edgeList);
 
-                // Using Prim's algorithm to fill the Segment
+                // Using Prim's algorithm to create the Segment
                 while (!priorityQueue.isEmpty()) {
-                    final Pixel currentPixel = priorityQueue.remove();
+                    final PixelEdge currentPixelEdge = priorityQueue.remove();
+
+                    // Check if Pixel is already in Segment
+                    if (segment.contains(currentPixelEdge.neighbourPixel)) {
+                        continue;
+                    }
+
+                    // Adding the new Pixel to the Segment
+                    segment.add(currentPixelEdge.currentPixel, currentPixelEdge.neighbourPixel);
+                    priorityQueue.addAll(currentPixelEdge.neighbourPixel.edgeList);
 
                 }
 
-                segments[i] = segment;
-            }
-            solutions[i] = new Solution(segments);  //add the segments as one solution
-        }
-//        final Comparator<Pixel> primPixelComparator = new Comparator<Pixel>() {
-//            @Override
-//            public int compare(Pixel pixel1, Pixel pixel2) {
-//
-//
-//                return 0;
-//            }
-//        };
-//        final PriorityQueue<Pixel> priorityQueue = new PriorityQueue<>();
+                segments[index] = segment;
 
-        return solutions;
+            });
+        }
+
+        return segments;
+    }
+
+    Segment[] divideSegment(Segment segment, int numberOfSegments) {
+        final Segment[] segments = new Segment[numberOfSegments];
+
+        //@TODO Divide segment into specified number of segments
+
+        return segments;
     }
 
     //euclidean distance in RGB color space
@@ -96,27 +104,28 @@ public class ImageSegmentation {
 
                 final Pixel currentPixel = pixels[i][j];
 
-                // Pixel1 to Pixel2 distance for above and left will have been previously calculated by Pixel2 to Pixel1
                 // Has neighbour above
                 if (i > 0) {
-                    currentPixel.neighbours[0] = pixels[i-1][j];
-                    currentPixel.neighbourDistances[0] = pixels[i-1][j].neighbourDistances[2];
+                    final PixelEdge pixelEdge = new PixelEdge(currentPixel, pixels[i-1][j], pixels[i-1][j].edges[2].distance);
+                    currentPixel.edges[0] = pixelEdge;
                 }
                 // Has neighbour left
                 if (j > 0) {
-                    currentPixel.neighbours[3] = pixels[i][j-1];
-                    currentPixel.neighbourDistances[3] = pixels[i-1][j].neighbourDistances[1];
+                    final PixelEdge pixelEdge = new PixelEdge(currentPixel, pixels[i][j-1], pixels[i][j-1].edges[1].distance);
+                    currentPixel.edges[3] = pixelEdge;
                 }
                 // Has neighbour below
                 if (i < imageParser.height - 1) {
-                    currentPixel.neighbours[2] = pixels[i+1][j];
-                    currentPixel.neighbourDistances[2] = euclideanRGB(currentPixel.color, pixels[i+1][j].color);
+                    final PixelEdge pixelEdge = new PixelEdge(currentPixel, pixels[i+1][j], euclideanRGB(currentPixel.color, pixels[i+1][j].color));
+                    currentPixel.edges[2] = pixelEdge;
                 }
                 // Has neighbour right
                 if (j < imageParser.width - 1) {
-                    currentPixel.neighbours[1] = pixels[i][j+1];
-                    currentPixel.neighbourDistances[1] = euclideanRGB(currentPixel.color, pixels[i][j+1].color);
+                    final PixelEdge pixelEdge = new PixelEdge(currentPixel, pixels[i][j+1], euclideanRGB(currentPixel.color, pixels[i][j+1].color));
+                    currentPixel.edges[1] = pixelEdge;
                 }
+
+                currentPixel.createEdgeList();
             }
         }
 

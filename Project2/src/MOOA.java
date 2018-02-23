@@ -1,4 +1,3 @@
-import java.awt.*;
 import java.io.IOException;
 
 public class MOOA {
@@ -42,8 +41,18 @@ public class MOOA {
         ImageSegmentation segmentation = new ImageSegmentation(img);
 
         //Step 3: Create Initial segments with Prim's algorithm
-        //@TODO: Implement Prim's algorithm to make individualCount number of minimum spanning trees. Each tree is used to create one initial segment.
-        Solution[] solutions = segmentation.createInitialSolutions(populationSize, minimumSegmentCount,maximumSegmentCount);
+
+        // Creating initial segments that contains the entire image in one large segment
+        Segment[] segments = segmentation.createInitialSegments(populationSize);
+
+        // Dividing the segments into smaller segments to form a Solution
+        Solution[] solutions = new Solution[populationSize];
+        for (int i = 0; i < populationSize; i ++) {
+            final Solution solution = new Solution(segmentation.divideSegment(segments[i], minimumSegmentCount));
+            solutions[i] = solution;
+        }
+
+
         Solution[] archive = new Solution[archiveSize];
 
         //Step 4: run the evolutionary cycle for <iterations> generations
