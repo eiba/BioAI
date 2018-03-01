@@ -57,6 +57,7 @@ public class MOOA {
             solutions[i] = solution;
         }
 
+        gui.drawImage(solutions[0], img.width, img.height);
 
         Solution[] archive = new Solution[archiveSize];
 
