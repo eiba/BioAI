@@ -1,6 +1,5 @@
 import javafx.application.Platform;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -44,8 +43,8 @@ public class GUI extends BorderPane {
         final PixelWriter pixelWriter = image.getPixelWriter();
 
         for (Segment segment : solution.segments) {
-            for (Pixel pixel : segment.pixelArray) {
-                pixelWriter.setArgb(pixel.column, pixel.row, pixel.rgba);
+            for (Pixel pixel : segment.pixels) {
+                pixelWriter.setArgb(pixel.column, pixel.row, pixel.argb);
             }
         }
 

@@ -3,24 +3,24 @@ import java.util.ArrayList;
 
 class Pixel {
 
-    final int row, column, rgba;
+    final int row, column, argb;
     final Color color;
     final PixelEdge[] edges;
     final ArrayList<PixelEdge> edgeList;
 
     /*
-    edges index mapping:
+    pixelEdgeMap index mapping:
     0 = Pixel object above
     1 = Pixel object right
     2 = Pixel object down
     3 = Pixel object left
      */
 
-    Pixel(int row, int column, int rgba) {
+    Pixel(int row, int column, int argb) {
         this.row = row;
         this.column = column;
-        this.rgba = rgba;
-        this.color = new Color(rgba);
+        this.argb = argb;
+        this.color = new Color(argb);
         edges = new PixelEdge[4];
         edgeList = new ArrayList<>();
 //        neighbours = new Pixel[4];

@@ -53,11 +53,13 @@ public class MOOA {
         // Dividing the segments into smaller segments to form a Solution
         Solution[] solutions = new Solution[populationSize];
         for (int i = 0; i < populationSize; i ++) {
-            final Solution solution = new Solution(segmentation.divideSegment(segments[i], minimumSegmentCount));
+            final Solution solution = new Solution(segmentation.divideSegment(segments[i], 8));
             solutions[i] = solution;
         }
 
-        gui.drawImage(new Solution(new Segment[]{segments[0]}), img.width, img.height);
+        if (solutions[0].segments[0] != null) {
+            gui.drawImage(solutions[0], img.width, img.height);
+        }
 
         Solution[] archive = new Solution[archiveSize];
 

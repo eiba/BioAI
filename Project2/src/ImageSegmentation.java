@@ -2,7 +2,6 @@ import java.awt.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class ImageSegmentation {
 
@@ -51,7 +50,7 @@ public class ImageSegmentation {
                     }
 
                     // Adding the new Pixel to the Segment
-                    segment.add(currentPixelEdge.currentPixel, currentPixelEdge.neighbourPixel);
+                    segment.add(currentPixelEdge);
                     priorityQueue.addAll(currentPixelEdge.neighbourPixel.edgeList);
 
                 }
@@ -62,6 +61,7 @@ public class ImageSegmentation {
         }
 
         executorService.shutdown();
+        //noinspection StatementWithEmptyBody
         while (!executorService.isTerminated()) {}
 
         return segments;
@@ -69,8 +69,14 @@ public class ImageSegmentation {
 
     Segment[] divideSegment(Segment segment, int numberOfSegments) {
         final Segment[] segments = new Segment[numberOfSegments];
+        final PixelEdge[] weakestPixelEdges = new PixelEdge[numberOfSegments];
 
-        //@TODO Divide segment into specified number of segments
+        final PriorityQueue<PixelEdge> priorityQueue = new PriorityQueue<>(Collections.reverseOrder());
+        priorityQueue.addAll(segment.edges);
+
+        for (int i = 0; i < numberOfSegments; i ++) {
+            weakestPixelEdges[i] = priorityQueue.remove();
+        }
 
         return segments;
     }
@@ -139,7 +145,7 @@ public class ImageSegmentation {
         double overAllDeviation = 0.0;
 
         for(Segment segment:solution.segments){
-            for(Pixel pixel: segment.pixelArray){
+            for(Pixel pixel: segment.pixels){
                 overAllDeviation += euclideanRGB(pixel.color,segment.centroid);
             }
         }

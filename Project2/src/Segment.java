@@ -4,42 +4,42 @@ import java.util.HashMap;
 
 class Segment {
 
-    final PixelSegment root;
-    final HashMap<Pixel, PixelSegment> pixels;
-    final ArrayList<Pixel> pixelArray;
+    final Pixel root;
+    final HashMap<Pixel, ArrayList<PixelEdge>> pixelEdgeMap;
+    final ArrayList<Pixel> pixels;
+    final ArrayList<PixelEdge> edges;
     Color centroid;
 
     Segment(Pixel root) {
-        this.root = new PixelSegment(root);
-        pixels = new HashMap<>();
-        pixelArray = new ArrayList<>();
+        this.root = root;
+        pixelEdgeMap = new HashMap<>();
+        pixelEdgeMap.put(root, new ArrayList<>());
+        pixels = new ArrayList<>();
+        pixels.add(root);
+        edges = new ArrayList<>();
     }
 
     boolean contains(Pixel pixel) {
-        return pixels.containsKey(pixel);
+        return pixelEdgeMap.containsKey(pixel);
     }
 
-    public void add(Pixel parent, Pixel child) {
-
-        PixelSegment pixelSegment = pixels.get(parent);
-
-        if (pixelSegment == null) {
-            pixelSegment = new PixelSegment(parent);
-            pixels.put(parent, pixelSegment);
-        }
-        pixelArray.add(child);
-        pixelSegment.add(child);
+    public void add(PixelEdge pixelEdge) {
+        ArrayList<PixelEdge> currentPixelEdges = pixelEdgeMap.get(pixelEdge.currentPixel);
+        currentPixelEdges.add(pixelEdge);
+        pixelEdgeMap.put(pixelEdge.neighbourPixel, new ArrayList<>());
+        pixels.add(pixelEdge.currentPixel);
+        edges.add(pixelEdge);
     }
 
     //Iterates over the pixels hashmap and returns the pixels as an array
-    public Pixel[] getPixels(){
-
-        Pixel[] pixels = new Pixel[this.pixels.keySet().size()];
-        int i = 0;
-        for(Pixel pixel: this.pixels.keySet()){
-            pixels[i] = pixel;
-            i++;
-        }
-        return pixels;
-    }
+//    public Pixel[] getPixels(){
+//
+//        Pixel[] pixels = new Pixel[this.pixels.keySet().size()];
+//        int i = 0;
+//        for(Pixel pixel: this.pixels.keySet()){
+//            pixels[i] = pixel;
+//            i++;
+//        }
+//        return pixels;
+//    }
 }
