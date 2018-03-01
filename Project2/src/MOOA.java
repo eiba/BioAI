@@ -3,6 +3,7 @@ import java.io.IOException;
 public class MOOA {
 
     private ImageParser img;
+    private GUI gui;
     private final int populationSize;
     private final int archiveSize;
     private final double mutationRate;
@@ -14,7 +15,9 @@ public class MOOA {
     private final double deviationWeight;
 
     //Multi Objective Optimization Algorithm
-    public MOOA(String filename, int populationSize,int archiveSize, double mutationRate, double crossoverRate, int iterations, int minimumSegmentCount, int maximumSegmentCount, double edgeWeight, double deviationWeight){
+    MOOA(GUI gui, String filename, int populationSize,int archiveSize, double mutationRate, double crossoverRate, int iterations, int minimumSegmentCount, int maximumSegmentCount, double edgeWeight, double deviationWeight){
+
+        this.gui = gui;
 
         //Step 1: setup variables for the evolutionary cycle
         this.populationSize = populationSize;
@@ -43,8 +46,10 @@ public class MOOA {
         //Step 3: Create Initial segments with Prim's algorithm
 
         // Creating initial segments that contains the entire image in one large segment
+        gui.out("Creating " + populationSize + " MSTs");
         Segment[] segments = segmentation.createInitialSegments(populationSize);
 
+        gui.out("Dividing MSTs into smaller segments");
         // Dividing the segments into smaller segments to form a Solution
         Solution[] solutions = new Solution[populationSize];
         for (int i = 0; i < populationSize; i ++) {
