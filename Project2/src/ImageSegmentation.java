@@ -1,8 +1,5 @@
 import java.awt.*;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.PriorityQueue;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -135,15 +132,22 @@ public class ImageSegmentation {
         return pixels;
     }
 
-    private double edgeValue(Segment[] segments){
-        //@TODO: Calculate edge value here.
+    private double[] edgeValueandDeviation(Solution solution){
+        //@TODO: Calculate edge value and deviation here.
+        double edgeValue = 0.0;
+        double overAllDeviation = 0.0;
 
-        return 0.0;
+        for(Segment segment:solution.segments){
+            for(Pixel pixel: segment.pixelArray){
+                //overAllDeviation += euclideanRGB();
+            }
+        }
+
+        double[] returnValues = new double[2];
+        returnValues[0] = edgeValue;
+        returnValues[1] = overAllDeviation;
+
+        return returnValues;
     }
 
-    private double overallDeviation(Segment[] segments){
-        //@TODO: Calculate overall deviation here.
-
-        return 0.0;
-    }
 }
