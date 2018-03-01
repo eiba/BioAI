@@ -133,7 +133,7 @@ public class ImageSegmentation {
     }
 
     //Calculated the edge Values and overall deviation for a solution
-    private double[] edgeValueandDeviation(Solution solution){
+    private void edgeValueandDeviation(Solution solution){
         //@TODO: Calculate edge value and deviation here.
         double edgeValue = 0.0;
         double overAllDeviation = 0.0;
@@ -155,11 +155,7 @@ public class ImageSegmentation {
             }
         }
 
-        double[] returnValues = new double[2];
-        returnValues[0] = edgeValue;
-        returnValues[1] = overAllDeviation;
-
-        return returnValues;
+        solution.scoreSolution(edgeValue,overAllDeviation);
     }
 
 }
