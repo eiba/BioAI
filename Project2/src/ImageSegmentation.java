@@ -148,7 +148,7 @@ public class ImageSegmentation {
                     Pixel neighbourPixel = pixelEdge.neighbourPixel;
 
                     if(!segment.pixels.containsKey(neighbourPixel)){
-                        edgeValue += euclideanRGB(neighbourPixel.color,pixel.color);
+                        edgeValue += pixelEdge.distance;    //add the distance of the edge if the neighbouring pixels are not in the same segment
                     }
                 }
             }
