@@ -26,8 +26,8 @@ class Segment {
         if (pixelSegment == null) {
             pixelSegment = new PixelSegment(parent);
             pixels.put(parent, pixelSegment);
-            pixelArray.add(parent);
         }
+        pixelArray.add(child);
         pixelSegment.add(child);
     }
 

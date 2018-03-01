@@ -44,7 +44,9 @@ public class GUI extends BorderPane {
         final PixelWriter pixelWriter = image.getPixelWriter();
 
         for (Segment segment : solution.segments) {
-            
+            for (Pixel pixel : segment.pixelArray) {
+
+            }
         }
 
         imageView.setImage(image);
