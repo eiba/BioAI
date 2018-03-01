@@ -9,10 +9,10 @@ public class Solution {
         this.segments = segments;
     }
 
-    public void scoreSolution(double edgeValue, double overAlldeviation){
+    public void scoreSolution(double edgeValue, double overAllDeviation){
         this.edgeValue = edgeValue;
-        this.overAlldeviation = overAlldeviation;
+        this.overAlldeviation = overAllDeviation;
 
-        score = overAlldeviation - edgeValue;
+        this.score = overAllDeviation - edgeValue;
     }
 }

@@ -140,7 +140,18 @@ public class ImageSegmentation {
 
         for(Segment segment:solution.segments){
             for(Pixel pixel: segment.pixelArray){
+                //Calculate overall deviation (summed rbg distance from current pixel to centroid of segment)
                 overAllDeviation += euclideanRGB(pixel.color,segment.centroid);
+
+                //Calculate the edgeValues. Calculate rgb distance between the current pixels and all its neighbours
+                //and all pixels that are not in the pixels segment
+                for(PixelEdge pixelEdge: pixel.edgeList){
+                    Pixel neighbourPixel = pixelEdge.neighbourPixel;
+
+                    if(!segment.pixels.containsKey(neighbourPixel)){
+                        edgeValue += euclideanRGB(neighbourPixel.color,pixel.color);
+                    }
+                }
             }
         }
 
