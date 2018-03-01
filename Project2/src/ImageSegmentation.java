@@ -134,7 +134,6 @@ public class ImageSegmentation {
 
     //Calculated the edge Values and overall deviation for a solution
     private void edgeValueandDeviation(Solution solution){
-        //@TODO: Calculate edge value and deviation here.
         double edgeValue = 0.0;
         double overAllDeviation = 0.0;
 
@@ -143,8 +142,8 @@ public class ImageSegmentation {
                 //Calculate overall deviation (summed rbg distance from current pixel to centroid of segment)
                 overAllDeviation += euclideanRGB(pixel.color,segment.centroid);
 
-                //Calculate the edgeValues. Calculate rgb distance between the current pixels and all its neighbours
-                //and all pixels that are not in the pixels segment
+                //Calculate the edgeValues. Calculate rgb distance between the current pixel and all its neighbours
+                //that are not in the same segment
                 for(PixelEdge pixelEdge: pixel.edgeList){
                     Pixel neighbourPixel = pixelEdge.neighbourPixel;
 
@@ -154,7 +153,6 @@ public class ImageSegmentation {
                 }
             }
         }
-
         solution.scoreSolution(edgeValue,overAllDeviation);
     }
 
