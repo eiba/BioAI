@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -6,6 +7,7 @@ class Segment {
     final PixelSegment root;
     final HashMap<Pixel, PixelSegment> pixels;
     final ArrayList<Pixel> pixelArray;
+    Color centroid;
 
     Segment(Pixel root) {
         this.root = new PixelSegment(root);

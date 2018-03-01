@@ -132,6 +132,7 @@ public class ImageSegmentation {
         return pixels;
     }
 
+    //Calculated the edge Values and overall deviation for a solution
     private double[] edgeValueandDeviation(Solution solution){
         //@TODO: Calculate edge value and deviation here.
         double edgeValue = 0.0;
@@ -139,7 +140,7 @@ public class ImageSegmentation {
 
         for(Segment segment:solution.segments){
             for(Pixel pixel: segment.pixelArray){
-                //overAllDeviation += euclideanRGB();
+                overAllDeviation += euclideanRGB(pixel.color,segment.centroid);
             }
         }
 
