@@ -95,6 +95,83 @@ public class ImageSegmentation {
         return segments;
     }
 
+    Solution[] createInitialSolutions(int solutionCount, int minimumSegmentCount, int maximumSegmentCount) {
+        final Solution[] solutions = new Solution[solutionCount];
+
+        // Create one solution for each iteration
+        final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+        // Creating a wrapper class to bind PixelEdge objects to a Segment
+        final class SegmentPixelEdge implements Comparable<SegmentPixelEdge>{
+
+            final Segment segment;
+            final PixelEdge pixelEdge;
+
+            SegmentPixelEdge(Segment segment, PixelEdge pixelEdge) {
+                this.segment = segment;
+                this.pixelEdge = pixelEdge;
+            }
+
+            @Override
+            public int compareTo(SegmentPixelEdge o) {
+                return this.pixelEdge.compareTo(o.pixelEdge);
+            }
+        }
+
+        for (int i = 0; i < solutionCount; i ++) {
+            final int index = i;
+            executorService.execute(() -> {
+                final HashSet<Pixel> visitedPixels = new HashSet<>();
+                final int segmentCount = minimumSegmentCount + random.nextInt(maximumSegmentCount - minimumSegmentCount + 1);
+                final Segment[] segments = new Segment[segmentCount];
+
+                final PriorityQueue<SegmentPixelEdge> priorityQueue = new PriorityQueue<>();
+
+                for (int j = 0; j < segmentCount; j ++) {
+
+                    //TODO Make sure rootPixel != another rootPixel for another segment
+                    // Selecting a random Pixel
+                    final int rootRow = random.nextInt(imageParser.height);
+                    final int rootColumn = random.nextInt(imageParser.width);
+                    final Pixel rootPixel = pixels[rootRow][rootColumn];
+
+                    segments[j] = new Segment(rootPixel);
+                    for (PixelEdge pixelEdge : rootPixel.edgeList) {
+                        priorityQueue.add(new SegmentPixelEdge(segments[j], pixelEdge));
+                    }
+                }
+
+                // Using Prim's algorithm to create the Segments for the Solution
+                while (!priorityQueue.isEmpty()) {
+                    final SegmentPixelEdge segmentPixelEdge = priorityQueue.remove();
+                    final Segment segment = segmentPixelEdge.segment;
+                    final PixelEdge currentPixelEdge = segmentPixelEdge.pixelEdge;
+
+                    // Check if Pixel is already in Solution
+                    if (visitedPixels.contains(currentPixelEdge.neighbourPixel)) {
+                        continue;
+                    }
+
+                    // Adding the new Pixel to the Segment
+                    segment.add(currentPixelEdge);
+                    visitedPixels.add(currentPixelEdge.neighbourPixel);
+                    for (PixelEdge pixelEdge : currentPixelEdge.neighbourPixel.edgeList) {
+                        priorityQueue.add(new SegmentPixelEdge(segment, pixelEdge));
+                    }
+
+                }
+
+                solutions[index] = new Solution(segments);
+            });
+        }
+
+        executorService.shutdown();
+        //noinspection StatementWithEmptyBody
+        while (!executorService.isTerminated()) {}
+
+        return solutions;
+    }
+
     //euclidean distance in RGB color space
     public double euclideanRGB(Color Color1, Color Color2){
 
