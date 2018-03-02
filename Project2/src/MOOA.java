@@ -49,6 +49,8 @@ public class MOOA {
         gui.out("Creating " + populationSize + " MSTs");
         Segment[] segments = segmentation.createInitialSegments(populationSize);
 
+//        gui.drawImage(new Solution(new Segment[]{segments[0]}), img.width, img.height);
+
         gui.out("Dividing MSTs into smaller segments");
         // Dividing the segments into smaller segments to form a Solution
         Solution[] solutions = new Solution[populationSize];
@@ -57,9 +59,13 @@ public class MOOA {
             solutions[i] = solution;
         }
 
+        gui.out("Drawing test image");
         if (solutions[0].segments[0] != null) {
             gui.drawImage(solutions[0], img.width, img.height);
         }
+//        else {
+//            gui.drawImage(new Solution(new Segment[]{segments[0]}), img.width, img.height);
+//        }
 
         Solution[] archive = new Solution[archiveSize];
 

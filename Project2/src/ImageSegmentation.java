@@ -69,13 +69,27 @@ public class ImageSegmentation {
 
     Segment[] divideSegment(Segment segment, int numberOfSegments) {
         final Segment[] segments = new Segment[numberOfSegments];
-        final PixelEdge[] weakestPixelEdges = new PixelEdge[numberOfSegments];
+        final PixelEdge[] weakestPixelEdges = new PixelEdge[numberOfSegments - 1];
 
         final PriorityQueue<PixelEdge> priorityQueue = new PriorityQueue<>(Collections.reverseOrder());
         priorityQueue.addAll(segment.edges);
 
-        for (int i = 0; i < numberOfSegments; i ++) {
-            weakestPixelEdges[i] = priorityQueue.remove();
+        // Finding the PixelEdges with highest distance in segment
+        for (int i = 0; i < weakestPixelEdges.length; i ++) {
+            PixelEdge pixelEdge = priorityQueue.remove();
+            while (segment.getSize(pixelEdge.neighbourPixel) < (double) segment.pixelCount / 10) {
+                pixelEdge = priorityQueue.remove();
+            }
+//            System.out.println(segment.getSize(pixelEdge.neighbourPixel));
+            weakestPixelEdges[i] = pixelEdge;
+        }
+
+        // Segment 0 is the entire segment minus the other segments
+        segments[0] = segment.copyFrom(segment.root);
+
+        // Making a copy of the other segments
+        for (int i = 0; i < weakestPixelEdges.length; i ++) {
+            segments[i+1] = segment.copyFrom(weakestPixelEdges[i].neighbourPixel);
         }
 
         return segments;
@@ -139,22 +153,27 @@ public class ImageSegmentation {
     }
 
     //Calculated the edge Values and overall deviation for a solution
-    private double[] edgeValueandDeviation(Solution solution){
-        //@TODO: Calculate edge value and deviation here.
+    private void edgeValueandDeviation(Solution solution){
         double edgeValue = 0.0;
         double overAllDeviation = 0.0;
 
         for(Segment segment:solution.segments){
             for(Pixel pixel: segment.pixels){
-                overAllDeviation += euclideanRGB(pixel.color,segment.centroid);
+                //Calculate overall deviation (summed rbg distance from current pixel to centroid of segment)
+                overAllDeviation += euclideanRGB(pixel.color, segment.getColor());
+
+                //Calculate the edgeValues. Calculate rgb distance between the current pixel and all its neighbours
+                //that are not in the same segment
+                for(PixelEdge pixelEdge: pixel.edgeList){
+                    Pixel neighbourPixel = pixelEdge.neighbourPixel;
+
+                    if(!segment.pixelEdgeMap.containsKey(neighbourPixel)){
+                        edgeValue += pixelEdge.distance;    //add the distance of the edge if the neighbouring pixels are not in the same segment
+                    }
+                }
             }
         }
-
-        double[] returnValues = new double[2];
-        returnValues[0] = edgeValue;
-        returnValues[1] = overAllDeviation;
-
-        return returnValues;
+        solution.scoreSolution(edgeValue,overAllDeviation);
     }
 
 }

@@ -44,7 +44,7 @@ public class GUI extends BorderPane {
 
         for (Segment segment : solution.segments) {
             for (Pixel pixel : segment.pixels) {
-                pixelWriter.setArgb(pixel.column, pixel.row, pixel.argb);
+                pixelWriter.setArgb(pixel.column, pixel.row, segment.getArgb());
             }
         }
 
