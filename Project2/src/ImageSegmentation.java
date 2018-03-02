@@ -133,13 +133,18 @@ public class ImageSegmentation {
 
                 for (int j = 0; j < segmentCount; j ++) {
 
-                    //TODO Make sure rootPixel != another rootPixel for another segment
-                    // Selecting a random Pixel
-                    final int rootRow = random.nextInt(imageParser.height);
-                    final int rootColumn = random.nextInt(imageParser.width);
-                    final Pixel rootPixel = pixels[rootRow][rootColumn];
+                    // Selecting a random Pixel, not visited before, as root for a new MST
+                    int rootRow, rootColumn;
+                    Pixel rootPixel;
+                    do {
+                        rootRow = random.nextInt(imageParser.height);
+                        rootColumn = random.nextInt(imageParser.width);
+                        rootPixel = pixels[rootRow][rootColumn];
+                    }
+                    while (visitedPixels.contains(rootPixel));
 
                     segments[j] = new Segment(rootPixel);
+                    visitedPixels.add(rootPixel);
                     for (PixelEdge pixelEdge : rootPixel.edgeList) {
                         priorityQueue.add(new SegmentPixelEdge(segments[j], pixelEdge));
                     }
