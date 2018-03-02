@@ -61,7 +61,16 @@ public class MOOA {
 
         gui.out("Drawing test image");
         if (solutions[0].segments[0] != null) {
-            gui.drawImage(solutions[0], img.width, img.height);
+            int bestIndex = 0;
+            double bestScore = solutions[0].score;
+            for(int i=1; i<solutions.length;i++){
+                if(solutions[i].score < bestScore){
+                    bestScore = solutions[i].score;
+                    bestIndex = i;
+                }
+            }
+            gui.drawImage(solutions[bestIndex], img.width, img.height);
+            gui.out("Score: "+bestScore);
         }
 //        else {
 //            gui.drawImage(new Solution(new Segment[]{segments[0]}), img.width, img.height);

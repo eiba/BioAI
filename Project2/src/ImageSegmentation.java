@@ -165,7 +165,9 @@ public class ImageSegmentation {
 
                 }
 
-                solutions[index] = new Solution(segments);
+                Solution newSolution = new Solution(segments);
+                solutions[index] = newSolution;
+                edgeValueandDeviation(newSolution);
             });
         }
 
@@ -234,7 +236,7 @@ public class ImageSegmentation {
     }
 
     //Calculated the edge Values and overall deviation for a solution
-    private void edgeValueandDeviation(Solution solution){
+    public void edgeValueandDeviation(Solution solution){
         double edgeValue = 0.0;
         double overAllDeviation = 0.0;
 
