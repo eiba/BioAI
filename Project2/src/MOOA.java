@@ -41,7 +41,7 @@ public class MOOA {
     }
 
     Solution[] iterate(){
-        ImageSegmentation segmentation = new ImageSegmentation(img);
+        ImageSegmentation segmentation = new ImageSegmentation(img,this.edgeWeight,this.deviationWeight);
 
         //Step 3: Create Initial segments with Prim's algorithm
 
