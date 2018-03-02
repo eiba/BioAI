@@ -8,9 +8,13 @@ public class ImageSegmentation {
     final Random random;
     final Pixel[][] pixels;
     ImageParser imageParser;
+    final double edgeWeight;
+    final double overallDeviationWeight;
 
-    ImageSegmentation(ImageParser imageParser){
+    ImageSegmentation(ImageParser imageParser, double edgeWeight, double overallDeviationWeight){
         this.imageParser = imageParser;
+        this.edgeWeight = edgeWeight;
+        this.overallDeviationWeight = overallDeviationWeight;
         pixels = createPixels();
         random = new Random();
     }
@@ -250,7 +254,7 @@ public class ImageSegmentation {
                 }
             }
         }
-        solution.scoreSolution(edgeValue,overAllDeviation);
+        solution.scoreSolution(edgeValue,overAllDeviation, this.edgeWeight,this.overallDeviationWeight);
     }
 
 }
