@@ -188,6 +188,8 @@ public class ImageSegmentation {
 
         for(Solution solution: solutions){
             Genotype genotype = createGenotype(solution);
+            System.out.println(genotype.pixelEdges.length);
+            createPhenotype(genotype);
         }
 
         return null;
@@ -213,8 +215,10 @@ public class ImageSegmentation {
 
                     //make sure that selected pixeledge must have both pixels in same segment and the pixels cannot point to each other.
                     if(segment.pixelEdgeMap.containsKey(somePixelEdge.neighbourPixel) && (pixelsEdges[imageParser.height*somePixelEdge.neighbourPixel.column + somePixelEdge.neighbourPixel.row] == null || pixelsEdges[imageParser.height*somePixelEdge.neighbourPixel.column + somePixelEdge.neighbourPixel.row].neighbourPixel != pixel)){
+                        if(pixelEdge == null || somePixelEdge.distance < pixelEdge.distance){   //take edge with lowest distance?
                          pixelEdge = somePixelEdge; //we found a pixel
-                         break;
+                        }
+                         //break;
                     }
 
                     //get next index, given that edgeindex not always starts at 0 we need modulo
@@ -225,7 +229,71 @@ public class ImageSegmentation {
                 pixelsEdges[imageParser.height*pixel.column + pixel.row] = pixelEdge;
             }
         }
+
+        /*int nullCounter = 0;
+        for(PixelEdge pixelEdge:pixelsEdges){
+            if(pixelEdge == null){
+                nullCounter +=1;
+            }
+        }
+        System.out.println(nullCounter);
+        System.out.println(solution.segments.length);*/
+
         return new Genotype(pixelsEdges);
+    }
+
+    public Solution createPhenotype(Genotype genotype){
+
+        ArrayList<Segment> segments = new ArrayList<>();
+
+
+        /*
+        final HashMap<Pixel, ArrayList<PixelEdge>> pixelEdgeMap = new HashMap<>();
+
+        for(PixelEdge pixelEdge: genotype.pixelEdges){
+            if(!pixelEdgeMap.containsKey(pixelEdge.currentPixel)){
+                pixelEdgeMap.put(pixelEdge.currentPixel,new ArrayList<>());
+            }
+            if(!pixelEdgeMap.containsKey(pixelEdge.neighbourPixel)){
+                pixelEdgeMap.put(pixelEdge.neighbourPixel,new ArrayList<>());
+            }
+
+        }*/
+        //final HashMap<Pixel, Integer> pixelSegmentMap = new HashMap<>();
+
+        for(PixelEdge pixelEdge:genotype.pixelEdges){
+            if(pixelEdge != null){
+
+            boolean foundSegment = false;
+            for(Segment segment:segments){
+                if(segment.pixels.contains(pixelEdge.currentPixel)){
+                    segment.pixels.add(pixelEdge.neighbourPixel);
+                    foundSegment = true;
+                }
+            }
+            if(!foundSegment){
+                Segment newSegment = new Segment(pixelEdge.currentPixel);
+                newSegment.pixels.add(pixelEdge.neighbourPixel);
+                segments.add(newSegment);
+            }
+            }
+            /*if(pixelSegmentMap.containsKey(pixelEdge.currentPixel)){
+                pixelSegmentMap.put(pixelEdge.currentPixel,pixelSegmentMap);
+            }
+            if(pixelSegmentMap.containsKey(pixelEdge.neighbourPixel)){
+                pixelSegmentMap.put(pixelEdge.neighbourPixel,new ArrayList<>());
+            }*/
+            //System.out.println("sadfasdf");
+
+        }
+
+        int pixelCount = 0;
+        System.out.println(segments.size());
+        for(Segment segment:segments){
+            pixelCount += segment.pixels.size();
+        }
+        System.out.println(pixelCount);
+        return null;
     }
 
     //euclidean distance in RGB color space
