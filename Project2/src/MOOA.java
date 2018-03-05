@@ -78,6 +78,7 @@ public class MOOA {
 
         Solution[] archive = new Solution[archiveSize];
 
+        segmentation.Crossover(solutions,archive,this.crossoverRate);
         //Step 4: run the evolutionary cycle for <iterations> generations
         for(int i=0; i< iterations;i++){
 

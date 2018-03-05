@@ -20,8 +20,8 @@ public class Main extends Application{
 
         MOOA mooa = new MOOA(
                 gui,
-                "./TestImages/1/Test image.jpg",
-                100,
+                "./TestImages/8/Test image.jpg",
+                1,
                 20,
                 0.2,
                 0.7,

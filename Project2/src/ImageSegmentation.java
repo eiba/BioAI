@@ -183,6 +183,55 @@ public class ImageSegmentation {
         return solutions;
     }
 
+    //Crossover
+    public Solution[] Crossover(Solution[] solutions, Solution[] archive, double crossoverRate){
+
+        Solution testSolution = solutions[0];
+        createGenotype(testSolution);
+        //Segment testSegment = testSolution.segments[0];
+
+        //Pixel pixel = testSegment.pixels.get(0);
+
+        //System.out.println(pixel.row);
+
+        return null;
+    }
+
+    public void createGenotype(Solution solution){
+
+        PixelEdge[] pixelsEdges = new PixelEdge[imageParser.width*imageParser.height];
+
+        for (Segment segment:solution.segments){
+            //Pixel previousPixel = null;
+            for(Pixel pixel: segment.pixels){
+
+                //Select a random index for the edge
+                int edgeIndex = random.nextInt(pixel.edgeList.size());
+
+                //pixelEdge to insert into pixelEdges list
+                PixelEdge pixelEdge = null;
+
+                //The pixeledge we select must be in same segment as the current pixel
+                for(int i=0; i<pixel.edgeList.size();i++){
+                    //Get the pixelEdge
+                    PixelEdge somePixelEdge = pixel.edgeList.get(edgeIndex);
+
+                    //make sure that selected pixeledge must have both pixels in same segment and the pixels cannot point to each other.
+                    if(segment.pixelEdgeMap.containsKey(somePixelEdge.neighbourPixel) && (pixelsEdges[imageParser.height*somePixelEdge.neighbourPixel.column + somePixelEdge.neighbourPixel.row] == null || pixelsEdges[imageParser.height*somePixelEdge.neighbourPixel.column + somePixelEdge.neighbourPixel.row].neighbourPixel != pixel)){
+                         pixelEdge = somePixelEdge; //we found a pixel
+                         break;
+                    }
+
+                    //get next index, given that edgeindex not always starts at 0 we need modulo
+                    edgeIndex = (edgeIndex +1) % pixel.edgeList.size();
+                }
+
+                //if we found no eligible pixel during the loop pixelEdge points to itself (is null)
+                pixelsEdges[imageParser.height*pixel.column + pixel.row] = pixelEdge;
+            }
+        }
+    }
+
     //euclidean distance in RGB color space
     public double euclideanRGB(Color Color1, Color Color2){
 
