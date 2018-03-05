@@ -21,7 +21,7 @@ public class Main extends Application{
         MOOA mooa = new MOOA(
                 gui,
                 "./TestImages/1/Test image.jpg",
-                1,
+                50,
                 20,
                 0.2,
                 0.7,
