@@ -4,6 +4,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
@@ -20,7 +21,12 @@ public class GUI extends BorderPane {
     private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
 
     // Image variables
-    private final ImageView imageView = new ImageView();
+    private final ScrollPane imagePane = new ScrollPane();
+    private final HBox imageBox = new HBox(4);
+    private final ImageView imageViewImage = new ImageView();
+    private final ImageView imageViewGreenLine = new ImageView();
+    private final ImageView imageViewBlackWhite = new ImageView();
+    private final ImageView imageViewSegments = new ImageView();
 
     GUI() {
         super();
@@ -35,10 +41,66 @@ public class GUI extends BorderPane {
         setBottom(outputPane);
 
         //Image initialization
-        setCenter(imageView);
+        imageBox.getChildren().addAll(imageViewGreenLine, imageViewBlackWhite, imageViewSegments, imageViewImage);
+        imagePane.setContent(imageBox);
+        setCenter(imagePane);
     }
 
     void drawImage(Solution solution, int width, int height) {
+
+        //Original Image
+        final WritableImage imageOriginal = new WritableImage(width, height);
+        final PixelWriter pixelWriterOriginal = imageOriginal.getPixelWriter();
+
+        for (Segment segment : solution.segments) {
+            for (Pixel pixel : segment.pixels) {
+                pixelWriterOriginal.setArgb(pixel.column, pixel.row, pixel.argb);
+            }
+        }
+
+        imageViewImage.setImage(imageOriginal);
+
+        //Green Line Image
+        final WritableImage imageGreen = new WritableImage(width, height);
+        final PixelWriter pixelWriterGreen = imageGreen.getPixelWriter();
+
+        for (Segment segment : solution.segments) {
+            for (Pixel pixel : segment.pixels) {
+                if (pixel.column == 0 || pixel.column == width-1 || pixel.row == 0 || pixel.row == height-1) {
+                    pixelWriterGreen.setColor(pixel.column, pixel.row, Color.LIMEGREEN);
+                }
+                else if (!segment.containsAllNeighbours(pixel)) {
+                    pixelWriterGreen.setColor(pixel.column, pixel.row, Color.LIMEGREEN);
+                }
+                else {
+                    pixelWriterGreen.setArgb(pixel.column, pixel.row, pixel.argb);
+                }
+            }
+        }
+
+        imageViewGreenLine.setImage(imageGreen);
+
+        //Black White Image
+        final WritableImage imageBlack = new WritableImage(width, height);
+        final PixelWriter pixelWriterBlack = imageBlack.getPixelWriter();
+
+        for (Segment segment : solution.segments) {
+            for (Pixel pixel : segment.pixels) {
+                if (pixel.column == 0 || pixel.column == width-1 || pixel.row == 0 || pixel.row == height-1) {
+                    pixelWriterBlack.setColor(pixel.column, pixel.row, Color.BLACK);
+                }
+                else if (!segment.containsAllNeighbours(pixel)) {
+                    pixelWriterBlack.setColor(pixel.column, pixel.row, Color.BLACK);
+                }
+                else {
+                    pixelWriterBlack.setColor(pixel.column, pixel.row, Color.WHITE);
+                }
+            }
+        }
+
+        imageViewBlackWhite.setImage(imageBlack);
+
+        //Segment Image
         final WritableImage image = new WritableImage(width, height);
         final PixelWriter pixelWriter = image.getPixelWriter();
 
@@ -48,7 +110,7 @@ public class GUI extends BorderPane {
             }
         }
 
-        imageView.setImage(image);
+        imageViewSegments.setImage(image);
     }
 
     void out(String message) {

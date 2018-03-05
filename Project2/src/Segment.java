@@ -82,6 +82,17 @@ class Segment {
         return new Color(redTotal / pixelCount, greenTotal / pixelCount, blueTotal / pixelCount, alphaTotal / pixelCount);
     }
 
+    boolean containsAllNeighbours(Pixel pixel) {
+
+        for (PixelEdge edge : pixel.edgeList) {
+            if (!pixelEdgeMap.containsKey(edge.neighbourPixel)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 //    void calculateCentroid() {
 //
 //
