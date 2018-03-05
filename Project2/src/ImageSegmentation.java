@@ -186,23 +186,18 @@ public class ImageSegmentation {
     //Crossover
     public Solution[] Crossover(Solution[] solutions, Solution[] archive, double crossoverRate){
 
-        Solution testSolution = solutions[0];
-        createGenotype(testSolution);
-        //Segment testSegment = testSolution.segments[0];
-
-        //Pixel pixel = testSegment.pixels.get(0);
-
-        //System.out.println(pixel.row);
+        for(Solution solution: solutions){
+            Genotype genotype = createGenotype(solution);
+        }
 
         return null;
     }
 
-    public void createGenotype(Solution solution){
+    public Genotype createGenotype(Solution solution){
 
         PixelEdge[] pixelsEdges = new PixelEdge[imageParser.width*imageParser.height];
 
         for (Segment segment:solution.segments){
-            //Pixel previousPixel = null;
             for(Pixel pixel: segment.pixels){
 
                 //Select a random index for the edge
@@ -230,6 +225,7 @@ public class ImageSegmentation {
                 pixelsEdges[imageParser.height*pixel.column + pixel.row] = pixelEdge;
             }
         }
+        return new Genotype(pixelsEdges);
     }
 
     //euclidean distance in RGB color space
