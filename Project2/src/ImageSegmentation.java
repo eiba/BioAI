@@ -242,11 +242,10 @@ public class ImageSegmentation {
         return new Genotype(pixelsEdges);
     }
 
+
     public Solution createPhenotype(Genotype genotype){
 
         ArrayList<Segment> segments = new ArrayList<>();
-
-
         /*
         final HashMap<Pixel, ArrayList<PixelEdge>> pixelEdgeMap = new HashMap<>();
 
@@ -306,7 +305,13 @@ public class ImageSegmentation {
         return Math.sqrt(Math.pow(differenceRed, 2) + Math.pow(differenceGreen, 2) + Math.pow(differenceBlue, 2));
 
     }
+    public void NSGA2(Solution[] solutions){
 
+        for(Solution solution:solutions){
+            
+        }
+
+    }
 
     private Pixel[][] createPixels() {
 
@@ -377,4 +382,18 @@ public class ImageSegmentation {
         solution.scoreSolution(edgeValue,overAllDeviation, this.edgeWeight,this.overallDeviationWeight);
     }
 
+    public int dominationRank(Solution[] population, Solution solution){
+
+        int dominationRank = 1;
+
+        for(Solution someSolution: population){
+            if(solution == someSolution){
+                continue;
+            }
+            if(solution.isDominatedBy(someSolution)){
+                dominationRank += 1;
+            }
+        }
+        return dominationRank;
+    }
 }

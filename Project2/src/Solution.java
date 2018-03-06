@@ -3,6 +3,7 @@ public class Solution {
     public double score;
     public double edgeValue;
     public double overallDeviation;
+    public int dominationRank;
 
     Segment[] segments;
     public Solution(Segment[] segments){
