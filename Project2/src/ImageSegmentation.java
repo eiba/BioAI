@@ -312,9 +312,9 @@ public class ImageSegmentation {
             final Solution offspring1 = new Solution(parent1, parent2, splitPoint, pixels);
             final Solution offspring2 = new Solution(parent2, parent1, splitPoint, pixels);
 
-            System.out.println();
-            System.out.println(offspring1.segments.length);
-            System.out.println(offspring2.segments.length);
+//            System.out.println();
+//            System.out.println(offspring1.segments.length);
+//            System.out.println(offspring2.segments.length);
 
             offspring[i] = offspring1;
             offspring[i+1] = offspring2;
