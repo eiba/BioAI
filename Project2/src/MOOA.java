@@ -59,7 +59,6 @@ public class MOOA {
 //            solutions[i] = solution;
 //        }
 
-        gui.out("Drawing test image");
         if (solutions[0].segments[0] != null) {
             int bestIndex = 0;
             double bestScore = solutions[0].score;
@@ -69,7 +68,7 @@ public class MOOA {
                     bestIndex = i;
                 }
             }
-            gui.drawImage(solutions[bestIndex], img.width, img.height);
+//            gui.drawImage(solutions[bestIndex], img.width, img.height);
             gui.out("Score: "+bestScore);
         }
 //        else {
@@ -78,7 +77,10 @@ public class MOOA {
 
         Solution[] archive = new Solution[archiveSize];
 
-        segmentation.Crossover(solutions,archive,this.crossoverRate);
+        gui.out("Starting crossover");
+        gui.out("Drawing test image");
+        gui.drawImage(segmentation.singlePointCrossover(solutions, solutions.length)[0], img.width, img.height);
+//        gui.drawImage(solutions[0], img.width, img.height);
         //Step 4: run the evolutionary cycle for <iterations> generations
         for(int i=0; i< iterations;i++){
 

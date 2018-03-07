@@ -108,10 +108,10 @@ public class ImageSegmentation {
         // Creating a wrapper class to bind PixelEdge objects to a Segment
         final class SegmentPixelEdge implements Comparable<SegmentPixelEdge>{
 
-            final Segment segment;
-            final PixelEdge pixelEdge;
+            private final Segment segment;
+            private final PixelEdge pixelEdge;
 
-            SegmentPixelEdge(Segment segment, PixelEdge pixelEdge) {
+            private SegmentPixelEdge(Segment segment, PixelEdge pixelEdge) {
                 this.segment = segment;
                 this.pixelEdge = pixelEdge;
             }
@@ -161,6 +161,7 @@ public class ImageSegmentation {
                         continue;
                     }
 
+
                     // Adding the new Pixel to the Segment
                     segment.add(currentPixelEdge);
                     visitedPixels.add(currentPixelEdge.neighbourPixel);
@@ -170,7 +171,7 @@ public class ImageSegmentation {
 
                 }
 
-                Solution newSolution = new Solution(segments);
+                Solution newSolution = new Solution(segments, imageParser.width, imageParser.height);
                 solutions[index] = newSolution;
                 edgeValueandDeviation(newSolution);
             });
@@ -184,12 +185,12 @@ public class ImageSegmentation {
     }
 
     //Crossover
-    public Solution[] Crossover(Solution[] solutions, Solution[] archive, double crossoverRate){
+    public Solution[] crossover(Solution[] solutions, Solution[] archive, double crossoverRate){
 
         for(Solution solution: solutions){
             Genotype genotype = createGenotype(solution);
-            System.out.println(genotype.pixelEdges.length);
-            createPhenotype(genotype);
+//            System.out.println(genotype.pixelEdges.length);
+//            createPhenotype(genotype);
         }
 
         return null;
@@ -295,6 +296,35 @@ public class ImageSegmentation {
         System.out.println(pixelCount);
         return null;
     }
+
+    Solution[] singlePointCrossover(Solution[] solutions, int offspringCount) {
+        final Solution[] offspring = new Solution[offspringCount];
+        final int size = imageParser.height * imageParser.width;
+
+        for (int i = 0; i < offspringCount; i += 2) {
+            // Selecting two parents
+            //@TODO Add a selection method for parent selection
+            final Solution parent1 = solutions[random.nextInt(solutions.length)];
+            final Solution parent2 = solutions[random.nextInt(solutions.length)];
+
+            // Selecting a random point for single point crossover
+            final int splitPoint = random.nextInt(size);
+
+            final Solution offspring1 = new Solution(parent1, parent2, splitPoint, pixels);
+            final Solution offspring2 = new Solution(parent2, parent1, splitPoint, pixels);
+
+            System.out.println();
+            System.out.println(offspring1.segments.length);
+            System.out.println(offspring2.segments.length);
+
+            offspring[i] = offspring1;
+            offspring[i+1] = offspring2;
+        }
+
+        return offspring;
+    }
+
+
 
     //euclidean distance in RGB color space
     public double euclideanRGB(Color Color1, Color Color2){
