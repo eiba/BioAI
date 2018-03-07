@@ -6,6 +6,7 @@ public class Solution {
     public double score;
     public double edgeValue;
     public double overallDeviation;
+    public int dominationRank;
 
     final Segment[] segments;
     final ArrayList<PixelEdge>[] pixelEdges;
