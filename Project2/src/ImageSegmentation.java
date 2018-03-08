@@ -412,6 +412,75 @@ public class ImageSegmentation {
         solution.scoreSolution(edgeValue,overAllDeviation, this.edgeWeight,this.overallDeviationWeight);
     }
 
+    public Solution[] nonDominationSorting(Solution[] solutions, int populationSize){
+
+        Solution[] returnedSolutions = new Solution[populationSize];
+        int returnedSolutionCount = 0;
+
+        //Add all the solutions of the different ranks in this hashmap and prioritize ranks from low to high
+        //Se Stigen! Jeg bruker hashmap og priority queue! :)
+        HashMap<Integer,ArrayList<Solution>> dominationMap = new HashMap<>();
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>();
+
+        for(Solution solution: solutions){
+            //create domination ranks for every solution
+            int dominationRank = dominationRank(solutions,solution);
+            solution.dominationRank = dominationRank;
+
+            //If the dominationrank already exist, add to the arraylist or if not create the arraylist which contains a domination edge
+            if(dominationMap.containsKey(dominationRank)){
+                dominationMap.get(dominationRank).add(solution);
+            }
+            else{
+                //create new hashmap input
+                ArrayList<Solution> solutionList = new ArrayList<>();
+                solutionList.add(solution);
+                dominationMap.put(dominationRank,solutionList);
+                priorityQueue.add(dominationRank);
+
+            }
+        }
+        Iterator itr = priorityQueue.iterator();
+
+        //iterate over the edges, from best edge to worst
+        while (itr.hasNext()){
+            int nextRank = priorityQueue.poll();
+
+            ArrayList<Solution> dominationEdge = dominationMap.get(nextRank);
+
+            if(returnedSolutionCount + dominationEdge.size() <= returnedSolutions.length){
+                for(Solution solution: dominationEdge){
+                    returnedSolutions[returnedSolutionCount] = solution;
+                    returnedSolutionCount += 1;
+                }
+            }else{
+                //The number of solutions we need to select from the current dominationEdge
+                int neededSolutions = returnedSolutions.length - returnedSolutionCount;
+                Solution[] lastNeededSolutions = crowdingDistanceSort(dominationEdge,neededSolutions);
+
+                for(Solution solution: lastNeededSolutions){
+                    returnedSolutions[returnedSolutionCount] = solution;
+                    returnedSolutionCount += 1;
+                }
+            }
+
+            //we've found all our solutions
+            if(returnedSolutionCount == returnedSolutions.length){
+                break;
+            }
+        }
+        return returnedSolutions;
+    }
+
+    //TODO: Crowding distance!
+    public Solution[] crowdingDistanceSort(ArrayList<Solution> dominationEdge, int neededSolutions){
+        Solution[] returnedSolutions = new Solution[neededSolutions];
+
+
+        return returnedSolutions;
+    }
+
+    //Returns the dominations rank (1 + number of solutions dominating the solution) for a solution based on the population
     public int dominationRank(Solution[] population, Solution solution){
 
         int dominationRank = 1;
