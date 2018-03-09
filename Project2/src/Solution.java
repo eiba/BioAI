@@ -8,6 +8,9 @@ public class Solution {
     public double edgeValue;
     public double overallDeviation;
     public int dominationRank;
+    public double crowdingDistance;
+    public boolean deviationSelected;
+    public boolean edgeValueSelected;
 
     final Segment[] segments;
     final ArrayList<PixelEdge>[] pixelEdges;

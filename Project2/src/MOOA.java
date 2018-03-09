@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MOOA {
 
@@ -58,6 +59,14 @@ public class MOOA {
 //            final Solution solution = new Solution(segmentation.divideSegment(segments[i], 8));
 //            solutions[i] = solution;
 //        }
+        gui.out("Starting sorting");
+        segmentation.nonDominationSorting(solutions,this.populationSize);
+        gui.out("Done sorting");
+        /*ArrayList<Solution> solutions1 = new ArrayList<>();
+        for(Solution solution: solutions){
+            solutions1.add(solution);
+        }*/
+        //segmentation.crowdingDistanceSort(solutions1,50);
 
         if (solutions[0].segments[0] != null) {
             int bestIndex = 0;
@@ -75,7 +84,6 @@ public class MOOA {
 //            gui.drawImage(new Solution(new Segment[]{segments[0]}), img.width, img.height);
 //        }
 
-        Solution[] archive = new Solution[archiveSize];
 
         gui.out("Starting crossover");
         gui.drawImage(segmentation.singlePointCrossover(solutions, solutions.length)[0], img.width, img.height);

@@ -422,6 +422,139 @@ public class ImageSegmentation {
         solution.scoreSolution(edgeValue,overAllDeviation, this.edgeWeight,this.overallDeviationWeight);
     }
 
+    public Solution[] nonDominationSorting(Solution[] solutions, int populationSize){
+
+        //The list of returned solutions
+        Solution[] returnedSolutions = new Solution[populationSize];
+        int returnedSolutionCount = 0;
+
+        //Add all the solutions of the different ranks in this hashmap and prioritize ranks from low to high
+        //Se Stigen! Jeg bruker hashmap og priority queue! :)
+        HashMap<Integer,ArrayList<Solution>> dominationMap = new HashMap<>();
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>();
+
+        for(Solution solution: solutions){
+            //create domination ranks for every solution
+            int dominationRank = dominationRank(solutions,solution);
+            solution.dominationRank = dominationRank;
+
+            //If the dominationrank already exist, add to the arraylist or if not create the arraylist which contains a domination edge
+            if(dominationMap.containsKey(dominationRank)){
+                dominationMap.get(dominationRank).add(solution);
+            }
+            else{
+                //create new hashmap input
+                ArrayList<Solution> solutionList = new ArrayList<>();
+                solutionList.add(solution);
+                dominationMap.put(dominationRank,solutionList);
+                priorityQueue.add(dominationRank);
+
+            }
+        }
+        Iterator itr = priorityQueue.iterator();
+
+        //iterate over the edges, from best edge to worst
+        while (itr.hasNext()){
+            int nextRank = priorityQueue.poll();
+
+            ArrayList<Solution> dominationEdge = dominationMap.get(nextRank);
+
+            if(returnedSolutionCount + dominationEdge.size() <= returnedSolutions.length){
+                for(Solution solution: dominationEdge){
+                    returnedSolutions[returnedSolutionCount] = solution;
+                    returnedSolutionCount += 1;
+                }
+            }else{
+                //The number of solutions we need to select from the current dominationEdge
+                int neededSolutions = returnedSolutions.length - returnedSolutionCount;
+                Solution[] lastNeededSolutions = crowdingDistanceSort(dominationEdge,neededSolutions);
+
+                for(Solution solution: lastNeededSolutions){
+                    returnedSolutions[returnedSolutionCount] = solution;
+                    returnedSolutionCount += 1;
+                }
+
+                //REMOVE THIS
+                //return null;
+
+            }
+
+            //we've found all our solutions
+            if(returnedSolutionCount == returnedSolutions.length){
+                break;
+            }
+        }
+        return returnedSolutions;
+    }
+
+    //TODO: Crowding distance!
+    public Solution[] crowdingDistanceSort(ArrayList<Solution> dominationEdge, int neededSolutions){
+        Solution[] returnedSolutions = new Solution[neededSolutions];
+        Solution[] edgeSort = new Solution[dominationEdge.size()];
+        Solution[] deviationSort = new Solution[dominationEdge.size()];
+
+        Comparator<Solution> comparator = new crowdingDistanceComparator();
+
+        PriorityQueue<Solution> priorityQueue = new PriorityQueue<>(comparator);
+        //reset values for solution
+        for(Solution solution: dominationEdge){
+            solution.deviationSelected = false;
+            solution.edgeValueSelected = false;
+            solution.crowdingDistance = 0;
+        }
+        for(int i=0; i<dominationEdge.size();i++){
+
+            Double bestDeviation = Double.MAX_VALUE;
+            Double bestEdgeValue = Double.MIN_VALUE;
+            Solution bestDeviationSoltion = null;
+            Solution bestEdgeValueSoltion = null;
+
+
+            for(Solution solution: dominationEdge){
+                if(solution.edgeValue > bestEdgeValue && !solution.edgeValueSelected){
+                    bestEdgeValue = solution.edgeValue;
+                    bestEdgeValueSoltion = solution;
+                }
+                if(solution.overallDeviation < bestDeviation && !solution.deviationSelected){
+                    bestDeviation = solution.overallDeviation;
+                    bestDeviationSoltion = solution;
+                }
+            }
+
+            if(bestDeviationSoltion == null || bestEdgeValueSoltion == null){
+                System.out.println("nullerror");
+            }
+            bestEdgeValueSoltion.edgeValueSelected = true;
+            bestDeviationSoltion.deviationSelected = true;
+            edgeSort[i] = bestEdgeValueSoltion;
+            deviationSort[i] = bestDeviationSoltion;
+        }
+
+        //setting the crowding distance of edges as far as possible.
+        deviationSort[0].crowdingDistance = Double.MAX_VALUE;
+        deviationSort[deviationSort.length - 1].crowdingDistance = Double.MAX_VALUE;
+        priorityQueue.add(deviationSort[0]);
+        priorityQueue.add(deviationSort[deviationSort.length - 1]);
+
+        double deviationMax = deviationSort[deviationSort.length-1].overallDeviation;
+        double deviationMin = deviationSort[0].overallDeviation;
+
+        double edgeValueMax = edgeSort[0].edgeValue;
+        double edgeValueMin = edgeSort[edgeSort.length-1].edgeValue;
+
+        for(int i=1; i < deviationSort.length - 1;i++){
+            deviationSort[i].crowdingDistance = Math.abs(deviationSort[i-1].overallDeviation / deviationSort[i+1].overallDeviation)/(deviationMax-deviationMin) + Math.abs(deviationSort[i-1].edgeValue / deviationSort[i+1].edgeValue)/(edgeValueMax-edgeValueMin);
+            priorityQueue.add(deviationSort[i]);
+        }
+
+        for(int i=0; i<returnedSolutions.length;i++){
+            returnedSolutions[i] = priorityQueue.poll();
+        }
+
+        return returnedSolutions;
+    }
+
+    //Returns the dominations rank (1 + number of solutions dominating the solution) for a solution based on the population
     public int dominationRank(Solution[] population, Solution solution){
 
         int dominationRank = 1;
@@ -435,5 +568,22 @@ public class ImageSegmentation {
             }
         }
         return dominationRank;
+    }
+}
+
+class crowdingDistanceComparator implements Comparator<Solution>
+{
+    @Override
+    public int compare(Solution x, Solution y)
+    {
+        if (x.crowdingDistance > y.crowdingDistance)
+        {
+            return -1;
+        }
+        if (x.crowdingDistance < y.crowdingDistance)
+        {
+            return 1;
+        }
+        return 0;
     }
 }
