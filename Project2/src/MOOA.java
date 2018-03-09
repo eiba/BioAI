@@ -126,10 +126,9 @@ public class MOOA {
                 //children = segmnetation.Mutate(children, mutationRate)
 
                 // Evaluate the new solutions
-                for (Solution solution : offspring) {
-                    segmentation.edgeValueAndDeviation(solution);
-                }
-                //solutions = solutions + children
+                gui.resetProgress();
+                gui.out("Evaluating new generation");
+                segmentation.evaluate(offspring);
 
                 //TODO step 8: select stuff for next generation
                 gui.out("Non dominating sort");

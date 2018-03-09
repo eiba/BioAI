@@ -359,8 +359,6 @@ public class ImageSegmentation {
                     //@TODO Add a selection method for parent selection
                     final Solution parent1 = tournamentSelection(solutions, 2);
                     final Solution parent2 = tournamentSelection(solutions, 2);
-//                    final Solution parent1 = solutions[0];
-//                    final Solution parent2 = solutions[1];
                     child = new Solution(parent1, parent2, splitPoint, pixels);
                     if (child.segments.length < minSegmentCount || child.segments.length > maxSegmentCount) {
                         child = null;
@@ -410,6 +408,23 @@ public class ImageSegmentation {
             
         }
 
+    }
+
+    void evaluate(Solution[] solutions) {
+        final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+        for (int i = 0; i < solutions.length; i ++) {
+            final int index = i;
+
+            executorService.execute(() -> {
+                edgeValueAndDeviation(solutions[index]);
+                gui.setProgress(index);
+            });
+        }
+
+        executorService.shutdown();
+        //noinspection StatementWithEmptyBody
+        while (!executorService.isTerminated()) {}
     }
 
     private Pixel[][] createPixels() {

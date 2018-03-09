@@ -61,18 +61,18 @@ public class Solution {
         }
 
         final ArrayList<Segment> segments = new ArrayList<>();
-        final HashSet<Pixel> visited = new HashSet<>();
+        final boolean[][] visited = new boolean[pixels.length][pixels[0].length];
 
         for (int i = 0; i < pixelEdges.length; i ++) {
             for (int j = 0; j < pixelEdges[0].length; j ++) {
                 final Pixel current = pixels[i][j];
-                if (visited.contains(current)) {
+                if (visited[i][j]) {
                     continue;
                 }
 
                 final Segment segment = new Segment();
                 segment.add(current);
-                visited.add(current);
+                visited[i][j] = true;
                 final ArrayList<Pixel> neighbours = new ArrayList<>();
                 for (int c = 0; c < 4; c ++) {
                     if (pixelEdges[i][j][c]) {
@@ -81,7 +81,7 @@ public class Solution {
                 }
                 while (!neighbours.isEmpty()) {
                     final Pixel neighbour = neighbours.remove(0);
-                    if (!visited.contains(neighbour)) {
+                    if (!visited[neighbour.row][neighbour.column]) {
 
                         for (int c = 0; c < 4; c++) {
                             if (pixelEdges[neighbour.row][neighbour.column][c]) {
@@ -90,7 +90,7 @@ public class Solution {
                         }
 
                         segment.add(neighbour);
-                        visited.add(neighbour);
+                        visited[neighbour.row][neighbour.column] = true;
                     }
                 }
                 segments.add(segment);
