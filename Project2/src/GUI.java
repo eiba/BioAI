@@ -48,7 +48,7 @@ public class GUI extends BorderPane {
 
         //Image initialization
         imageBox.getChildren().addAll(imageViewGreenLine, imageViewBlackWhite, imageViewSegments, imageViewImage);
-        imageBox.setStyle("-fx-background-color: red");
+//        imageBox.setStyle("-fx-background-color: red");
         imagePane.setContent(imageBox);
         setCenter(imagePane);
     }

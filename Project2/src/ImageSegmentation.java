@@ -137,13 +137,10 @@ public class ImageSegmentation {
         for (int i = 0; i < solutionCount; i ++) {
             final int index = i;
             executorService.execute(() -> {
-                final boolean[][] visitedPixels = new boolean[imageParser.height][imageParser.width];
+                final HashMap<Pixel, Segment> visitedPixels = new HashMap<>();
                 final int segmentCount = minimumSegmentCount + random.nextInt(maximumSegmentCount - minimumSegmentCount + 1);
                 final Segment[] segments = new Segment[segmentCount];
-                final ArrayList<PixelEdge>[] pixelEdges = new ArrayList[imageParser.height * imageParser.width];
-                for (int j = 0; j < imageParser.height * imageParser.width; j ++) {
-                    pixelEdges[j] = new ArrayList<>();
-                }
+                final boolean[][][] pixelEdges = new boolean[imageParser.height][imageParser.width][4];
 
                 final PriorityQueue<SegmentPixelEdge> priorityQueue = new PriorityQueue<>();
 
@@ -157,12 +154,14 @@ public class ImageSegmentation {
                         rootColumn = random.nextInt(imageParser.width);
                         rootPixel = pixels[rootRow][rootColumn];
                     }
-                    while (visitedPixels[rootRow][rootColumn]);
+                    while (visitedPixels.containsKey(rootPixel));
 
                     segments[j] = new Segment(rootPixel);
-                    visitedPixels[rootRow][rootColumn] = true;
-                    for (PixelEdge pixelEdge : rootPixel.edgeList) {
-                        priorityQueue.add(new SegmentPixelEdge(segments[j], pixelEdge));
+                    visitedPixels.put(rootPixel, segments[j]);
+                    for (PixelEdge pixelEdge : rootPixel.edges) {
+                        if (pixelEdge != null) {
+                            priorityQueue.add(new SegmentPixelEdge(segments[j], pixelEdge));
+                        }
                     }
                 }
 
@@ -173,28 +172,45 @@ public class ImageSegmentation {
                     final PixelEdge currentPixelEdge = segmentPixelEdge.pixelEdge;
 
                     // Check if Pixel is not already in Solution
-                    if (!visitedPixels[currentPixelEdge.pixelB.row][currentPixelEdge.pixelB.column]) {
+                    if (!visitedPixels.containsKey(currentPixelEdge.pixelB)) {
                         // Adding the new Pixel to the Segment
                         segment.add(currentPixelEdge.pixelB);
-                        pixelEdges[currentPixelEdge.pixelA.column + currentPixelEdge.pixelA.row * imageParser.width].add(currentPixelEdge);
-
-//                        visitedPixels.add(currentPixelEdge.pixelB);
-                        visitedPixels[currentPixelEdge.pixelB.row][currentPixelEdge.pixelB.column] = true;
-                        for (PixelEdge pixelEdge : currentPixelEdge.pixelB.edgeList) {
-                            priorityQueue.add(new SegmentPixelEdge(segment, pixelEdge));
+                        visitedPixels.put(currentPixelEdge.pixelB, segment);
+                        for (PixelEdge pixelEdge : currentPixelEdge.pixelB.edges) {
+                            if (pixelEdge != null) {
+                                priorityQueue.add(new SegmentPixelEdge(segment, pixelEdge));
+                            }
                         }
                     }
-                    else if (!visitedPixels[currentPixelEdge.pixelA.row][currentPixelEdge.pixelA.column]) {
+                    else if (!visitedPixels.containsKey(currentPixelEdge.pixelA)) {
                         // Adding the new Pixel to the Segment
                         segment.add(currentPixelEdge.pixelA);
-                        pixelEdges[currentPixelEdge.pixelB.column + currentPixelEdge.pixelB.row * imageParser.width].add(currentPixelEdge);
-                        visitedPixels[currentPixelEdge.pixelA.row][currentPixelEdge.pixelA.column] = true;
-//                        visitedPixels.add(currentPixelEdge.pixelA);
-                        for (PixelEdge pixelEdge : currentPixelEdge.pixelA.edgeList) {
-                            priorityQueue.add(new SegmentPixelEdge(segment, pixelEdge));
+//                        final int pos = currentPixelEdge.pixelA.getEdgeIndex(currentPixelEdge);
+//                        pixelEdges[currentPixelEdge.pixelA.row][currentPixelEdge.pixelA.column][pos] = true;
+//                        pixelEdges[currentPixelEdge.pixelB.row][currentPixelEdge.pixelB.column][(pos + 2) % 4] = true;
+                        visitedPixels.put(currentPixelEdge.pixelA, segment);
+                        for (PixelEdge pixelEdge : currentPixelEdge.pixelA.edges) {
+                            if (pixelEdge != null) {
+                                priorityQueue.add(new SegmentPixelEdge(segment, pixelEdge));
+                            }
                         }
                     }
 
+                }
+
+                //Linking PixelEdges to Pixels in Segments
+                for (Segment segment : segments) {
+                    for (Pixel pixel : segment.pixels) {
+                        for (int j = 0; j < 4; j ++) {
+                            final Pixel neighbour = pixel.pixels[j];
+                            if (neighbour != null) {
+                                if (visitedPixels.get(neighbour) == segment) {
+                                    pixelEdges[pixel.row][pixel.column][j] = true;
+                                    pixelEdges[neighbour.row][neighbour.column][Pixel.mapDirection(j)] = true;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 Solution newSolution = new Solution(pixelEdges, segments);
@@ -327,13 +343,13 @@ public class ImageSegmentation {
         final Solution[] offspring = new Solution[offspringCount];
         final int size = imageParser.height * imageParser.width;
 
-//        final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         for (int i = 0; i < offspringCount; i ++) {
 
             final int index = i;
 
-//            executorService.execute(() -> {
+            executorService.execute(() -> {
 
                 Solution child = null;
                 while (child == null) {
@@ -341,27 +357,26 @@ public class ImageSegmentation {
                     final int splitPoint = random.nextInt(size);
                     // Selecting two parents
                     //@TODO Add a selection method for parent selection
-//                    final Solution parent1 = solutions[random.nextInt(solutions.length)];
-//                    final Solution parent2 = solutions[random.nextInt(solutions.length)];
-                    final Solution parent1 = solutions[0];
-                    final Solution parent2 = solutions[1];
+                    final Solution parent1 = solutions[random.nextInt(solutions.length)];
+                    final Solution parent2 = solutions[random.nextInt(solutions.length)];
+//                    final Solution parent1 = solutions[0];
+//                    final Solution parent2 = solutions[1];
                     child = new Solution(parent1, parent2, splitPoint, pixels);
                     if (child.segments.length < minSegmentCount || child.segments.length > maxSegmentCount) {
-//                        System.out.println(child.segments.length);
-//                        child = null;
+                        child = null;
                     }
-                    gui.debugDrawImage(parent1, parent2, child, imageParser.width, imageParser.height, splitPoint);
+//                    gui.debugDrawImage(parent1, parent2, child, imageParser.width, imageParser.height, splitPoint);
 
                 }
 
                 offspring[index] = child;
                 Platform.runLater(() ->  gui.setProgress((double)(index+2)/offspringCount));
-//            });
+            });
         }
 
-//        executorService.shutdown();
-//        noinspection StatementWithEmptyBody
-//        while (!executorService.isTerminated()) {}
+        executorService.shutdown();
+        //noinspection StatementWithEmptyBody
+        while (!executorService.isTerminated()) {}
 
         return offspring;
     }
@@ -406,11 +421,15 @@ public class ImageSegmentation {
                 // Has neighbour above
                 if (i > 0) {
                     final PixelEdge pixelEdge = pixels[i-1][j].edges[2];
+                    currentPixel.pixels[0] = pixels[i-1][j];
+                    pixels[i-1][j].pixels[2] = currentPixel;
                     currentPixel.edges[0] = pixelEdge;
                 }
                 // Has neighbour left
                 if (j > 0) {
                     final PixelEdge pixelEdge = pixels[i][j-1].edges[1];
+                    currentPixel.pixels[3] = pixels[i][j-1];
+                    pixels[i][j-1].pixels[1] = currentPixel;
                     currentPixel.edges[3] = pixelEdge;
                 }
                 // Has neighbour below
@@ -424,7 +443,7 @@ public class ImageSegmentation {
                     currentPixel.edges[1] = pixelEdge;
                 }
 
-                currentPixel.createEdgeList();
+//                currentPixel.createEdgeList();
             }
         }
 
@@ -443,8 +462,16 @@ public class ImageSegmentation {
 
                 //Calculate the edgeValues. Calculate rgb distance between the current pixel and all its neighbours
                 //that are not in the same segment
-                for(PixelEdge pixelEdge: pixel.edgeList){
-                    Pixel neighbourPixel = pixelEdge.pixelB;
+                for(int i = 0; i < 4; i ++){
+                    PixelEdge pixelEdge = pixel.edges[i];
+                    if (pixelEdge == null) {
+                        continue;
+                    }
+                    //Not connected to neighbour
+                    Pixel neighbourPixel = pixelEdge.pixelA;
+                    if (neighbourPixel == pixel) {
+                        neighbourPixel = pixelEdge.pixelB;
+                    }
 
                     if(!segment.pixels.contains(neighbourPixel)){
                         edgeValue += pixelEdge.distance;    //add the distance of the edge if the neighbouring pixels are not in the same segment

@@ -79,7 +79,7 @@ public class MOOA {
                     bestIndex = i;
                 }
             }
-//            gui.drawImage(solutions[bestIndex], img.width, img.height);
+            gui.drawImage(solutions[bestIndex], img.width, img.height);
             gui.out("Score: " + bestScore);
         }
 //        else {
@@ -130,7 +130,7 @@ public class MOOA {
                         bestIndex = j;
                     }
                 }
-//                gui.drawImage(solutions[bestIndex], img.width, img.height);
+                gui.drawImage(solutions[bestIndex], img.width, img.height);
                 gui.out("Score: " + bestScore);
 
                 //TODO step 6: Mutate

@@ -63,9 +63,18 @@ class Segment {
 
     boolean containsAllNeighbours(Pixel pixel) {
 
-        for (PixelEdge edge : pixel.edgeList) {
-            if (!pixels.contains(edge.pixelB)) {
-                return false;
+        for (PixelEdge edge : pixel.edges) {
+            if (edge != null) {
+                if (pixel != edge.pixelB) {
+                    if (!pixels.contains(edge.pixelB)) {
+                        return false;
+                    }
+                }
+                else {
+                    if (!pixels.contains(edge.pixelA)) {
+                        return false;
+                    }
+                }
             }
         }
 

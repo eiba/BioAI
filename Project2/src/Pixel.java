@@ -6,7 +6,8 @@ class Pixel {
     final int row, column, argb;
     final Color color;
     final PixelEdge[] edges;
-    final ArrayList<PixelEdge> edgeList;
+    final Pixel[] pixels;
+//    final ArrayList<PixelEdge> edgeList;
 
     /*
     pixelEdgeMap index mapping:
@@ -22,17 +23,34 @@ class Pixel {
         this.argb = argb;
         this.color = new Color(argb);
         edges = new PixelEdge[4];
-        edgeList = new ArrayList<>();
+        pixels = new Pixel[4];
+//        edgeList = new ArrayList<>();
 //        neighbours = new Pixel[4];
 //        neighbourDistances = new double[4];
     }
 
-    void createEdgeList() {
-        for (PixelEdge pixelEdge : edges) {
-            if (pixelEdge != null) {
-                edgeList.add(pixelEdge);
+    int getEdgeIndex(PixelEdge pixelEdge) {
+        for (int i = 0; i < 4; i ++) {
+            if (edges[i] == pixelEdge) {
+                return i;
             }
         }
+        return -1;
+    }
+
+//    void createEdgeList() {
+//        for (PixelEdge pixelEdge : edges) {
+//            if (pixelEdge != null) {
+//                edgeList.add(pixelEdge);
+//            }
+//        }
+//    }
+
+    static int mapDirection(int i) {
+        if (i < 2) {
+            return i + 2;
+        }
+        return i - 2;
     }
 
 }
