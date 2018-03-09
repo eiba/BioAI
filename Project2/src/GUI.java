@@ -120,6 +120,87 @@ public class GUI extends BorderPane {
         imageViewSegments.setImage(image);
     }
 
+    void debugDrawImage(Solution parent1, Solution parent2, Solution child, int width, int height, int splitPoint) {
+        //Green Line Image
+        final WritableImage imageGreen = new WritableImage(width, height);
+        final PixelWriter pixelWriterGreen = imageGreen.getPixelWriter();
+
+        for (Segment segment : parent1.segments) {
+            for (Pixel pixel : segment.pixels) {
+                if (pixel.column == 0 || pixel.column == width-1 || pixel.row == 0 || pixel.row == height-1) {
+                    pixelWriterGreen.setColor(pixel.column, pixel.row, Color.LIMEGREEN);
+                }
+                else if (!segment.containsAllNeighbours(pixel)) {
+                    pixelWriterGreen.setColor(pixel.column, pixel.row, Color.LIMEGREEN);
+                }
+                else {
+                    pixelWriterGreen.setArgb(pixel.column, pixel.row, pixel.argb);
+                }
+            }
+        }
+
+        for (int i = splitPoint; i < splitPoint + width; i ++) {
+            final int indexRow = i / width;
+            final int indexCol = i % width;
+            pixelWriterGreen.setColor(indexCol, indexRow, Color.RED);
+        }
+
+        imageViewGreenLine.setImage(imageGreen);
+
+        //Green Line Image
+        final WritableImage imageBlack = new WritableImage(width, height);
+        final PixelWriter pixelWriterBlack = imageBlack.getPixelWriter();
+
+        for (Segment segment : parent2.segments) {
+            for (Pixel pixel : segment.pixels) {
+                if (pixel.column == 0 || pixel.column == width-1 || pixel.row == 0 || pixel.row == height-1) {
+                    pixelWriterBlack.setColor(pixel.column, pixel.row, Color.LIMEGREEN);
+                }
+                else if (!segment.containsAllNeighbours(pixel)) {
+                    pixelWriterBlack.setColor(pixel.column, pixel.row, Color.LIMEGREEN);
+                }
+                else {
+                    pixelWriterBlack.setArgb(pixel.column, pixel.row, pixel.argb);
+                }
+            }
+        }
+
+        for (int i = splitPoint; i < splitPoint + width; i ++) {
+            final int indexRow = i / width;
+            final int indexCol = i % width;
+            pixelWriterBlack.setColor(indexCol, indexRow, Color.RED);
+        }
+
+        imageViewBlackWhite.setImage(imageBlack);
+
+        //Green Line Image
+        final WritableImage imageSegment = new WritableImage(width, height);
+        final PixelWriter pixelWriterSegment = imageSegment.getPixelWriter();
+
+        for (Segment segment : child.segments) {
+            for (Pixel pixel : segment.pixels) {
+                if (pixel.column == 0 || pixel.column == width-1 || pixel.row == 0 || pixel.row == height-1) {
+                    pixelWriterSegment.setColor(pixel.column, pixel.row, Color.LIMEGREEN);
+                }
+                else if (!segment.containsAllNeighbours(pixel)) {
+                    pixelWriterSegment.setColor(pixel.column, pixel.row, Color.LIMEGREEN);
+                }
+                else {
+                    pixelWriterSegment.setArgb(pixel.column, pixel.row, pixel.argb);
+                }
+            }
+        }
+
+        for (int i = splitPoint; i < splitPoint + width; i ++) {
+            final int indexRow = i / width;
+            final int indexCol = i % width;
+            pixelWriterSegment.setColor(indexCol, indexRow, Color.RED);
+        }
+
+        imageViewSegments.setImage(imageSegment);
+        imageViewImage.setImage(null);
+    }
+
     void out(String message) {
         Date date = new Date();
         outputBuilder.append(formatter.format(date));

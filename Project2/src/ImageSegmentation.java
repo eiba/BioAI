@@ -327,13 +327,13 @@ public class ImageSegmentation {
         final Solution[] offspring = new Solution[offspringCount];
         final int size = imageParser.height * imageParser.width;
 
-        final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+//        final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         for (int i = 0; i < offspringCount; i ++) {
 
             final int index = i;
 
-            executorService.execute(() -> {
+//            executorService.execute(() -> {
 
                 Solution child = null;
                 while (child == null) {
@@ -341,25 +341,27 @@ public class ImageSegmentation {
                     final int splitPoint = random.nextInt(size);
                     // Selecting two parents
                     //@TODO Add a selection method for parent selection
-                    final Solution parent1 = solutions[random.nextInt(solutions.length)];
-                    final Solution parent2 = solutions[random.nextInt(solutions.length)];
+//                    final Solution parent1 = solutions[random.nextInt(solutions.length)];
+//                    final Solution parent2 = solutions[random.nextInt(solutions.length)];
+                    final Solution parent1 = solutions[0];
+                    final Solution parent2 = solutions[1];
                     child = new Solution(parent1, parent2, splitPoint, pixels);
                     if (child.segments.length < minSegmentCount || child.segments.length > maxSegmentCount) {
-                        System.out.println(child.segments.length);
-                        child = null;
+//                        System.out.println(child.segments.length);
+//                        child = null;
                     }
+                    gui.debugDrawImage(parent1, parent2, child, imageParser.width, imageParser.height, splitPoint);
 
                 }
 
-                edgeValueAndDeviation(child);
                 offspring[index] = child;
                 Platform.runLater(() ->  gui.setProgress((double)(index+2)/offspringCount));
-            });
+//            });
         }
 
-        executorService.shutdown();
-        //noinspection StatementWithEmptyBody
-        while (!executorService.isTerminated()) {}
+//        executorService.shutdown();
+//        noinspection StatementWithEmptyBody
+//        while (!executorService.isTerminated()) {}
 
         return offspring;
     }

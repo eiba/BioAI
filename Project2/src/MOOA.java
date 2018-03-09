@@ -130,13 +130,16 @@ public class MOOA {
                         bestIndex = j;
                     }
                 }
-                gui.drawImage(solutions[bestIndex], img.width, img.height);
+//                gui.drawImage(solutions[bestIndex], img.width, img.height);
                 gui.out("Score: " + bestScore);
 
                 //TODO step 6: Mutate
                 //children = segmnetation.Mutate(children, mutationRate)
 
-                //TODO step 7: Evaluate the new solutions
+                // Evaluate the new solutions
+                for (Solution solution : offspring) {
+                    segmentation.edgeValueAndDeviation(solution);
+                }
                 //solutions = solutions + children
 
                 //TODO step 8: select stuff for next generation

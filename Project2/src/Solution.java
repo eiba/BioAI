@@ -24,8 +24,12 @@ public class Solution {
         final boolean[][] hasEdge = new boolean[pixels.length][pixels[0].length];
 
         // Filling out the new pixelEdges - Genotype
-        System.arraycopy(parent1.pixelEdges, 0, pixelEdges, 0, splitPoint);
-        System.arraycopy(parent2.pixelEdges, splitPoint, pixelEdges, splitPoint, pixelEdges.length - splitPoint);
+        for (int i = 0; i < splitPoint; i ++) {
+            pixelEdges[i] = new ArrayList<>(parent1.pixelEdges[i]);
+        }
+        for (int i = splitPoint; i < pixelEdges.length; i ++) {
+            pixelEdges[i] = new ArrayList<>(parent2.pixelEdges[i]);
+        }
 
         // The hard part, defining segments - Phenotype
 
@@ -37,21 +41,81 @@ public class Solution {
             if (index < 0) {
                 break;
             }
-            edges.addAll(parent1.pixelEdges[index]);
+            edges.addAll(pixelEdges[index]);
+        }
+        //Adding edges that were incoming in parent2
+        final HashSet<PixelEdge> parent2LostEdges = new HashSet<>();
+        for (int i = 0; i < pixels[0].length; i ++) {
+            index = splitPoint - 1 - i;
+            if (index < 0) {
+                break;
+            }
+            parent2LostEdges.addAll(parent2.pixelEdges[index]);
         }
         for (int i = 0; i < pixels[0].length; i ++) {
             final ArrayList<PixelEdge> removeList = new ArrayList<>();
             index = splitPoint + i;
-            if (index >= parent2.pixelEdges.length) {
+            if (index >= pixelEdges.length) {
                 break;
             }
-            for (PixelEdge pixelEdge : parent2.pixelEdges[index]) {
+            final int indexRow = index / pixels[0].length;
+            final int indexCol = index % pixels[0].length;
+            for (PixelEdge pixelEdge : pixels[indexRow][indexCol].edgeList) {
+                if (parent2LostEdges.contains(pixelEdge)) {
+                    pixelEdges[index].add(pixelEdge);
+                }
+            }
+            for (PixelEdge pixelEdge : pixelEdges[index]) {
                 // If duplicate edge
                 if (edges.contains(pixelEdge)) {
                     removeList.add(pixelEdge);
                 }
             }
-            parent2.pixelEdges[splitPoint + i].removeAll(removeList);
+//            //Merging further to not get to many segments
+//            if (pixelEdges[index].isEmpty()) {
+//                final int indexRow = index / pixels[0].length;
+//                final int indexCol = index % pixels[0].length;
+//                PixelEdge bestEdge = null;
+//                for (PixelEdge pixelEdge : pixels[indexRow][indexCol].edgeList) {
+//                    if (bestEdge == null || bestEdge.distance > pixelEdge.distance) {
+//                        if (!edges.contains(pixelEdge)) {
+//                            bestEdge = pixelEdge;
+//
+//                        }
+//                    }
+//                }
+//                pixelEdges[index].add(bestEdge);
+//            }
+        }
+
+        for (int i = 0; i < pixels[0].length; i ++) {
+            final ArrayList<PixelEdge> removeList = new ArrayList<>();
+            index = splitPoint + i;
+            if (index >= pixelEdges.length) {
+                break;
+            }
+            for (PixelEdge pixelEdge : pixelEdges[index]) {
+                // If duplicate edge
+                if (edges.contains(pixelEdge)) {
+                    removeList.add(pixelEdge);
+                }
+            }
+//            //Merging further to not get to many segments
+//            if (pixelEdges[index].isEmpty()) {
+//                final int indexRow = index / pixels[0].length;
+//                final int indexCol = index % pixels[0].length;
+//                PixelEdge bestEdge = null;
+//                for (PixelEdge pixelEdge : pixels[indexRow][indexCol].edgeList) {
+//                    if (bestEdge == null || bestEdge.distance > pixelEdge.distance) {
+//                        if (!edges.contains(pixelEdge)) {
+//                            bestEdge = pixelEdge;
+//
+//                        }
+//                    }
+//                }
+//                pixelEdges[index].add(bestEdge);
+//            }
+            pixelEdges[index].removeAll(removeList);
         }
 
 
@@ -174,9 +238,6 @@ public class Solution {
 
             segments.add(segment);
         }
-//        System.out.println("Visited: " + visited.size());
-//        System.out.println("Phenotypes: " + phenotypes.size());
-//        System.out.println("Segments: " + segments.size());
         this.segments = segments.toArray(new Segment[0]);
 
 //        final HashMap<Pixel, PixelEdge> parentMap = new HashMap<>();
