@@ -15,13 +15,14 @@ public class Solution {
     final Segment[] segments;
     final ArrayList<PixelEdge>[] pixelEdges;
 
-    public Solution(ArrayList<PixelEdge>[] pixelEdges, Segment[] segments){
+    Solution(ArrayList<PixelEdge>[] pixelEdges, Segment[] segments){
         this.segments = segments;
         this.pixelEdges = pixelEdges;
     }
 
     Solution(Solution parent1, Solution parent2, int splitPoint, Pixel[][] pixels) {
         pixelEdges = new ArrayList[parent1.pixelEdges.length];
+        final boolean[][] hasEdge = new boolean[pixels.length][pixels[0].length];
 
         // Filling out the new pixelEdges - Genotype
         System.arraycopy(parent1.pixelEdges, 0, pixelEdges, 0, splitPoint);
@@ -31,12 +32,21 @@ public class Solution {
 
         // Removing duplicate edges from new solution
         HashSet<PixelEdge> edges = new HashSet<>();
+        int index;
         for (int i = 0; i < pixels[0].length; i ++) {
-            edges.addAll(parent1.pixelEdges[splitPoint - 1 - i]);
+            index = splitPoint - 1 - i;
+            if (index < 0) {
+                break;
+            }
+            edges.addAll(parent1.pixelEdges[index]);
         }
         for (int i = 0; i < pixels[0].length; i ++) {
             final ArrayList<PixelEdge> removeList = new ArrayList<>();
-            for (PixelEdge pixelEdge : parent2.pixelEdges[splitPoint + i]) {
+            index = splitPoint + i;
+            if (index >= parent2.pixelEdges.length) {
+                break;
+            }
+            for (PixelEdge pixelEdge : parent2.pixelEdges[index]) {
                 // If duplicate edge
                 if (edges.contains(pixelEdge)) {
                     removeList.add(pixelEdge);
@@ -45,18 +55,8 @@ public class Solution {
             parent2.pixelEdges[splitPoint + i].removeAll(removeList);
         }
 
-        // Building Segments from PixelEdges
-        // Wrapper classes
-//        final class Edge {
-//            final Pixel current, neighbour;
-//            final PixelEdge pixelEdge;
-//
-//            Edge(Pixel current, Pixel neighbour, PixelEdge pixelEdge) {
-//                this.current = current;
-//                this.neighbour = neighbour;
-//                this.pixelEdge = pixelEdge;
-//            }
-//        }
+
+
         final class Phenotype {
             final ArrayList<Pixel> pixels = new ArrayList<>();
 //            Segment segment = new Segment();
@@ -88,12 +88,14 @@ public class Solution {
 //                    phenotypeA.edges.add(new Edge(pixelEdge.pixelA, pixelEdge.pixelB, pixelEdge));
                     phenotypeA.pixels.add(pixelEdge.pixelB);
                     phenotypeMap.put(pixelEdge.pixelB, phenotypeA);
+                    hasEdge[pixelEdge.pixelB.row][pixelEdge.pixelB.column] = true;
                     continue;
                 }
 
                 if (phenotypeB != null) {
 //                    phenotypeB.edges.add(new Edge(pixelEdge.pixelB, pixelEdge.pixelA, pixelEdge));
                     phenotypeB.pixels.add(pixelEdge.pixelA);
+                    hasEdge[pixelEdge.pixelA.row][pixelEdge.pixelA.column] = true;
                     phenotypeMap.put(pixelEdge.pixelA, phenotypeB);
                     continue;
                 }
@@ -102,10 +104,47 @@ public class Solution {
 //                phenotype.edges.add(new Edge(pixelEdge.pixelA, pixelEdge.pixelB, pixelEdge));
                 phenotype.pixels.add(pixelEdge.pixelA);
                 phenotype.pixels.add(pixelEdge.pixelB);
+                hasEdge[pixelEdge.pixelA.row][pixelEdge.pixelA.column] = true;
+                hasEdge[pixelEdge.pixelB.row][pixelEdge.pixelB.column] = true;
 //                phenotype.pixelEdges.add(pixelEdge);
                 phenotypeMap.put(pixelEdge.pixelA, phenotype);
                 phenotypeMap.put(pixelEdge.pixelB, phenotype);
                 phenotypes.add(phenotype);
+            }
+        }
+
+        // Fixing pixels not having any segment
+        for (int i = 0; i < hasEdge.length; i ++) {
+            for (int j = 0; j < hasEdge[0].length; j ++) {
+                if (!hasEdge[i][j]) {
+                    PixelEdge bestEdge = null;
+                    for (PixelEdge pixelEdge : pixels[i][j].edgeList) {
+                        if (bestEdge == null || bestEdge.distance > pixelEdge.distance) {
+                            if (phenotypeMap.containsKey(pixelEdge.pixelA) || phenotypeMap.containsKey(pixelEdge.pixelB)) {
+                                bestEdge = pixelEdge;
+                            }
+                        }
+                    }
+                    pixelEdges[i * hasEdge[0].length + j].add(bestEdge);
+                    final Phenotype phenotypeA = phenotypeMap.get(bestEdge.pixelA);
+                    final Phenotype phenotypeB = phenotypeMap.get(bestEdge.pixelB);
+                    if (phenotypeA != null) {
+                        phenotypeA.pixels.add(bestEdge.pixelB);
+                        phenotypeMap.put(bestEdge.pixelB, phenotypeA);
+                    }
+                    else {
+                        phenotypeB.pixels.add(bestEdge.pixelA);
+                        phenotypeMap.put(bestEdge.pixelA, phenotypeB);
+                    }
+//                    else {
+//                        final Phenotype phenotype = new Phenotype();
+//                        phenotype.pixels.add(bestEdge.pixelA);
+//                        phenotype.pixels.add(bestEdge.pixelB);
+//                        phenotypeMap.put(bestEdge.pixelA, phenotype);
+//                        phenotypeMap.put(bestEdge.pixelB, phenotype);
+//                        phenotypes.add(phenotype);
+//                    }
+                }
             }
         }
 

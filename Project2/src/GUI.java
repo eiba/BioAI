@@ -1,10 +1,12 @@
 import javafx.application.Platform;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
@@ -19,6 +21,7 @@ public class GUI extends BorderPane {
     private final ScrollPane outputPane = new ScrollPane();
     private final StringBuilder outputBuilder = new StringBuilder();
     private final DateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+    private final ProgressBar progressBar = new ProgressBar();
 
     // Image variables
     private final ScrollPane imagePane = new ScrollPane();
@@ -32,16 +35,20 @@ public class GUI extends BorderPane {
         super();
 
         // Output initialization
+        VBox vBox = new VBox();
+        progressBar.prefWidthProperty().bind(vBox.widthProperty());
         outputText.setFill(Color.valueOf("#BBBBBB"));
         outputText.setTranslateX(5);
         outputPane.setStyle("-fx-background: #2B2B2B");
         outputPane.setContent(outputText);
         outputPane.setMinHeight(150);
         outputPane.setMaxHeight(150);
-        setBottom(outputPane);
+        vBox.getChildren().addAll(progressBar, outputPane);
+        setBottom(vBox);
 
         //Image initialization
         imageBox.getChildren().addAll(imageViewGreenLine, imageViewBlackWhite, imageViewSegments, imageViewImage);
+        imageBox.setStyle("-fx-background-color: red");
         imagePane.setContent(imageBox);
         setCenter(imagePane);
     }
@@ -123,6 +130,16 @@ public class GUI extends BorderPane {
             outputPane.setVvalue( 1.0d );
         });
         outputBuilder.append('\n');
+    }
+
+    void resetProgress() {
+        progressBar.setProgress(0);
+    }
+
+    void setProgress(double value) {
+        if (value > progressBar.getProgress()) {
+            progressBar.setProgress(value);
+        }
     }
 
 }

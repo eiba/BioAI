@@ -13,7 +13,7 @@ public class Main extends Application{
 
         // Creating a new GUI
         GUI gui = new GUI();
-        Scene scene = new Scene(gui, 1400, 700);
+        Scene scene = new Scene(gui, 1920, 600);
         primaryStage.setTitle("IT3708 - Assignment 2");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -21,7 +21,7 @@ public class Main extends Application{
         MOOA mooa = new MOOA(
                 gui,
                 "./TestImages/1/Test image.jpg",
-                10,
+                50,
                 20,
                 0.2,
                 0.7,

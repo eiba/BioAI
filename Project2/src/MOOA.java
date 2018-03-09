@@ -42,7 +42,7 @@ public class MOOA {
     }
 
     Solution[] iterate(){
-        ImageSegmentation segmentation = new ImageSegmentation(img,this.edgeWeight,this.deviationWeight);
+        ImageSegmentation segmentation = new ImageSegmentation(img, gui, this.edgeWeight, this.deviationWeight);
 
         //Step 3: Create Initial segments with Prim's algorithm
 
@@ -86,9 +86,10 @@ public class MOOA {
 
 
         gui.out("Starting crossover");
+        gui.resetProgress();
         gui.drawImage(segmentation.singlePointCrossover(solutions, solutions.length)[0], img.width, img.height);
-        gui.out("Drawing test image");
 //        gui.drawImage(solutions[0], img.width, img.height);
+        gui.out("Drawing test image");
         //Step 4: run the evolutionary cycle for <iterations> generations
         for(int i=0; i< iterations;i++){
 

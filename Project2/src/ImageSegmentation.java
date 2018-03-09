@@ -1,3 +1,5 @@
+import javafx.application.Platform;
+
 import java.awt.*;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -6,13 +8,15 @@ import java.util.concurrent.Executors;
 public class ImageSegmentation {
 
     private final ImageParser imageParser;
+    private final GUI gui;
     final Random random;
     final Pixel[][] pixels;
     final double edgeWeight;
     final double overallDeviationWeight;
 
-    ImageSegmentation(ImageParser imageParser, double edgeWeight, double overallDeviationWeight){
+    ImageSegmentation(ImageParser imageParser, GUI gui, double edgeWeight, double overallDeviationWeight){
         this.imageParser = imageParser;
+        this.gui = gui;
         this.edgeWeight = edgeWeight;
         this.overallDeviationWeight = overallDeviationWeight;
         pixels = createPixels();
@@ -187,6 +191,7 @@ public class ImageSegmentation {
 
                 Solution newSolution = new Solution(pixelEdges, segments);
                 solutions[index] = newSolution;
+                Platform.runLater(() -> gui.setProgress((double) (index+1) / solutionCount));
                 edgeValueAndDeviation(newSolution);
             });
         }
@@ -314,21 +319,35 @@ public class ImageSegmentation {
         final Solution[] offspring = new Solution[offspringCount];
         final int size = imageParser.height * imageParser.width;
 
+        final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
         for (int i = 0; i < offspringCount; i += 2) {
-            // Selecting two parents
-            //@TODO Add a selection method for parent selection
-            final Solution parent1 = solutions[random.nextInt(solutions.length)];
-            final Solution parent2 = solutions[random.nextInt(solutions.length)];
 
-            // Selecting a random point for single point crossover
-            final int splitPoint = random.nextInt(size);
+            final int index = i;
 
-            final Solution offspring1 = new Solution(parent1, parent2, splitPoint, pixels);
-            final Solution offspring2 = new Solution(parent2, parent1, splitPoint, pixels);
+            executorService.execute(() -> {
+                // Selecting two parents
+                //@TODO Add a selection method for parent selection
+                final Solution parent1 = solutions[random.nextInt(solutions.length)];
+                final Solution parent2 = solutions[random.nextInt(solutions.length)];
+    //            final Solution parent1 = solutions[0];
+    //            final Solution parent2 = solutions[1];
 
-            offspring[i] = offspring1;
-            offspring[i+1] = offspring2;
+                // Selecting a random point for single point crossover
+                final int splitPoint = random.nextInt(size);
+
+                final Solution offspring1 = new Solution(parent1, parent2, splitPoint, pixels);
+                final Solution offspring2 = new Solution(parent2, parent1, splitPoint, pixels);
+
+                offspring[index] = offspring1;
+                offspring[index+1] = offspring2;
+                Platform.runLater(() ->  gui.setProgress((double)(index+2)/offspringCount));
+            });
         }
+
+        executorService.shutdown();
+        //noinspection StatementWithEmptyBody
+        while (!executorService.isTerminated()) {}
 
         return offspring;
     }
