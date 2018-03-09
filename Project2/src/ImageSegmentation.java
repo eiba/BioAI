@@ -5,9 +5,9 @@ import java.util.concurrent.Executors;
 
 public class ImageSegmentation {
 
+    private final ImageParser imageParser;
     final Random random;
     final Pixel[][] pixels;
-    ImageParser imageParser;
     final double edgeWeight;
     final double overallDeviationWeight;
 
@@ -19,85 +19,85 @@ public class ImageSegmentation {
         random = new Random();
     }
 
-    /**
-     * Create initial segments that contains the entire image
-     * @param populationSize Number of segments to be returned
-     * @return segments that each contains the entire image
-     */
-    Segment[] createInitialSegments(int populationSize){
-
-        final Segment[] segments = new Segment[populationSize];
-
-        //Create one solution for each iteration
-        final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
-        for (int i = 0; i < populationSize; i ++) {
-            final int index = i;
-            executorService.execute(() -> {
-
-                // Selecting a random Pixel
-                final int rootRow = random.nextInt(imageParser.height);
-                final int rootColumn = random.nextInt(imageParser.width);
-                final Pixel rootPixel = pixels[rootRow][rootColumn];
-
-                // Creating a new segment
-                final Segment segment = new Segment(rootPixel);
-                final PriorityQueue<PixelEdge> priorityQueue = new PriorityQueue<>(rootPixel.edgeList);
-
-                // Using Prim's algorithm to create the Segment
-                while (!priorityQueue.isEmpty()) {
-                    final PixelEdge currentPixelEdge = priorityQueue.remove();
-
-                    // Check if Pixel is already in Segment
-                    if (segment.contains(currentPixelEdge.neighbourPixel)) {
-                        continue;
-                    }
-
-                    // Adding the new Pixel to the Segment
-                    segment.add(currentPixelEdge);
-                    priorityQueue.addAll(currentPixelEdge.neighbourPixel.edgeList);
-
-                }
-
-                segments[index] = segment;
-
-            });
-        }
-
-        executorService.shutdown();
-        //noinspection StatementWithEmptyBody
-        while (!executorService.isTerminated()) {}
-
-        return segments;
-    }
-
-    Segment[] divideSegment(Segment segment, int numberOfSegments) {
-        final Segment[] segments = new Segment[numberOfSegments];
-        final PixelEdge[] weakestPixelEdges = new PixelEdge[numberOfSegments - 1];
-
-        final PriorityQueue<PixelEdge> priorityQueue = new PriorityQueue<>(Collections.reverseOrder());
-        priorityQueue.addAll(segment.edges);
-
-        // Finding the PixelEdges with highest distance in segment
-        for (int i = 0; i < weakestPixelEdges.length; i ++) {
-            PixelEdge pixelEdge = priorityQueue.remove();
-            while (segment.getSize(pixelEdge.neighbourPixel) < (double) segment.pixelCount / 10) {
-                pixelEdge = priorityQueue.remove();
-            }
-//            System.out.println(segment.getSize(pixelEdge.neighbourPixel));
-            weakestPixelEdges[i] = pixelEdge;
-        }
-
-        // Segment 0 is the entire segment minus the other segments
-        segments[0] = segment.copyFrom(segment.root);
-
-        // Making a copy of the other segments
-        for (int i = 0; i < weakestPixelEdges.length; i ++) {
-            segments[i+1] = segment.copyFrom(weakestPixelEdges[i].neighbourPixel);
-        }
-
-        return segments;
-    }
+//    /**
+//     * Create initial segments that contains the entire image
+//     * @param populationSize Number of segments to be returned
+//     * @return segments that each contains the entire image
+//     */
+//    Segment[] createInitialSegments(int populationSize){
+//
+//        final Segment[] segments = new Segment[populationSize];
+//
+//        //Create one solution for each iteration
+//        final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+//
+//        for (int i = 0; i < populationSize; i ++) {
+//            final int index = i;
+//            executorService.execute(() -> {
+//
+//                // Selecting a random Pixel
+//                final int rootRow = random.nextInt(imageParser.height);
+//                final int rootColumn = random.nextInt(imageParser.width);
+//                final Pixel rootPixel = pixels[rootRow][rootColumn];
+//
+//                // Creating a new segment
+//                final Segment segment = new Segment(rootPixel);
+//                final PriorityQueue<PixelEdge> priorityQueue = new PriorityQueue<>(rootPixel.edgeList);
+//
+//                // Using Prim's algorithm to create the Segment
+//                while (!priorityQueue.isEmpty()) {
+//                    final PixelEdge currentPixelEdge = priorityQueue.remove();
+//
+//                    // Check if Pixel is already in Segment
+//                    if (segment.contains(currentPixelEdge.pixelB)) {
+//                        continue;
+//                    }
+//
+//                    // Adding the new Pixel to the Segment
+//                    segment.add(currentPixelEdge);
+//                    priorityQueue.addAll(currentPixelEdge.pixelB.edgeList);
+//
+//                }
+//
+//                segments[index] = segment;
+//
+//            });
+//        }
+//
+//        executorService.shutdown();
+//        //noinspection StatementWithEmptyBody
+//        while (!executorService.isTerminated()) {}
+//
+//        return segments;
+//    }
+//
+//    Segment[] divideSegment(Segment segment, int numberOfSegments) {
+//        final Segment[] segments = new Segment[numberOfSegments];
+//        final PixelEdge[] weakestPixelEdges = new PixelEdge[numberOfSegments - 1];
+//
+//        final PriorityQueue<PixelEdge> priorityQueue = new PriorityQueue<>(Collections.reverseOrder());
+//        priorityQueue.addAll(segment.edges);
+//
+//        // Finding the PixelEdges with highest distance in segment
+//        for (int i = 0; i < weakestPixelEdges.length; i ++) {
+//            PixelEdge pixelEdge = priorityQueue.remove();
+//            while (segment.getSize(pixelEdge.pixelB) < (double) segment.pixelCount / 10) {
+//                pixelEdge = priorityQueue.remove();
+//            }
+////            System.out.println(segment.getSize(pixelEdge.pixelB));
+//            weakestPixelEdges[i] = pixelEdge;
+//        }
+//
+//        // Segment 0 is the entire segment minus the other segments
+//        segments[0] = segment.copyFrom(segment.root);
+//
+//        // Making a copy of the other segments
+//        for (int i = 0; i < weakestPixelEdges.length; i ++) {
+//            segments[i+1] = segment.copyFrom(weakestPixelEdges[i].pixelB);
+//        }
+//
+//        return segments;
+//    }
 
     Solution[] createInitialSolutions(int solutionCount, int minimumSegmentCount, int maximumSegmentCount) {
         final Solution[] solutions = new Solution[solutionCount];
@@ -125,9 +125,13 @@ public class ImageSegmentation {
         for (int i = 0; i < solutionCount; i ++) {
             final int index = i;
             executorService.execute(() -> {
-                final HashSet<Pixel> visitedPixels = new HashSet<>();
+                final boolean[][] visitedPixels = new boolean[imageParser.height][imageParser.width];
                 final int segmentCount = minimumSegmentCount + random.nextInt(maximumSegmentCount - minimumSegmentCount + 1);
                 final Segment[] segments = new Segment[segmentCount];
+                final ArrayList<PixelEdge>[] pixelEdges = new ArrayList[imageParser.height * imageParser.width];
+                for (int j = 0; j < imageParser.height * imageParser.width; j ++) {
+                    pixelEdges[j] = new ArrayList<>();
+                }
 
                 final PriorityQueue<SegmentPixelEdge> priorityQueue = new PriorityQueue<>();
 
@@ -141,10 +145,10 @@ public class ImageSegmentation {
                         rootColumn = random.nextInt(imageParser.width);
                         rootPixel = pixels[rootRow][rootColumn];
                     }
-                    while (visitedPixels.contains(rootPixel));
+                    while (visitedPixels[rootRow][rootColumn]);
 
                     segments[j] = new Segment(rootPixel);
-                    visitedPixels.add(rootPixel);
+                    visitedPixels[rootRow][rootColumn] = true;
                     for (PixelEdge pixelEdge : rootPixel.edgeList) {
                         priorityQueue.add(new SegmentPixelEdge(segments[j], pixelEdge));
                     }
@@ -156,24 +160,34 @@ public class ImageSegmentation {
                     final Segment segment = segmentPixelEdge.segment;
                     final PixelEdge currentPixelEdge = segmentPixelEdge.pixelEdge;
 
-                    // Check if Pixel is already in Solution
-                    if (visitedPixels.contains(currentPixelEdge.neighbourPixel)) {
-                        continue;
+                    // Check if Pixel is not already in Solution
+                    if (!visitedPixels[currentPixelEdge.pixelB.row][currentPixelEdge.pixelB.column]) {
+                        // Adding the new Pixel to the Segment
+                        segment.add(currentPixelEdge.pixelB);
+                        pixelEdges[currentPixelEdge.pixelA.column + currentPixelEdge.pixelA.row * imageParser.width].add(currentPixelEdge);
+
+//                        visitedPixels.add(currentPixelEdge.pixelB);
+                        visitedPixels[currentPixelEdge.pixelB.row][currentPixelEdge.pixelB.column] = true;
+                        for (PixelEdge pixelEdge : currentPixelEdge.pixelB.edgeList) {
+                            priorityQueue.add(new SegmentPixelEdge(segment, pixelEdge));
+                        }
                     }
-
-
-                    // Adding the new Pixel to the Segment
-                    segment.add(currentPixelEdge);
-                    visitedPixels.add(currentPixelEdge.neighbourPixel);
-                    for (PixelEdge pixelEdge : currentPixelEdge.neighbourPixel.edgeList) {
-                        priorityQueue.add(new SegmentPixelEdge(segment, pixelEdge));
+                    else if (!visitedPixels[currentPixelEdge.pixelA.row][currentPixelEdge.pixelA.column]) {
+                        // Adding the new Pixel to the Segment
+                        segment.add(currentPixelEdge.pixelA);
+                        pixelEdges[currentPixelEdge.pixelB.column + currentPixelEdge.pixelB.row * imageParser.width].add(currentPixelEdge);
+                        visitedPixels[currentPixelEdge.pixelA.row][currentPixelEdge.pixelA.column] = true;
+//                        visitedPixels.add(currentPixelEdge.pixelA);
+                        for (PixelEdge pixelEdge : currentPixelEdge.pixelA.edgeList) {
+                            priorityQueue.add(new SegmentPixelEdge(segment, pixelEdge));
+                        }
                     }
 
                 }
 
-                Solution newSolution = new Solution(segments, imageParser.width, imageParser.height);
+                Solution newSolution = new Solution(pixelEdges, segments);
                 solutions[index] = newSolution;
-                edgeValueandDeviation(newSolution);
+                edgeValueAndDeviation(newSolution);
             });
         }
 
@@ -185,116 +199,116 @@ public class ImageSegmentation {
     }
 
     //Crossover
-    public Solution[] crossover(Solution[] solutions, Solution[] archive, double crossoverRate){
+//    public Solution[] crossover(Solution[] solutions, Solution[] archive, double crossoverRate){
+//
+//        for(Solution solution: solutions){
+//            Genotype genotype = createGenotype(solution);
+////            System.out.println(genotype.pixelEdges.length);
+////            createPhenotype(genotype);
+//        }
+//
+//        return null;
+//    }
 
-        for(Solution solution: solutions){
-            Genotype genotype = createGenotype(solution);
-//            System.out.println(genotype.pixelEdges.length);
-//            createPhenotype(genotype);
-        }
-
-        return null;
-    }
-
-    public Genotype createGenotype(Solution solution){
-
-        PixelEdge[] pixelsEdges = new PixelEdge[imageParser.width*imageParser.height];
-
-        for (Segment segment:solution.segments){
-            for(Pixel pixel: segment.pixels){
-
-                //Select a random index for the edge
-                int edgeIndex = random.nextInt(pixel.edgeList.size());
-
-                //pixelEdge to insert into pixelEdges list
-                PixelEdge pixelEdge = null;
-
-                //The pixeledge we select must be in same segment as the current pixel
-                for(int i=0; i<pixel.edgeList.size();i++){
-                    //Get the pixelEdge
-                    PixelEdge somePixelEdge = pixel.edgeList.get(edgeIndex);
-
-                    //make sure that selected pixeledge must have both pixels in same segment and the pixels cannot point to each other.
-                    if(segment.pixelEdgeMap.containsKey(somePixelEdge.neighbourPixel) && (pixelsEdges[imageParser.height*somePixelEdge.neighbourPixel.column + somePixelEdge.neighbourPixel.row] == null || pixelsEdges[imageParser.height*somePixelEdge.neighbourPixel.column + somePixelEdge.neighbourPixel.row].neighbourPixel != pixel)){
-                        if(pixelEdge == null || somePixelEdge.distance < pixelEdge.distance){   //take edge with lowest distance?
-                         pixelEdge = somePixelEdge; //we found a pixel
-                        }
-                         //break;
-                    }
-
-                    //get next index, given that edgeindex not always starts at 0 we need modulo
-                    edgeIndex = (edgeIndex +1) % pixel.edgeList.size();
-                }
-
-                //if we found no eligible pixel during the loop pixelEdge points to itself (is null)
-                pixelsEdges[imageParser.height*pixel.column + pixel.row] = pixelEdge;
-            }
-        }
-
-        /*int nullCounter = 0;
-        for(PixelEdge pixelEdge:pixelsEdges){
-            if(pixelEdge == null){
-                nullCounter +=1;
-            }
-        }
-        System.out.println(nullCounter);
-        System.out.println(solution.segments.length);*/
-
-        return new Genotype(pixelsEdges);
-    }
+//    public Genotype createGenotype(Solution solution){
+//
+//        PixelEdge[] pixelsEdges = new PixelEdge[imageParser.width*imageParser.height];
+//
+//        for (Segment segment:solution.segments){
+//            for(Pixel pixel: segment.pixels){
+//
+//                //Select a random index for the edge
+//                int edgeIndex = random.nextInt(pixel.edgeList.size());
+//
+//                //pixelEdge to insert into pixelEdges list
+//                PixelEdge pixelEdge = null;
+//
+//                //The pixeledge we select must be in same segment as the current pixel
+//                for(int i=0; i<pixel.edgeList.size();i++){
+//                    //Get the pixelEdge
+//                    PixelEdge somePixelEdge = pixel.edgeList.get(edgeIndex);
+//
+//                    //make sure that selected pixeledge must have both pixels in same segment and the pixels cannot point to each other.
+//                    if(segment.pixelEdgeMap.containsKey(somePixelEdge.pixelB) && (pixelsEdges[imageParser.height*somePixelEdge.pixelB.column + somePixelEdge.pixelB.row] == null || pixelsEdges[imageParser.height*somePixelEdge.pixelB.column + somePixelEdge.pixelB.row].pixelB != pixel)){
+//                        if(pixelEdge == null || somePixelEdge.distance < pixelEdge.distance){   //take edge with lowest distance?
+//                         pixelEdge = somePixelEdge; //we found a pixel
+//                        }
+//                         //break;
+//                    }
+//
+//                    //get next index, given that edgeindex not always starts at 0 we need modulo
+//                    edgeIndex = (edgeIndex +1) % pixel.edgeList.size();
+//                }
+//
+//                //if we found no eligible pixel during the loop pixelEdge points to itself (is null)
+//                pixelsEdges[imageParser.height*pixel.column + pixel.row] = pixelEdge;
+//            }
+//        }
+//
+//        /*int nullCounter = 0;
+//        for(PixelEdge pixelEdge:pixelsEdges){
+//            if(pixelEdge == null){
+//                nullCounter +=1;
+//            }
+//        }
+//        System.out.println(nullCounter);
+//        System.out.println(solution.segments.length);*/
+//
+//        return new Genotype(pixelsEdges);
+//    }
 
 
-    public Solution createPhenotype(Genotype genotype){
-
-        ArrayList<Segment> segments = new ArrayList<>();
-        /*
-        final HashMap<Pixel, ArrayList<PixelEdge>> pixelEdgeMap = new HashMap<>();
-
-        for(PixelEdge pixelEdge: genotype.pixelEdges){
-            if(!pixelEdgeMap.containsKey(pixelEdge.currentPixel)){
-                pixelEdgeMap.put(pixelEdge.currentPixel,new ArrayList<>());
-            }
-            if(!pixelEdgeMap.containsKey(pixelEdge.neighbourPixel)){
-                pixelEdgeMap.put(pixelEdge.neighbourPixel,new ArrayList<>());
-            }
-
-        }*/
-        //final HashMap<Pixel, Integer> pixelSegmentMap = new HashMap<>();
-
-        for(PixelEdge pixelEdge:genotype.pixelEdges){
-            if(pixelEdge != null){
-
-            boolean foundSegment = false;
-            for(Segment segment:segments){
-                if(segment.pixels.contains(pixelEdge.currentPixel)){
-                    segment.pixels.add(pixelEdge.neighbourPixel);
-                    foundSegment = true;
-                }
-            }
-            if(!foundSegment){
-                Segment newSegment = new Segment(pixelEdge.currentPixel);
-                newSegment.pixels.add(pixelEdge.neighbourPixel);
-                segments.add(newSegment);
-            }
-            }
-            /*if(pixelSegmentMap.containsKey(pixelEdge.currentPixel)){
-                pixelSegmentMap.put(pixelEdge.currentPixel,pixelSegmentMap);
-            }
-            if(pixelSegmentMap.containsKey(pixelEdge.neighbourPixel)){
-                pixelSegmentMap.put(pixelEdge.neighbourPixel,new ArrayList<>());
-            }*/
-            //System.out.println("sadfasdf");
-
-        }
-
-        int pixelCount = 0;
-        System.out.println(segments.size());
-        for(Segment segment:segments){
-            pixelCount += segment.pixels.size();
-        }
-        System.out.println(pixelCount);
-        return null;
-    }
+//    public Solution createPhenotype(Genotype genotype){
+//
+//        ArrayList<Segment> segments = new ArrayList<>();
+//        /*
+//        final HashMap<Pixel, ArrayList<PixelEdge>> pixelEdgeMap = new HashMap<>();
+//
+//        for(PixelEdge pixelEdge: genotype.pixelEdges){
+//            if(!pixelEdgeMap.containsKey(pixelEdge.pixelA)){
+//                pixelEdgeMap.put(pixelEdge.pixelA,new ArrayList<>());
+//            }
+//            if(!pixelEdgeMap.containsKey(pixelEdge.pixelB)){
+//                pixelEdgeMap.put(pixelEdge.pixelB,new ArrayList<>());
+//            }
+//
+//        }*/
+//        //final HashMap<Pixel, Integer> pixelSegmentMap = new HashMap<>();
+//
+//        for(PixelEdge pixelEdge:genotype.pixelEdges){
+//            if(pixelEdge != null){
+//
+//            boolean foundSegment = false;
+//            for(Segment segment:segments){
+//                if(segment.pixels.contains(pixelEdge.pixelA)){
+//                    segment.pixels.add(pixelEdge.pixelB);
+//                    foundSegment = true;
+//                }
+//            }
+//            if(!foundSegment){
+////                Segment newSegment = new Segment(pixelEdge.pixelA);
+////                newSegment.pixels.add(pixelEdge.pixelB);
+////                segments.add(newSegment);
+//            }
+//            }
+//            /*if(pixelSegmentMap.containsKey(pixelEdge.pixelA)){
+//                pixelSegmentMap.put(pixelEdge.pixelA,pixelSegmentMap);
+//            }
+//            if(pixelSegmentMap.containsKey(pixelEdge.pixelB)){
+//                pixelSegmentMap.put(pixelEdge.pixelB,new ArrayList<>());
+//            }*/
+//            //System.out.println("sadfasdf");
+//
+//        }
+//
+//        int pixelCount = 0;
+//        System.out.println(segments.size());
+//        for(Segment segment:segments){
+//            pixelCount += segment.pixels.size();
+//        }
+//        System.out.println(pixelCount);
+//        return null;
+//    }
 
     Solution[] singlePointCrossover(Solution[] solutions, int offspringCount) {
         final Solution[] offspring = new Solution[offspringCount];
@@ -311,10 +325,6 @@ public class ImageSegmentation {
 
             final Solution offspring1 = new Solution(parent1, parent2, splitPoint, pixels);
             final Solution offspring2 = new Solution(parent2, parent1, splitPoint, pixels);
-
-//            System.out.println();
-//            System.out.println(offspring1.segments.length);
-//            System.out.println(offspring2.segments.length);
 
             offspring[i] = offspring1;
             offspring[i+1] = offspring2;
@@ -362,12 +372,12 @@ public class ImageSegmentation {
 
                 // Has neighbour above
                 if (i > 0) {
-                    final PixelEdge pixelEdge = new PixelEdge(currentPixel, pixels[i-1][j], pixels[i-1][j].edges[2].distance);
+                    final PixelEdge pixelEdge = pixels[i-1][j].edges[2];
                     currentPixel.edges[0] = pixelEdge;
                 }
                 // Has neighbour left
                 if (j > 0) {
-                    final PixelEdge pixelEdge = new PixelEdge(currentPixel, pixels[i][j-1], pixels[i][j-1].edges[1].distance);
+                    final PixelEdge pixelEdge = pixels[i][j-1].edges[1];
                     currentPixel.edges[3] = pixelEdge;
                 }
                 // Has neighbour below
@@ -389,7 +399,7 @@ public class ImageSegmentation {
     }
 
     //Calculated the edge Values and overall deviation for a solution
-    public void edgeValueandDeviation(Solution solution){
+    public void edgeValueAndDeviation(Solution solution){
         double edgeValue = 0.0;
         double overAllDeviation = 0.0;
 
@@ -401,9 +411,9 @@ public class ImageSegmentation {
                 //Calculate the edgeValues. Calculate rgb distance between the current pixel and all its neighbours
                 //that are not in the same segment
                 for(PixelEdge pixelEdge: pixel.edgeList){
-                    Pixel neighbourPixel = pixelEdge.neighbourPixel;
+                    Pixel neighbourPixel = pixelEdge.pixelB;
 
-                    if(!segment.pixelEdgeMap.containsKey(neighbourPixel)){
+                    if(!segment.pixels.contains(neighbourPixel)){
                         edgeValue += pixelEdge.distance;    //add the distance of the edge if the neighbouring pixels are not in the same segment
                     }
                 }

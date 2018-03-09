@@ -1,11 +1,11 @@
 public class PixelEdge implements Comparable<PixelEdge> {
 
-    final Pixel currentPixel, neighbourPixel;
+    final Pixel pixelA, pixelB;
     final double distance;
 
-    PixelEdge(Pixel currentPixel, Pixel neighbourPixel, double distance) {
-        this.currentPixel = currentPixel;
-        this.neighbourPixel = neighbourPixel;
+    PixelEdge(Pixel pixelA, Pixel pixelB, double distance) {
+        this.pixelA = pixelA;
+        this.pixelB = pixelB;
         this.distance = distance;
     }
 
