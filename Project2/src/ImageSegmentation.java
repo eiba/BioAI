@@ -10,6 +10,10 @@ public class ImageSegmentation {
     final Pixel[][] pixels;
     final double edgeWeight;
     final double overallDeviationWeight;
+    private final Comparator<Solution> weightedSumComparator;
+    private final Comparator<Solution> overallDeviationComparator;
+    private final Comparator<Solution> edgeValueComparator;
+    private final Comparator<Solution> crowdingDistanceComparator;
 
     ImageSegmentation(ImageParser imageParser, double edgeWeight, double overallDeviationWeight){
         this.imageParser = imageParser;
@@ -17,6 +21,10 @@ public class ImageSegmentation {
         this.overallDeviationWeight = overallDeviationWeight;
         pixels = createPixels();
         random = new Random();
+        this.weightedSumComparator = new weightedSumComparator();
+        this.overallDeviationComparator = new overallDeviationComparator();
+        this.edgeValueComparator = new edgeValueComparator();
+        this.crowdingDistanceComparator = new crowdingDistanceComparator();
     }
 
 //    /**
@@ -473,10 +481,6 @@ public class ImageSegmentation {
                     returnedSolutions[returnedSolutionCount] = solution;
                     returnedSolutionCount += 1;
                 }
-
-                //REMOVE THIS
-                //return null;
-
             }
 
             //we've found all our solutions
@@ -490,61 +494,36 @@ public class ImageSegmentation {
     //TODO: Crowding distance!
     public Solution[] crowdingDistanceSort(ArrayList<Solution> dominationEdge, int neededSolutions){
         Solution[] returnedSolutions = new Solution[neededSolutions];
-        Solution[] edgeSort = new Solution[dominationEdge.size()];
-        Solution[] deviationSort = new Solution[dominationEdge.size()];
 
-        Comparator<Solution> comparator = new crowdingDistanceComparator();
+        ArrayList<Solution> edgeSort = new ArrayList<>(dominationEdge);
+        ArrayList<Solution> deviationSort = new ArrayList<>(dominationEdge);
 
-        PriorityQueue<Solution> priorityQueue = new PriorityQueue<>(comparator);
+        edgeSort.sort(edgeValueComparator);
+        deviationSort.sort(overallDeviationComparator);
+
+        PriorityQueue<Solution> priorityQueue = new PriorityQueue<>(crowdingDistanceComparator);
+
         //reset values for solution
         for(Solution solution: dominationEdge){
-            solution.deviationSelected = false;
-            solution.edgeValueSelected = false;
             solution.crowdingDistance = 0;
-        }
-        for(int i=0; i<dominationEdge.size();i++){
-
-            Double bestDeviation = Double.MAX_VALUE;
-            Double bestEdgeValue = Double.MIN_VALUE;
-            Solution bestDeviationSoltion = null;
-            Solution bestEdgeValueSoltion = null;
-
-
-            for(Solution solution: dominationEdge){
-                if(solution.edgeValue > bestEdgeValue && !solution.edgeValueSelected){
-                    bestEdgeValue = solution.edgeValue;
-                    bestEdgeValueSoltion = solution;
-                }
-                if(solution.overallDeviation < bestDeviation && !solution.deviationSelected){
-                    bestDeviation = solution.overallDeviation;
-                    bestDeviationSoltion = solution;
-                }
-            }
-
-            if(bestDeviationSoltion == null || bestEdgeValueSoltion == null){
-                System.out.println("nullerror");
-            }
-            bestEdgeValueSoltion.edgeValueSelected = true;
-            bestDeviationSoltion.deviationSelected = true;
-            edgeSort[i] = bestEdgeValueSoltion;
-            deviationSort[i] = bestDeviationSoltion;
         }
 
         //setting the crowding distance of edges as far as possible.
-        deviationSort[0].crowdingDistance = Double.MAX_VALUE;
-        deviationSort[deviationSort.length - 1].crowdingDistance = Double.MAX_VALUE;
-        priorityQueue.add(deviationSort[0]);
-        priorityQueue.add(deviationSort[deviationSort.length - 1]);
+        deviationSort.get(0).crowdingDistance = Double.MAX_VALUE;
+        deviationSort.get(deviationSort.size() - 1).crowdingDistance = Double.MAX_VALUE;
+        priorityQueue.add(deviationSort.get(0));
+        priorityQueue.add(deviationSort.get(deviationSort.size() - 1));
 
-        double deviationMax = deviationSort[deviationSort.length-1].overallDeviation;
-        double deviationMin = deviationSort[0].overallDeviation;
 
-        double edgeValueMax = edgeSort[0].edgeValue;
-        double edgeValueMin = edgeSort[edgeSort.length-1].edgeValue;
+        double deviationMax = deviationSort.get(deviationSort.size()-1).overallDeviation;
+        double deviationMin = deviationSort.get(0).overallDeviation;
 
-        for(int i=1; i < deviationSort.length - 1;i++){
-            deviationSort[i].crowdingDistance = Math.abs(deviationSort[i-1].overallDeviation / deviationSort[i+1].overallDeviation)/(deviationMax-deviationMin) + Math.abs(deviationSort[i-1].edgeValue / deviationSort[i+1].edgeValue)/(edgeValueMax-edgeValueMin);
-            priorityQueue.add(deviationSort[i]);
+        double edgeValueMax = edgeSort.get(0).edgeValue;
+        double edgeValueMin = edgeSort.get(edgeSort.size()-1).edgeValue;
+
+        for(int i=1; i < deviationSort.size() - 1;i++){
+            deviationSort.get(i).crowdingDistance = Math.abs(deviationSort.get(i-1).overallDeviation / deviationSort.get(i+1).overallDeviation)/(deviationMax-deviationMin) + Math.abs(deviationSort.get(i-1).edgeValue / deviationSort.get(i+1).edgeValue)/(edgeValueMax-edgeValueMin);
+            priorityQueue.add(deviationSort.get(i));
         }
 
         for(int i=0; i<returnedSolutions.length;i++){
@@ -569,21 +548,44 @@ public class ImageSegmentation {
         }
         return dominationRank;
     }
-}
 
-class crowdingDistanceComparator implements Comparator<Solution>
-{
-    @Override
-    public int compare(Solution x, Solution y)
-    {
-        if (x.crowdingDistance > y.crowdingDistance)
-        {
-            return -1;
-        }
-        if (x.crowdingDistance < y.crowdingDistance)
-        {
-            return 1;
-        }
-        return 0;
+    //implements rank selection for the weighted sum
+    public Solution[] selectWeightedSum(Solution[] population, int populationSize){
+
+        ArrayList<Solution> priorityQueue = new ArrayList<>(Arrays.asList(population));
+        priorityQueue.sort(weightedSumComparator);
+
+        final Solution[] survivors = new Solution[populationSize];
+
+        int index = 0;
+
+        while (index < survivors.length) {
+            double p = Math.random();
+
+            int rank = priorityQueue.size();
+
+            int rankSum = 0;
+            for(int i=priorityQueue.size();i>0;i--){
+                rankSum += i;
+            }
+            Double cumulativeProbability = 0.0;
+            int listIndex = 0;
+
+            while (!priorityQueue.isEmpty()) {
+                //Solution solution = priorityQueue.get(listIndex);
+                cumulativeProbability += (double) rank/rankSum;
+
+                if(p <= cumulativeProbability){
+
+                    survivors[index ++] = priorityQueue.remove(listIndex);
+                    break;
+                }
+                listIndex++;
+                rank--;
+                }
+            }
+
+        return survivors;
     }
 }
+

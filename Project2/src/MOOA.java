@@ -67,8 +67,8 @@ public class MOOA {
         /*ArrayList<Solution> solutions1 = new ArrayList<>();
         for(Solution solution: solutions){
             solutions1.add(solution);
-        }*/
-        //segmentation.crowdingDistanceSort(solutions1,50);
+        }
+        segmentation.crowdingDistanceSort(solutions1,this.populationSize);*/
 
         if (solutions[0].segments[0] != null) {
             int bestIndex = 0;
@@ -86,7 +86,6 @@ public class MOOA {
 //            gui.drawImage(new Solution(new Segment[]{segments[0]}), img.width, img.height);
 //        }
 
-
         gui.out("Starting crossover");
         gui.drawImage(segmentation.singlePointCrossover(solutions, solutions.length)[0], img.width, img.height);
         gui.out("Drawing test image");
@@ -96,7 +95,21 @@ public class MOOA {
         if(weightedSum){
             //TODO: implement weighted sum
             for(int i=0; i<iterations;i++){
+                //TODO step 5: parent selection? toutnament? Could be inside crossover too
 
+                //mutation and crossover is the same
+                //TODO step 6: Crossover
+                //children = segmnetation.Crossover(solutions, archive crossoverRate)
+
+                //TODO step 7: Mutate
+                //children = segmnetation.Mutate(children, mutationRate)
+
+                //TODO step 8: Combine parents and offspring
+                //solutions = solutions + children
+
+                //TODO: step 9; Survivor selection
+                //rank selection
+                solutions = segmentation.selectWeightedSum(solutions,  this.populationSize);
             }
         }
         else{

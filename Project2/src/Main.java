@@ -30,7 +30,7 @@ public class Main extends Application{
                 50,
                 0.5,
                 0.5,
-                true);
+                false);
 
         Thread mooaThread = new Thread(() -> {
             Solution[] solutions = mooa.iterate();
