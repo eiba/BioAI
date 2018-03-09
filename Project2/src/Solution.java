@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -9,8 +10,6 @@ public class Solution {
     public double overallDeviation;
     public int dominationRank;
     public double crowdingDistance;
-    public boolean deviationSelected;
-    public boolean edgeValueSelected;
 
     final Segment[] segments;
     final ArrayList<PixelEdge>[] pixelEdges;
@@ -270,4 +269,72 @@ public class Solution {
         return false;
     }
 
+}
+
+class crowdingDistanceComparator implements Comparator<Solution>
+{
+    @Override
+    public int compare(Solution x, Solution y)
+    {
+        if (x.crowdingDistance > y.crowdingDistance)
+        {
+            return -1;
+        }
+        if (x.crowdingDistance < y.crowdingDistance)
+        {
+            return 1;
+        }
+        return 0;
+    }
+}
+
+class weightedSumComparator implements Comparator<Solution>
+{
+    @Override
+    public int compare(Solution x, Solution y)
+    {
+        if (x.score > y.score)
+        {
+            return 1;
+        }
+        if (x.score < y.score)
+        {
+            return -1;
+        }
+        return 0;
+    }
+}
+
+class overallDeviationComparator implements Comparator<Solution>
+{
+    @Override
+    public int compare(Solution x, Solution y)
+    {
+        if (x.overallDeviation > y.overallDeviation)
+        {
+            return 1;
+        }
+        if (x.overallDeviation < y.overallDeviation)
+        {
+            return -1;
+        }
+        return 0;
+    }
+}
+
+class edgeValueComparator implements Comparator<Solution>
+{
+    @Override
+    public int compare(Solution x, Solution y)
+    {
+        if (x.edgeValue < y.edgeValue)
+        {
+            return 1;
+        }
+        if (x.edgeValue > y.edgeValue)
+        {
+            return -1;
+        }
+        return 0;
+    }
 }
