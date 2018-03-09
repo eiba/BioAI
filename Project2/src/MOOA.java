@@ -80,17 +80,16 @@ public class MOOA {
                 }
             }
 //            gui.drawImage(solutions[bestIndex], img.width, img.height);
-            gui.out("Score: "+bestScore);
+            gui.out("Score: " + bestScore);
         }
 //        else {
 //            gui.drawImage(new Solution(new Segment[]{segments[0]}), img.width, img.height);
 //        }
 
-        gui.out("Starting crossover");
-        gui.resetProgress();
-        gui.drawImage(segmentation.singlePointCrossover(solutions, solutions.length)[0], img.width, img.height);
+
+//        gui.drawImage(segmentation.singlePointCrossover(solutions, solutions.length)[0], img.width, img.height);
 //        gui.drawImage(solutions[0], img.width, img.height);
-        gui.out("Drawing test image");
+//        gui.out("Drawing test image");
         //Step 4: run the evolutionary cycle for <iterations> generations
 
         if(weightedSum){
@@ -114,10 +113,25 @@ public class MOOA {
             }
         }
         else{
-            for(int i=0; i< iterations;i++){
+            gui.out("Starting MOEA");
+            for (int i = 0; i < iterations; i++){
 
-                //TODO step 5: Crossover
-                //children = segmnetation.Crossover(solutions, archive crossoverRate)
+                gui.out("Generation " + (i+1) + "/" + iterations);
+                // Crossover
+                gui.resetProgress();
+                gui.out("Crossover");
+                final Solution[] offspring = segmentation.singlePointCrossover(solutions, solutions.length, minimumSegmentCount, maximumSegmentCount);
+
+                int bestIndex = 0;
+                double bestScore = solutions[0].score;
+                for(int j=1; j < solutions.length; j++){
+                    if(solutions[j].score < bestScore){
+                        bestScore = solutions[j].score;
+                        bestIndex = j;
+                    }
+                }
+                gui.drawImage(solutions[bestIndex], img.width, img.height);
+                gui.out("Score: " + bestScore);
 
                 //TODO step 6: Mutate
                 //children = segmnetation.Mutate(children, mutationRate)
@@ -126,7 +140,8 @@ public class MOOA {
                 //solutions = solutions + children
 
                 //TODO step 8: select stuff for next generation
-                solutions = segmentation.nonDominationSorting(solutions, this.populationSize);
+                gui.out("Non dominating sort");
+                solutions = segmentation.nonDominationSorting(solutions, offspring, this.populationSize);
             }
         }
         return solutions;

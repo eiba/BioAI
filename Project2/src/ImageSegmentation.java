@@ -323,32 +323,36 @@ public class ImageSegmentation {
 //        return null;
 //    }
 
-    Solution[] singlePointCrossover(Solution[] solutions, int offspringCount) {
+    Solution[] singlePointCrossover(Solution[] solutions, int offspringCount, int minSegmentCount, int maxSegmentCount) {
         final Solution[] offspring = new Solution[offspringCount];
         final int size = imageParser.height * imageParser.width;
 
         final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
-        for (int i = 0; i < offspringCount; i += 2) {
+        for (int i = 0; i < offspringCount; i ++) {
 
             final int index = i;
 
             executorService.execute(() -> {
-                // Selecting two parents
-                //@TODO Add a selection method for parent selection
-                final Solution parent1 = solutions[random.nextInt(solutions.length)];
-                final Solution parent2 = solutions[random.nextInt(solutions.length)];
-    //            final Solution parent1 = solutions[0];
-    //            final Solution parent2 = solutions[1];
 
-                // Selecting a random point for single point crossover
-                final int splitPoint = random.nextInt(size);
+                Solution child = null;
+                while (child == null) {
+                    // Selecting a random point for single point crossover
+                    final int splitPoint = random.nextInt(size);
+                    // Selecting two parents
+                    //@TODO Add a selection method for parent selection
+                    final Solution parent1 = solutions[random.nextInt(solutions.length)];
+                    final Solution parent2 = solutions[random.nextInt(solutions.length)];
+                    child = new Solution(parent1, parent2, splitPoint, pixels);
+                    if (child.segments.length < minSegmentCount || child.segments.length > maxSegmentCount) {
+                        System.out.println(child.segments.length);
+                        child = null;
+                    }
 
-                final Solution offspring1 = new Solution(parent1, parent2, splitPoint, pixels);
-                final Solution offspring2 = new Solution(parent2, parent1, splitPoint, pixels);
+                }
 
-                offspring[index] = offspring1;
-                offspring[index+1] = offspring2;
+                edgeValueAndDeviation(child);
+                offspring[index] = child;
                 Platform.runLater(() ->  gui.setProgress((double)(index+2)/offspringCount));
             });
         }
@@ -449,20 +453,24 @@ public class ImageSegmentation {
         solution.scoreSolution(edgeValue,overAllDeviation, this.edgeWeight,this.overallDeviationWeight);
     }
 
-    public Solution[] nonDominationSorting(Solution[] solutions, int populationSize){
+    public Solution[] nonDominationSorting(Solution[] solutions, Solution[] offspring, int populationSize){
 
         //The list of returned solutions
-        Solution[] returnedSolutions = new Solution[populationSize];
+        final Solution[] returnedSolutions = new Solution[populationSize];
         int returnedSolutionCount = 0;
 
+        final Solution[] population = new Solution[solutions.length + offspring.length];
+        System.arraycopy(solutions, 0, population, 0, solutions.length);
+        System.arraycopy(offspring, 0, population, solutions.length, offspring.length);
+
         //Add all the solutions of the different ranks in this hashmap and prioritize ranks from low to high
-        //Se Stigen! Jeg bruker hashmap og priority queue! :)
+        //Se Stigen! Jeg bruker hashmap og priority queue! :) Flink gutt ;)
         HashMap<Integer,ArrayList<Solution>> dominationMap = new HashMap<>();
         PriorityQueue<Integer> priorityQueue = new PriorityQueue<>();
 
-        for(Solution solution: solutions){
+        for(Solution solution: population){
             //create domination ranks for every solution
-            int dominationRank = dominationRank(solutions,solution);
+            int dominationRank = dominationRank(solutions, solution);
             solution.dominationRank = dominationRank;
 
             //If the dominationrank already exist, add to the arraylist or if not create the arraylist which contains a domination edge
