@@ -14,9 +14,10 @@ public class MOOA {
     private final int maximumSegmentCount;
     private final double edgeWeight;
     private final double deviationWeight;
+    private final boolean weightedSum;
 
     //Multi Objective Optimization Algorithm
-    MOOA(GUI gui, String filename, int populationSize,int archiveSize, double mutationRate, double crossoverRate, int iterations, int minimumSegmentCount, int maximumSegmentCount, double edgeWeight, double deviationWeight){
+    MOOA(GUI gui, String filename, int populationSize,int archiveSize, double mutationRate, double crossoverRate, int iterations, int minimumSegmentCount, int maximumSegmentCount, double edgeWeight, double deviationWeight, boolean weightedSum){
 
         this.gui = gui;
 
@@ -30,6 +31,7 @@ public class MOOA {
         this.maximumSegmentCount = maximumSegmentCount;
         this.edgeWeight = edgeWeight;
         this.deviationWeight = deviationWeight;
+        this.weightedSum = weightedSum;
 
         //Step 2: parse the image
         try {
@@ -59,9 +61,9 @@ public class MOOA {
 //            final Solution solution = new Solution(segmentation.divideSegment(segments[i], 8));
 //            solutions[i] = solution;
 //        }
-        gui.out("Starting sorting");
+        /*gui.out("Starting sorting");
         segmentation.nonDominationSorting(solutions,this.populationSize);
-        gui.out("Done sorting");
+        gui.out("Done sorting");*/
         /*ArrayList<Solution> solutions1 = new ArrayList<>();
         for(Solution solution: solutions){
             solutions1.add(solution);
@@ -90,21 +92,29 @@ public class MOOA {
         gui.out("Drawing test image");
 //        gui.drawImage(solutions[0], img.width, img.height);
         //Step 4: run the evolutionary cycle for <iterations> generations
-        for(int i=0; i< iterations;i++){
 
-            //TODO step 5: Crossover
-            //solutions = segmnetation.Crossover(solutions, archive crossoverRate)
+        if(weightedSum){
+            //TODO: implement weighted sum
+            for(int i=0; i<iterations;i++){
 
-            //TODO step 6: Mutate
-            //solutions = segmnetation.Mutate(solutions, mutationRate)
-
-            //TODO step 7: Evaluate the new solutions
-            //segmentation.scoreSolution(solutions, archive, deviationWeight, edgeWeight)
-
-            //TODO step 8: Archive the best non dominated solutions
-            //archive = segmentation.archive(solutions, archive, archiveSize)
+            }
         }
+        else{
+            for(int i=0; i< iterations;i++){
 
+                //TODO step 5: Crossover
+                //children = segmnetation.Crossover(solutions, archive crossoverRate)
+
+                //TODO step 6: Mutate
+                //children = segmnetation.Mutate(children, mutationRate)
+
+                //TODO step 7: Evaluate the new solutions
+                //solutions = solutions + children
+
+                //TODO step 8: select stuff for next generation
+                solutions = segmentation.nonDominationSorting(solutions, this.populationSize);
+            }
+        }
         return solutions;
     }
 }
