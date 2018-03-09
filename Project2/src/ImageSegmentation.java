@@ -357,8 +357,8 @@ public class ImageSegmentation {
                     final int splitPoint = random.nextInt(size);
                     // Selecting two parents
                     //@TODO Add a selection method for parent selection
-                    final Solution parent1 = solutions[random.nextInt(solutions.length)];
-                    final Solution parent2 = solutions[random.nextInt(solutions.length)];
+                    final Solution parent1 = tournamentSelection(solutions, 2);
+                    final Solution parent2 = tournamentSelection(solutions, 2);
 //                    final Solution parent1 = solutions[0];
 //                    final Solution parent2 = solutions[1];
                     child = new Solution(parent1, parent2, splitPoint, pixels);
@@ -381,7 +381,18 @@ public class ImageSegmentation {
         return offspring;
     }
 
+    Solution tournamentSelection(Solution[] solutions, int numberOfTournaments) {
+        Solution winner = null;
 
+        for (int i = 0; i < numberOfTournaments; i ++) {
+            final Solution contender = solutions[random.nextInt(solutions.length)];
+            if (winner == null || contender.score < winner.score) {
+                winner = contender;
+            }
+        }
+
+        return winner;
+    }
 
     //euclidean distance in RGB color space
     public double euclideanRGB(Color Color1, Color Color2){

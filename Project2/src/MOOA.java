@@ -122,17 +122,6 @@ public class MOOA {
                 gui.out("Crossover");
                 final Solution[] offspring = segmentation.singlePointCrossover(solutions, solutions.length, minimumSegmentCount, maximumSegmentCount);
 
-                int bestIndex = 0;
-                double bestScore = solutions[0].score;
-                for(int j=1; j < solutions.length; j++){
-                    if(solutions[j].score < bestScore){
-                        bestScore = solutions[j].score;
-                        bestIndex = j;
-                    }
-                }
-                gui.drawImage(solutions[bestIndex], img.width, img.height);
-                gui.out("Score: " + bestScore);
-
                 //TODO step 6: Mutate
                 //children = segmnetation.Mutate(children, mutationRate)
 
@@ -145,6 +134,9 @@ public class MOOA {
                 //TODO step 8: select stuff for next generation
                 gui.out("Non dominating sort");
                 solutions = segmentation.nonDominationSorting(solutions, offspring, this.populationSize);
+
+                gui.drawImage(solutions[0], img.width, img.height);
+                gui.out("Score: " + solutions[0].score);
             }
         }
         return solutions;

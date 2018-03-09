@@ -22,7 +22,6 @@ public class Solution {
 
     Solution(Solution parent1, Solution parent2, int splitPoint, Pixel[][] pixels) {
         pixelEdges = new boolean[pixels.length][pixels[0].length][4];
-        final boolean[][] hasEdge = new boolean[pixels.length][pixels[0].length];
 
         // Filling out the new pixelEdges - Genotype
         int counter = 0;
@@ -55,7 +54,7 @@ public class Solution {
                 for (int c = 0; c < 4; c ++) {
                     if (pixelEdges[i][j][c]) {
                         final Pixel neighbourPixel = currentPixel.pixels[c];
-                        pixelEdges[neighbourPixel.row][neighbourPixel.column][(c+2) % 4] = true;
+                        pixelEdges[neighbourPixel.row][neighbourPixel.column][Pixel.mapDirection(c)] = true;
                     }
                 }
             }
