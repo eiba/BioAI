@@ -1,4 +1,5 @@
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -14,6 +15,7 @@ import javafx.scene.text.Text;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class GUI extends BorderPane {
@@ -34,8 +36,8 @@ public class GUI extends BorderPane {
     private final ImageView imageViewSegments = new ImageView();
 
     //Options variables
-    Text textFilename = new Text("Name of image folder");
-    TextField inputFilename = new TextField("353013");
+    Text textFilename = new Text("Select folder");
+//    TextField inputFilename = new TextField("353013");
     Text textMin = new Text("Minimum number of segments");
     TextField inputMin= new TextField("1");
     Text textMax = new Text("Maximum number of segments");
@@ -52,7 +54,7 @@ public class GUI extends BorderPane {
     Text textEdge = new Text("Edge weight");
     TextField inputEdge = new TextField("0.5");
     Text textDeviation = new Text("Deviation weight");
-    TextField inputDeviaton = new TextField("0.5");
+    TextField inputDeviation = new TextField("0.5");
     Text textTournament = new Text("Tournament size");
     TextField inputTournament = new TextField("3");
     Button start = new Button("Start");
@@ -67,10 +69,21 @@ public class GUI extends BorderPane {
         super();
 
         // Options initialization
+        File dir = new File("./Test Images Project 2");
+        File[] listOfFiles = dir.listFiles();
+        ArrayList<String> folders = new ArrayList<>();
+        for (int i = 0; i < listOfFiles.length; i++) {
+            if (listOfFiles[i].isDirectory()) {
+                folders.add(listOfFiles[i].getName());
+            }
+        }
+        final ChoiceBox<String> taskMenu = new ChoiceBox<>(FXCollections.observableArrayList(folders));
+        taskMenu.setValue(folders.get(0));
+
         VBox optionBox = new VBox(5);
-        optionBox.getChildren().addAll(textFilename, inputFilename, textMin, inputMin, textMax, inputMax,
+        optionBox.getChildren().addAll(textFilename, taskMenu, textMin, inputMin, textMax, inputMax,
                 textPopulation, inputPopulation, textIterations, inputIterations, textCrossover, inputCrossover,
-                textMutation, inputMutation, weightedSum, textEdge, inputEdge, textDeviation, inputDeviaton, textTournament,
+                textMutation, inputMutation, weightedSum, textEdge, inputEdge, textDeviation, inputDeviation, textTournament,
                 inputTournament);
         optionBox.setAlignment(Pos.CENTER);
         setLeft(optionBox);
@@ -106,7 +119,7 @@ public class GUI extends BorderPane {
         start.setOnAction((e) -> {
             MOOA mooa = new MOOA(
                     this,
-                    "./Test Images Project 2/" + inputFilename.getText() + "/Test image.jpg",
+                    "./Test Images Project 2/" + taskMenu.getValue() + "/Test image.jpg",
                     getPopulationSize(),
                     20,
                     getMutationRate(),
@@ -116,7 +129,8 @@ public class GUI extends BorderPane {
                     getMaxSegments(),
                     getEdgeWeight(),
                     getDeviationWeight(),
-                    weightedSum.isSelected());
+                    weightedSum.isSelected(),
+                    getNuberOfTournaments());
 
             Thread mooaThread = new Thread(() -> {
                 Solution[] solutions = mooa.iterate();
@@ -343,7 +357,10 @@ public class GUI extends BorderPane {
         return Double.valueOf(inputEdge.getText());
     }
     private double getDeviationWeight() {
-        return Double.valueOf(inputDeviaton.getText());
+        return Double.valueOf(inputDeviation.getText());
+    }
+    private int getNuberOfTournaments() {
+        return Integer.valueOf(inputTournament.getText());
     }
 
 }

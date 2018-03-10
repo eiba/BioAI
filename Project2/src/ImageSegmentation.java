@@ -348,7 +348,7 @@ public class ImageSegmentation {
 //        return null;
 //    }
 
-    Solution[] singlePointCrossover(Solution[] solutions, int offspringCount, int minSegmentCount, int maxSegmentCount) {
+    Solution[] singlePointCrossover(Solution[] solutions, int offspringCount, int minSegmentCount, int maxSegmentCount, boolean nsga2, int numberOfTournaments) {
         final Solution[] offspring = new Solution[offspringCount];
         final int size = imageParser.height * imageParser.width;
 
@@ -365,14 +365,19 @@ public class ImageSegmentation {
                     // Selecting a random point for single point crossover
                     final int splitPoint = random.nextInt(size);
                     // Selecting two parents
-                    //@TODO Add a selection method for parent selection
-                    final Solution parent1 = tournamentSelection(solutions, 2);
-                    final Solution parent2 = tournamentSelection(solutions, 2);
+                    Solution parent1, parent2;
+                    if (nsga2) {
+                        parent1 = tournamentSelectionNSGA2(solutions, numberOfTournaments);
+                        parent2 = tournamentSelectionNSGA2(solutions, numberOfTournaments);
+                    }
+                    else {
+                        parent1 = tournamentSelectionWeightedSum(solutions, numberOfTournaments);
+                        parent2 = tournamentSelectionWeightedSum(solutions, numberOfTournaments);
+                    }
                     child = new Solution(parent1, parent2, splitPoint, pixels);
                     if (child.segments.length < minSegmentCount || child.segments.length > maxSegmentCount) {
                         child = null;
                     }
-//                    gui.debugDrawImage(parent1, parent2, child, imageParser.width, imageParser.height, splitPoint);
 
                 }
 
@@ -388,7 +393,20 @@ public class ImageSegmentation {
         return offspring;
     }
 
-    Solution tournamentSelection(Solution[] solutions, int numberOfTournaments) {
+    private Solution tournamentSelectionNSGA2(Solution[] solutions, int numberOfTournaments) {
+        int bestIndex = Integer.MAX_VALUE;
+
+        for (int i = 0; i < numberOfTournaments; i ++) {
+            final int contender = random.nextInt(solutions.length);
+            if (contender < bestIndex) {
+                bestIndex = contender;
+            }
+        }
+
+        return solutions[bestIndex];
+    }
+
+    private Solution tournamentSelectionWeightedSum(Solution[] solutions, int numberOfTournaments) {
         Solution winner = null;
 
         for (int i = 0; i < numberOfTournaments; i ++) {

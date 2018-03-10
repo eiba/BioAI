@@ -18,9 +18,12 @@ public class MOOA {
     private final double edgeWeight;
     private final double deviationWeight;
     private final boolean weightedSum;
+    private final int numberOfTournaments;
 
     //Multi Objective Optimization Algorithm
-    MOOA(GUI gui, String filename, int populationSize,int archiveSize, double mutationRate, double crossoverRate, int iterations, int minimumSegmentCount, int maximumSegmentCount, double edgeWeight, double deviationWeight, boolean weightedSum){
+    MOOA(GUI gui, String filename, int populationSize,int archiveSize, double mutationRate, double crossoverRate,
+         int iterations, int minimumSegmentCount, int maximumSegmentCount, double edgeWeight, double deviationWeight,
+         boolean weightedSum, int numberOfTournaments){
 
         this.gui = gui;
         this.filename = filename;
@@ -36,6 +39,7 @@ public class MOOA {
         this.edgeWeight = edgeWeight;
         this.deviationWeight = deviationWeight;
         this.weightedSum = weightedSum;
+        this.numberOfTournaments = numberOfTournaments;
 
         //Step 2: parse the image
         try {
@@ -85,7 +89,7 @@ public class MOOA {
                 }
             }
             gui.drawImage(solutions[bestIndex], img.width, img.height);
-            gui.out("Score: " + bestScore);
+            gui.out("Weighted sum: " + bestScore);
 //            segmentation.writeImage(solutions[bestIndex]);
         }
 //        else {
@@ -137,7 +141,7 @@ public class MOOA {
                 // Crossover
                 gui.resetProgress(solutions.length);
                 gui.out("Crossover");
-                final Solution[] offspring = segmentation.singlePointCrossover(solutions, solutions.length, minimumSegmentCount, maximumSegmentCount);
+                final Solution[] offspring = segmentation.singlePointCrossover(solutions, solutions.length, minimumSegmentCount, maximumSegmentCount, true, numberOfTournaments);
 
                 //TODO step 6: Mutate
                 //children = segmnetation.Mutate(children, mutationRate)
@@ -152,7 +156,7 @@ public class MOOA {
                 solutions = segmentation.nonDominationSorting(solutions, offspring, this.populationSize);
 
                 gui.drawImage(solutions[0], img.width, img.height);
-                gui.out("Score: " + solutions[0].score);
+                gui.out("Weighted sum: " + solutions[0].score);
             }
         }
 
