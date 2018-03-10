@@ -52,7 +52,7 @@ public class GUI extends BorderPane {
     Text textEdge = new Text("Edge weight");
     TextField inputEdge = new TextField("0.5");
     Text textDeviation = new Text("Deviation weight");
-    TextField inputDeviaton = new TextField("0.5");
+    TextField inputDeviation = new TextField("0.5");
     Text textTournament = new Text("Tournament size");
     TextField inputTournament = new TextField("3");
     Button start = new Button("Start");
@@ -70,7 +70,7 @@ public class GUI extends BorderPane {
         VBox optionBox = new VBox(5);
         optionBox.getChildren().addAll(textFilename, inputFilename, textMin, inputMin, textMax, inputMax,
                 textPopulation, inputPopulation, textIterations, inputIterations, textCrossover, inputCrossover,
-                textMutation, inputMutation, weightedSum, textEdge, inputEdge, textDeviation, inputDeviaton, textTournament,
+                textMutation, inputMutation, weightedSum, textEdge, inputEdge, textDeviation, inputDeviation, textTournament,
                 inputTournament);
         optionBox.setAlignment(Pos.CENTER);
         setLeft(optionBox);
@@ -116,7 +116,8 @@ public class GUI extends BorderPane {
                     getMaxSegments(),
                     getEdgeWeight(),
                     getDeviationWeight(),
-                    weightedSum.isSelected());
+                    weightedSum.isSelected(),
+                    getNuberOfTournaments());
 
             Thread mooaThread = new Thread(() -> {
                 Solution[] solutions = mooa.iterate();
@@ -343,7 +344,10 @@ public class GUI extends BorderPane {
         return Double.valueOf(inputEdge.getText());
     }
     private double getDeviationWeight() {
-        return Double.valueOf(inputDeviaton.getText());
+        return Double.valueOf(inputDeviation.getText());
+    }
+    private int getNuberOfTournaments() {
+        return Integer.valueOf(inputTournament.getText());
     }
 
 }
