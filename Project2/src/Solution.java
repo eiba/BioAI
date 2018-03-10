@@ -52,9 +52,11 @@ public class Solution {
             for (int j = 0; j < pixels[0].length; j ++) {
                 final Pixel currentPixel = pixels[i][j];
                 for (int c = 0; c < 4; c ++) {
-                    if (pixelEdges[i][j][c]) {
-                        final Pixel neighbourPixel = currentPixel.pixels[c];
-                        pixelEdges[neighbourPixel.row][neighbourPixel.column][Pixel.mapDirection(c)] = true;
+                    if (currentPixel.pixels[c] != null) {
+                        if (!pixelEdges[i][j][c]) {
+                            final Pixel neighbourPixel = currentPixel.pixels[c];
+                            pixelEdges[neighbourPixel.row][neighbourPixel.column][Pixel.mapDirection(c)] = false;
+                        }
                     }
                 }
             }

@@ -201,6 +201,8 @@ public class ImageSegmentation {
                 //Linking PixelEdges to Pixels in Segments
                 for (Segment segment : segments) {
                     for (Pixel pixel : segment.pixels) {
+                        final Pixel neighbourUp = pixel.pixels[0];
+                        final Pixel neighbourLeft = pixel.pixels[3];
                         for (int j = 0; j < 4; j ++) {
                             final Pixel neighbour = pixel.pixels[j];
                             if (neighbour != null) {
