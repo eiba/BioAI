@@ -659,9 +659,10 @@ public class ImageSegmentation {
     }
 
     //implements rank selection for the weighted sum
-    public Solution[] selectWeightedSum(Solution[] population, int populationSize){
+    public Solution[] selectWeightedSum(Solution[] population, Solution[] offspring, int populationSize){
 
         ArrayList<Solution> priorityQueue = new ArrayList<>(Arrays.asList(population));
+        Collections.addAll(priorityQueue, offspring);
         priorityQueue.sort(weightedSumComparator);
 
         final Solution[] survivors = new Solution[populationSize];

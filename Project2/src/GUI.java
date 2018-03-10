@@ -117,7 +117,7 @@ public class GUI extends BorderPane {
         setCenter(imagePane);
 
         start.setOnAction((e) -> {
-            MOOA mooa = new MOOA(
+            MOEA MOEA = new MOEA(
                     this,
                     "./Test Images Project 2/" + taskMenu.getValue() + "/Test image.jpg",
                     getPopulationSize(),
@@ -133,7 +133,7 @@ public class GUI extends BorderPane {
                     getNuberOfTournaments());
 
             Thread mooaThread = new Thread(() -> {
-                Solution[] solutions = mooa.iterate();
+                Solution[] solutions = MOEA.iterate();
             });
             loop = true;
 
