@@ -155,6 +155,9 @@ public class MOOA {
 
         gui.out("MOEA ended, saving best images to folder");
         for (int i = 0; i < 5; i ++) {
+            if (i >= solutions.length) {
+                break;
+            }
             segmentation.writeImage(solutions[i]);
         }
         gui.moeaStopped();

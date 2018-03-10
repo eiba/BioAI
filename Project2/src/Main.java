@@ -13,7 +13,7 @@ public class Main extends Application{
 
         // Creating a new GUI
         GUI gui = new GUI();
-        Scene scene = new Scene(gui, 1800, 800);
+        Scene scene = new Scene(gui, 1400, 900);
         primaryStage.setTitle("IT3708 - Assignment 2");
         primaryStage.setScene(scene);
         primaryStage.show();

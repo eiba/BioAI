@@ -5,6 +5,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -25,7 +26,7 @@ public class GUI extends BorderPane {
     private final ProgressBar progressBar = new ProgressBar();
 
     // Image variables
-    private final ScrollPane imagePane = new ScrollPane();
+    private final FlowPane imagePane = new FlowPane();
     private final HBox imageBox = new HBox(4);
     private final ImageView imageViewImage = new ImageView();
     private final ImageView imageViewGreenLine = new ImageView();
@@ -70,6 +71,7 @@ public class GUI extends BorderPane {
                 textPopulation, inputPopulation, textIterations, inputIterations, textCrossover, inputCrossover,
                 textMutation, inputMutation, weightedSum, textEdge, inputEdge, textDeviation, inputDeviaton, textTournament,
                 inputTournament);
+        optionBox.setAlignment(Pos.CENTER);
         setLeft(optionBox);
 
         HBox hBox = new HBox(5);
@@ -92,8 +94,12 @@ public class GUI extends BorderPane {
         setBottom(vBox);
 
         //Image initialization
-        imageBox.getChildren().addAll(imageViewGreenLine, imageViewBlackWhite, imageViewSegments, imageViewImage);
-        imagePane.setContent(imageBox);
+//        imageBox.getChildren().addAll();
+        imagePane.getChildren().addAll(imageViewGreenLine, imageViewBlackWhite, imageViewSegments, imageViewImage);
+        imagePane.setAlignment(Pos.CENTER);
+        imagePane.setVgap(5);
+        imagePane.setHgap(5);
+        imagePane.setPrefWrapLength(900);
         setCenter(imagePane);
 
         start.setOnAction((e) -> {
