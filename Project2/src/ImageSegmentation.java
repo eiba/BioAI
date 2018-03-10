@@ -366,14 +366,8 @@ public class ImageSegmentation {
                     final int splitPoint = random.nextInt(size);
                     // Selecting two parents
                     Solution parent1, parent2;
-                    if (nsga2) {
-                        parent1 = tournamentSelectionNSGA2(solutions, numberOfTournaments);
-                        parent2 = tournamentSelectionNSGA2(solutions, numberOfTournaments);
-                    }
-                    else {
-                        parent1 = tournamentSelectionWeightedSum(solutions, numberOfTournaments);
-                        parent2 = tournamentSelectionWeightedSum(solutions, numberOfTournaments);
-                    }
+                    parent1 = tournamentSelection(solutions, numberOfTournaments);
+                    parent2 = tournamentSelection(solutions, numberOfTournaments);
                     child = new Solution(parent1, parent2, splitPoint, pixels);
                     if (child.segments.length < minSegmentCount || child.segments.length > maxSegmentCount) {
                         child = null;
@@ -393,7 +387,7 @@ public class ImageSegmentation {
         return offspring;
     }
 
-    private Solution tournamentSelectionNSGA2(Solution[] solutions, int numberOfTournaments) {
+    private Solution tournamentSelection(Solution[] solutions, int numberOfTournaments) {
         int bestIndex = Integer.MAX_VALUE;
 
         for (int i = 0; i < numberOfTournaments; i ++) {
@@ -404,19 +398,6 @@ public class ImageSegmentation {
         }
 
         return solutions[bestIndex];
-    }
-
-    private Solution tournamentSelectionWeightedSum(Solution[] solutions, int numberOfTournaments) {
-        Solution winner = null;
-
-        for (int i = 0; i < numberOfTournaments; i ++) {
-            final Solution contender = solutions[random.nextInt(solutions.length)];
-            if (winner == null || contender.score < winner.score) {
-                winner = contender;
-            }
-        }
-
-        return winner;
     }
 
     //euclidean distance in RGB color space
@@ -669,11 +650,13 @@ public class ImageSegmentation {
         Collections.addAll(priorityQueue, offspring);
         priorityQueue.sort(weightedSumComparator);
 
-        final Solution[] survivors = new Solution[populationSize];
+        //final Solution[] survivors = new Solution[populationSize];
+        final ArrayList<Solution> survivors = new ArrayList<>();
+        Solution[] survivorArray = new Solution[populationSize];
 
         int index = 0;
 
-        while (index < survivors.length) {
+        while (index < populationSize) {
             double p = Math.random();
 
             int rank = priorityQueue.size();
@@ -690,16 +673,18 @@ public class ImageSegmentation {
                 cumulativeProbability += (double) rank/rankSum;
 
                 if(p <= cumulativeProbability){
-
-                    survivors[index ++] = priorityQueue.remove(listIndex);
+                    survivors.add(priorityQueue.remove(listIndex));
+                    index++;
+                    //survivors[index ++] = priorityQueue.remove(listIndex);
                     break;
                 }
                 listIndex++;
                 rank--;
-                }
             }
+        }
+        survivors.sort(weightedSumComparator);
 
-        return survivors;
+        return survivors.toArray(survivorArray);
     }
 
     void writeImage(Solution solution) {
