@@ -17,7 +17,8 @@
 .idea/**/uiDesigner.xml
 
 #Images
-Student images/*
+Student Images/*
+!Student Images/.gitkeep
 
 # Gradle:
 .idea/**/gradle.xml
