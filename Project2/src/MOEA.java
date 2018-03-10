@@ -77,6 +77,7 @@ public class MOEA {
 
 
         //Step 4: run the evolutionary cycle for <iterations> generations
+        gui.out("Starting MOEA");
 
         if(weightedSum){
             //TODO: implement weighted sum
@@ -110,7 +111,6 @@ public class MOEA {
             }
         }
         else{
-            gui.out("Starting MOEA");
             for (int i = 0; i < iterations; i++){
 
                 // Stop button has been pressed, stopping thread
