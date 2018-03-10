@@ -1,3 +1,5 @@
+import javafx.application.Platform;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -52,6 +54,7 @@ public class MOOA {
 
         // Creating initial segments that contains the entire image in one large segment
         gui.out("Creating " + populationSize + " MSTs");
+        Platform.runLater(() -> gui.resetProgress(populationSize));
         Solution[] solutions = segmentation.createInitialSolutions(populationSize, minimumSegmentCount, maximumSegmentCount);
 
 //        gui.drawImage(new Solution(new Segment[]{segments[0]}), img.width, img.height);
@@ -132,7 +135,7 @@ public class MOOA {
 
                 gui.out("Generation " + (i+1) + "/" + iterations);
                 // Crossover
-                gui.resetProgress();
+                gui.resetProgress(solutions.length);
                 gui.out("Crossover");
                 final Solution[] offspring = segmentation.singlePointCrossover(solutions, solutions.length, minimumSegmentCount, maximumSegmentCount);
 
@@ -140,7 +143,7 @@ public class MOOA {
                 //children = segmnetation.Mutate(children, mutationRate)
 
                 // Evaluate the new solutions
-                gui.resetProgress();
+                gui.resetProgress(offspring.length);
                 gui.out("Evaluating new generation");
                 segmentation.evaluate(offspring);
 

@@ -60,6 +60,7 @@ public class GUI extends BorderPane {
 
     //Running variables
     private boolean loop;
+    private int counter, steps;
 
 
     GUI() {
@@ -301,14 +302,15 @@ public class GUI extends BorderPane {
         outputBuilder.append('\n');
     }
 
-    void resetProgress() {
+    void resetProgress(int steps) {
+        counter = 0;
+        this.steps = steps;
         progressBar.setProgress(0);
     }
 
-    void setProgress(double value) {
-        if (value > progressBar.getProgress()) {
-            progressBar.setProgress(value);
-        }
+    synchronized void addProgress() {
+        counter ++;
+        progressBar.setProgress((double) counter / steps);
     }
 
     synchronized boolean getLoop() {

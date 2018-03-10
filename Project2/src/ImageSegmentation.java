@@ -224,7 +224,7 @@ public class ImageSegmentation {
 
                 Solution newSolution = new Solution(pixelEdges, segments);
                 solutions[index] = newSolution;
-                Platform.runLater(() -> gui.setProgress((double) (index+1) / solutionCount));
+                Platform.runLater(gui::addProgress);
                 edgeValueAndDeviation(newSolution);
             });
         }
@@ -377,7 +377,7 @@ public class ImageSegmentation {
                 }
 
                 offspring[index] = child;
-                Platform.runLater(() ->  gui.setProgress((double)(index+2)/offspringCount));
+                Platform.runLater(gui::addProgress);
             });
         }
 
@@ -427,7 +427,7 @@ public class ImageSegmentation {
 
             executorService.execute(() -> {
                 edgeValueAndDeviation(solutions[index]);
-                gui.setProgress(index);
+                gui.addProgress();
             });
         }
 
