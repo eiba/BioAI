@@ -5,6 +5,7 @@ public class MOOA {
 
     private ImageParser img;
     private GUI gui;
+    private final String filename;
     private final int populationSize;
     private final int archiveSize;
     private final double mutationRate;
@@ -20,6 +21,7 @@ public class MOOA {
     MOOA(GUI gui, String filename, int populationSize,int archiveSize, double mutationRate, double crossoverRate, int iterations, int minimumSegmentCount, int maximumSegmentCount, double edgeWeight, double deviationWeight, boolean weightedSum){
 
         this.gui = gui;
+        this.filename = filename;
 
         //Step 1: setup variables for the evolutionary cycle
         this.populationSize = populationSize;
@@ -81,6 +83,7 @@ public class MOOA {
             }
             gui.drawImage(solutions[bestIndex], img.width, img.height);
             gui.out("Score: " + bestScore);
+//            segmentation.writeImage(solutions[bestIndex]);
         }
 //        else {
 //            gui.drawImage(new Solution(new Segment[]{segments[0]}), img.width, img.height);

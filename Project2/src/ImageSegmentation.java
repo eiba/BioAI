@@ -1,6 +1,12 @@
 import javafx.application.Platform;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,6 +23,7 @@ public class ImageSegmentation {
     private final Comparator<Solution> overallDeviationComparator;
     private final Comparator<Solution> edgeValueComparator;
     private final Comparator<Solution> crowdingDistanceComparator;
+    int imagesWritten = 0;
 
     ImageSegmentation(ImageParser imageParser, GUI gui, double edgeWeight, double overallDeviationWeight){
         this.imageParser = imageParser;
@@ -670,6 +677,38 @@ public class ImageSegmentation {
             }
 
         return survivors;
+    }
+
+    void writeImage(Solution solution) {
+        //Black White Image
+        final int width = solution.pixelEdges[0].length;
+        final int height = solution.pixelEdges.length;
+        final WritableImage imageBlack = new WritableImage(width, height);
+        final PixelWriter pixelWriterBlack = imageBlack.getPixelWriter();
+
+        for (Segment segment : solution.segments) {
+            for (Pixel pixel : segment.pixels) {
+                if (pixel.column == 0 || pixel.column == width-1 || pixel.row == 0 || pixel.row == height-1) {
+                    pixelWriterBlack.setColor(pixel.column, pixel.row, javafx.scene.paint.Color.BLACK);
+                }
+                else if (!segment.containsAllNeighbours(pixel)) {
+                    pixelWriterBlack.setColor(pixel.column, pixel.row, javafx.scene.paint.Color.BLACK);
+                }
+                else {
+                    pixelWriterBlack.setColor(pixel.column, pixel.row, javafx.scene.paint.Color.WHITE);
+                }
+            }
+        }
+
+        BufferedImage bImage = SwingFXUtils.fromFXImage(imageBlack, null);
+        imagesWritten ++;
+        File file = new File("./Student Images/" + imagesWritten + "_segments=" + solution.segments.length + ".png");
+        try {
+            ImageIO.write(bImage, "png", file);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 
