@@ -609,11 +609,15 @@ public class ImageSegmentation {
         double deviationMax = deviationSort.get(deviationSort.size()-1).overallDeviation;
         double deviationMin = deviationSort.get(0).overallDeviation;
 
-        double edgeValueMax = edgeSort.get(0).edgeValue;
-        double edgeValueMin = edgeSort.get(edgeSort.size()-1).edgeValue;
+        /*double edgeValueMax = edgeSort.get(0).edgeValue;
+        double edgeValueMin = edgeSort.get(edgeSort.size()-1).edgeValue;*/
+
+        double edgeValueMax = -edgeSort.get(edgeSort.size()-1).edgeValue;
+        double edgeValueMin = -edgeSort.get(0).edgeValue;
 
         for(int i=1; i < deviationSort.size() - 1;i++){
-            deviationSort.get(i).crowdingDistance = Math.abs(deviationSort.get(i-1).overallDeviation / deviationSort.get(i+1).overallDeviation)/(deviationMax-deviationMin) + Math.abs(deviationSort.get(i-1).edgeValue / deviationSort.get(i+1).edgeValue)/(edgeValueMax-edgeValueMin);
+            deviationSort.get(i).crowdingDistance = Math.abs((deviationSort.get(i-1).overallDeviation / deviationSort.get(i+1).overallDeviation)/(deviationMax-deviationMin)) + Math.abs(-deviationSort.get(i-1).edgeValue / (-deviationSort.get(i+1).edgeValue)/(edgeValueMax-edgeValueMin));
+            //System.out.println(deviationSort.get(i).crowdingDistance);
             priorityQueue.add(deviationSort.get(i));
         }
 
