@@ -1,6 +1,6 @@
 import javafx.application.Platform;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ScrollPane;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,8 +32,52 @@ public class GUI extends BorderPane {
     private final ImageView imageViewBlackWhite = new ImageView();
     private final ImageView imageViewSegments = new ImageView();
 
+    //Options variables
+    Text textFilename = new Text("Name of image folder");
+    TextField inputFilename = new TextField("353013");
+    Text textMin = new Text("Minimum number of segments");
+    TextField inputMin= new TextField("1");
+    Text textMax = new Text("Maximum number of segments");
+    TextField inputMax = new TextField("50");
+    Text textPopulation = new Text("Population size");
+    TextField inputPopulation = new TextField("50");
+    Text textIterations = new Text("Iterations");
+    TextField inputIterations = new TextField("100");
+    Text textCrossover = new Text("Crossover rate");
+    TextField inputCrossover = new TextField("1.0");
+    Text textMutation = new Text("Mutation rate");
+    TextField inputMutation = new TextField("0.2");
+    CheckBox weightedSum = new CheckBox("Use weighted sum");
+    Text textEdge = new Text("Edge weight");
+    TextField inputEdge = new TextField("0.5");
+    Text textDeviation = new Text("Deviation weight");
+    TextField inputDeviaton = new TextField("0.5");
+    Text textTournament = new Text("Tournament size");
+    TextField inputTournament = new TextField("3");
+    Button start = new Button("Start");
+    Button stop = new Button("Stop");
+
+    //Running variables
+    private boolean loop;
+
+
     GUI() {
         super();
+
+        // Options initialization
+        VBox optionBox = new VBox(5);
+        optionBox.getChildren().addAll(textFilename, inputFilename, textMin, inputMin, textMax, inputMax,
+                textPopulation, inputPopulation, textIterations, inputIterations, textCrossover, inputCrossover,
+                textMutation, inputMutation, weightedSum, textEdge, inputEdge, textDeviation, inputDeviaton, textTournament,
+                inputTournament);
+        setLeft(optionBox);
+
+        HBox hBox = new HBox(5);
+        hBox.getChildren().addAll(start, stop);
+        hBox.setAlignment(Pos.CENTER);
+        stop.setDisable(true);
+        setTop(hBox);
+
 
         // Output initialization
         VBox vBox = new VBox();
@@ -48,9 +93,46 @@ public class GUI extends BorderPane {
 
         //Image initialization
         imageBox.getChildren().addAll(imageViewGreenLine, imageViewBlackWhite, imageViewSegments, imageViewImage);
-//        imageBox.setStyle("-fx-background-color: red");
         imagePane.setContent(imageBox);
         setCenter(imagePane);
+
+        start.setOnAction((e) -> {
+            MOOA mooa = new MOOA(
+                    this,
+                    "./Test Images Project 2/" + inputFilename.getText() + "/Test image.jpg",
+                    getPopulationSize(),
+                    20,
+                    getMutationRate(),
+                    getCrossoverRate(),
+                    getIterations(),
+                    getMinSegments(),
+                    getMaxSegments(),
+                    getEdgeWeight(),
+                    getDeviationWeight(),
+                    weightedSum.isSelected());
+
+            Thread mooaThread = new Thread(() -> {
+                Solution[] solutions = mooa.iterate();
+            });
+            loop = true;
+
+            //Cleaning Image directory
+            File directory = new File("./Student Images");
+            for(File file: directory.listFiles()) {
+                if (!file.isDirectory()) {
+                    file.delete();
+                }
+            }
+
+            mooaThread.start();
+            start.setDisable(true);
+            stop.setDisable(false);
+        });
+
+        stop.setOnAction((e) -> {
+            loop = false;
+            stop.setDisable(true);
+        });
     }
 
     void drawImage(Solution solution, int width, int height) {
@@ -221,6 +303,39 @@ public class GUI extends BorderPane {
         if (value > progressBar.getProgress()) {
             progressBar.setProgress(value);
         }
+    }
+
+    synchronized boolean getLoop() {
+        return loop;
+    }
+
+    void moeaStopped() {
+        start.setDisable(false);
+    }
+
+    private int getPopulationSize() {
+        return Integer.valueOf(inputPopulation.getText());
+    }
+    private double getMutationRate() {
+        return Double.valueOf(inputMutation.getText());
+    }
+    private double getCrossoverRate() {
+        return Double.valueOf(inputCrossover.getText());
+    }
+    private int getIterations() {
+        return Integer.valueOf(inputIterations.getText());
+    }
+    private int getMinSegments() {
+        return Integer.valueOf(inputMin.getText());
+    }
+    private int getMaxSegments() {
+        return Integer.valueOf(inputMax.getText());
+    }
+    private double getEdgeWeight() {
+        return Double.valueOf(inputEdge.getText());
+    }
+    private double getDeviationWeight() {
+        return Double.valueOf(inputDeviaton.getText());
     }
 
 }

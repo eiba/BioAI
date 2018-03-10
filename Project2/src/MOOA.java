@@ -98,6 +98,12 @@ public class MOOA {
         if(weightedSum){
             //TODO: implement weighted sum
             for(int i=0; i<iterations;i++){
+
+                // Stop button has been pressed, stopping thread
+                if (!gui.getLoop()) {
+                    break;
+                }
+
                 //TODO step 5: parent selection? toutnament? Could be inside crossover too
 
                 //mutation and crossover is the same
@@ -118,6 +124,11 @@ public class MOOA {
         else{
             gui.out("Starting MOEA");
             for (int i = 0; i < iterations; i++){
+
+                // Stop button has been pressed, stopping thread
+                if (!gui.getLoop()) {
+                    break;
+                }
 
                 gui.out("Generation " + (i+1) + "/" + iterations);
                 // Crossover
@@ -141,6 +152,13 @@ public class MOOA {
                 gui.out("Score: " + solutions[0].score);
             }
         }
+
+        gui.out("MOEA ended, saving best images to folder");
+        for (int i = 0; i < 5; i ++) {
+            segmentation.writeImage(solutions[i]);
+        }
+        gui.moeaStopped();
+
         return solutions;
     }
 }
