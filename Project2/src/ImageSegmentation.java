@@ -302,6 +302,16 @@ public class ImageSegmentation {
         return Math.sqrt(Math.pow(differenceRed, 2) + Math.pow(differenceGreen, 2) + Math.pow(differenceBlue, 2));
 
     }
+
+    //euclidean distance in pixel coordinate space
+    public double euclideanPixel(Pixel pixel1, Pixel pixel2){
+
+        int differenceRow = pixel1.row - pixel2.row;
+        int differenceCol = pixel1.column - pixel2.column;
+
+        return Math.sqrt(Math.pow(differenceCol, 2) + Math.pow(differenceRow, 2));
+
+    }
     public void NSGA2(Solution[] solutions){
 
         for(Solution solution:solutions){
@@ -496,7 +506,7 @@ public class ImageSegmentation {
 
         if(currentSegCount == minSegCount){
             //split segment
-            double worstOverallDeviation = Double.MIN_VALUE;
+            double worstOverallDeviation = -1.0;
             Segment worstOverallDeviationSegment = null;
 
             for(Segment segment:solution.segments){
@@ -541,7 +551,7 @@ public class ImageSegmentation {
                 combineSegment(solution,worstEdgeValueSegment);
             }else{
                 //split
-                double worstOverallDeviation = Double.MIN_VALUE;
+                double worstOverallDeviation = -1.0;
                 Segment worstOverallDeviationSegment = null;
 
                 for(Segment segment:solution.segments){
@@ -551,14 +561,65 @@ public class ImageSegmentation {
                         worstOverallDeviationSegment = segment;
                     }
                 }
-                splitSegment(solution,worstOverallDeviationSegment);
+                //if the segment has only 1 pixel we cannot split, but we can combine
+                if(worstOverallDeviationSegment.pixels.size() == 1){
+                    combineSegment(solution,worstOverallDeviationSegment);
+                }else {
+                    splitSegment(solution,worstOverallDeviationSegment);
+                }
             }
 
         }
     }
 
+    //splits a segment into two
     public void splitSegment(Solution solution, Segment segment){
+        boolean[][][] genoType = solution.pixelEdges;
 
+        HashMap<Pixel,ArrayList<PixelEdge>> border = new HashMap<>();   //determines the segment border
+        ArrayList<Pixel> borderArray = new ArrayList<>();
+
+        for(Pixel pixel: segment.pixels){
+            for(int i=0; i<pixel.edges.length; i++){
+                if(pixel.edges[i] != null && !genoType[pixel.row][pixel.column][i]){
+
+                    //map the border og the segment.
+                    if(!border.containsKey(pixel)){
+                        ArrayList<PixelEdge> borderPixels = new ArrayList<>();
+                        borderPixels.add(pixel.edges[i]);
+                        border.put(pixel,borderPixels);
+                        borderArray.add(pixel);
+                    }else{
+                        border.get(pixel).add(pixel.edges[i]);
+                    }
+                }
+            }
+        }
+        //Select the edges to split between
+        Pixel pixelEdge1 = borderArray.get(random.nextInt(borderArray.size()));
+        Pixel pixelEdge2 = pixelEdge1;
+
+        while (pixelEdge1 == pixelEdge2){
+            pixelEdge2 = borderArray.get(random.nextInt(borderArray.size()));
+        }
+
+        //Now we need to get from pixel1 to pixel2
+        Pixel currentPixel = pixelEdge1;
+        while (currentPixel != pixelEdge2){
+            for(int i=0; i < currentPixel.edges.length;i++){
+                //there is an edge there and they are connected
+                Pixel nextPixel = null;
+                Double bestDistance = Double.MAX_VALUE;
+                if(currentPixel.edges[i] != null && genoType[currentPixel.row][currentPixel.column][i]){
+                    double distance = euclideanPixel(currentPixel.pixels[i],pixelEdge2);
+
+                    if(distance < bestDistance){
+                        bestDistance = distance;
+                        nextPixel = currentPixel.pixels[i];
+                    }
+                }
+            }
+        }
     }
 
     //combines the segment with the neighbouring segment with the lowest border contrast
