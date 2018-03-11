@@ -1,3 +1,5 @@
+import java.util.Comparator;
+
 public class PixelEdge implements Comparable<PixelEdge> {
 
     final Pixel pixelA, pixelB;
@@ -16,6 +18,23 @@ public class PixelEdge implements Comparable<PixelEdge> {
         }
         else if (this.distance > o.distance) {
             return 1;
+        }
+        return 0;
+    }
+}
+
+class rgbDistanceComparator implements Comparator<PixelEdge>
+{
+    @Override
+    public int compare(PixelEdge x, PixelEdge y)
+    {
+        if (x.distance < y.distance)
+        {
+            return 1;
+        }
+        if (x.distance > y.distance)
+        {
+            return -1;
         }
         return 0;
     }

@@ -23,6 +23,7 @@ public class ImageSegmentation {
     private final Comparator<Solution> overallDeviationComparator;
     private final Comparator<Solution> edgeValueComparator;
     private final Comparator<Solution> crowdingDistanceComparator;
+    private final Comparator<PixelEdge> pixelEdgeDistanceComparator;
 
     int imagesWritten = 0;
 
@@ -37,6 +38,7 @@ public class ImageSegmentation {
         this.overallDeviationComparator = new overallDeviationComparator();
         this.edgeValueComparator = new edgeValueComparator();
         this.crowdingDistanceComparator = new crowdingDistanceComparator();
+        this.pixelEdgeDistanceComparator = new rgbDistanceComparator();
     }
 
 //    /**
@@ -203,7 +205,6 @@ public class ImageSegmentation {
                             }
                         }
                     }
-
                 }
 
                 //Linking PixelEdges to Pixels in Segments
@@ -310,13 +311,6 @@ public class ImageSegmentation {
         int differenceCol = pixel1.column - pixel2.column;
 
         return Math.sqrt(Math.pow(differenceCol, 2) + Math.pow(differenceRow, 2));
-
-    }
-    public void NSGA2(Solution[] solutions){
-
-        for(Solution solution:solutions){
-            
-        }
 
     }
 
@@ -576,50 +570,114 @@ public class ImageSegmentation {
     public void splitSegment(Solution solution, Segment segment){
         boolean[][][] genoType = solution.pixelEdges;
 
-        HashMap<Pixel,ArrayList<PixelEdge>> border = new HashMap<>();   //determines the segment border
-        ArrayList<Pixel> borderArray = new ArrayList<>();
+        final class SegmentPixelEdge implements Comparable<SegmentPixelEdge>{
 
+            private final Segment segment;
+            private final PixelEdge pixelEdge;
+
+            private SegmentPixelEdge(Segment segment, PixelEdge pixelEdge) {
+                this.segment = segment;
+                this.pixelEdge = pixelEdge;
+            }
+
+            @Override
+            public int compareTo(SegmentPixelEdge o) {
+                return this.pixelEdge.compareTo(o.pixelEdge);
+            }
+        }
+
+        final PriorityQueue<SegmentPixelEdge> priorityQueue = new PriorityQueue<>();
+
+        //HashSet<Pixel> allPxels = segment.pixels;
+        final HashMap<Pixel, Segment> visitedPixels = new HashMap<>();
+
+       PriorityQueue<PixelEdge> distancePriorityQueue = new PriorityQueue<>(pixelEdgeDistanceComparator);
+
+       //add pixels to the segments
         for(Pixel pixel: segment.pixels){
             for(int i=0; i<pixel.edges.length; i++){
-                if(pixel.edges[i] != null && !genoType[pixel.row][pixel.column][i]){
+                if(pixel.edges[i] != null && genoType[pixel.row][pixel.column][i]){
+                    distancePriorityQueue.add(pixel.edges[i]);
+                }
+            }
+        }
 
-                    //map the border og the segment.
-                    if(!border.containsKey(pixel)){
-                        ArrayList<PixelEdge> borderPixels = new ArrayList<>();
-                        borderPixels.add(pixel.edges[i]);
-                        border.put(pixel,borderPixels);
-                        borderArray.add(pixel);
-                    }else{
-                        border.get(pixel).add(pixel.edges[i]);
+            //the pixelEdge with the largest distance!
+        PixelEdge largestPixelEdge = distancePriorityQueue.poll();
+
+        //create the new segments with the edge pixels as root nodes
+        Segment newSegment1 = new Segment(largestPixelEdge.pixelB);
+        Segment newSegment2 = new Segment(largestPixelEdge.pixelA);
+        //final Segment[] newSegments = new Segment[]{newSegment1,newSegment2};
+        visitedPixels.put(largestPixelEdge.pixelB,newSegment1);
+        visitedPixels.put(largestPixelEdge.pixelA,newSegment2);
+
+        for(int i = 0; i<largestPixelEdge.pixelB.edges.length;i++){
+            if(largestPixelEdge.pixelB.edges[i] != null && genoType[largestPixelEdge.pixelB.row][largestPixelEdge.pixelB.column][i]){
+                priorityQueue.add(new SegmentPixelEdge(newSegment1, largestPixelEdge.pixelB.edges[i]));
+            }
+        }
+        for(int i = 0; i<largestPixelEdge.pixelA.edges.length;i++){
+            if(largestPixelEdge.pixelA.edges[i] != null && genoType[largestPixelEdge.pixelA.row][largestPixelEdge.pixelA.column][i]){
+                priorityQueue.add(new SegmentPixelEdge(newSegment2, largestPixelEdge.pixelA.edges[i]));
+            }
+        }
+
+        while (!priorityQueue.isEmpty()) {
+            final SegmentPixelEdge segmentPixelEdge = priorityQueue.remove();
+            final Segment segment1 = segmentPixelEdge.segment;
+            final PixelEdge currentPixelEdge = segmentPixelEdge.pixelEdge;
+
+            // Check if Pixel is not already in Solution
+            if (!visitedPixels.containsKey(currentPixelEdge.pixelB)) {
+                // Adding the new Pixel to the Segment
+                segment1.add(currentPixelEdge.pixelB);
+                visitedPixels.put(currentPixelEdge.pixelB, segment1);
+                for(int i = 0; i<currentPixelEdge.pixelB.edges.length;i++){
+                    if(currentPixelEdge.pixelB.edges[i] != null && genoType[currentPixelEdge.pixelB.row][currentPixelEdge.pixelB.column][i]){
+                        priorityQueue.add(new SegmentPixelEdge(segment1, currentPixelEdge.pixelB.edges[i]));
+                    }
+                }
+            }
+            else if (!visitedPixels.containsKey(currentPixelEdge.pixelA)) {
+                // Adding the new Pixel to the Segment
+                segment1.add(currentPixelEdge.pixelA);
+                visitedPixels.put(currentPixelEdge.pixelA, segment1);
+                for(int i = 0; i<currentPixelEdge.pixelA.edges.length;i++){
+                    if(currentPixelEdge.pixelA.edges[i] != null && genoType[currentPixelEdge.pixelA.row][currentPixelEdge.pixelA.column][i]){
+                        priorityQueue.add(new SegmentPixelEdge(segment1, currentPixelEdge.pixelA.edges[i]));
                     }
                 }
             }
         }
-        //Select the edges to split between
-        Pixel pixelEdge1 = borderArray.get(random.nextInt(borderArray.size()));
-        Pixel pixelEdge2 = pixelEdge1;
 
-        while (pixelEdge1 == pixelEdge2){
-            pixelEdge2 = borderArray.get(random.nextInt(borderArray.size()));
+        // create the new segment list
+        Segment[] newSegmentList = new Segment[solution.segments.length + 1];
+        int segmentCounter = 0;
+        for(Segment segment1: solution.segments){
+            if(segment1 == segment){
+                continue;
+            }
+            newSegmentList[segmentCounter++] = segment1;
         }
 
-        //Now we need to get from pixel1 to pixel2
-        Pixel currentPixel = pixelEdge1;
-        while (currentPixel != pixelEdge2){
-            for(int i=0; i < currentPixel.edges.length;i++){
-                //there is an edge there and they are connected
-                Pixel nextPixel = null;
-                Double bestDistance = Double.MAX_VALUE;
-                if(currentPixel.edges[i] != null && genoType[currentPixel.row][currentPixel.column][i]){
-                    double distance = euclideanPixel(currentPixel.pixels[i],pixelEdge2);
+        newSegmentList[newSegmentList.length - 1] = newSegment1;
+        newSegmentList[newSegmentList.length - 2] = newSegment2;
 
-                    if(distance < bestDistance){
-                        bestDistance = distance;
-                        nextPixel = currentPixel.pixels[i];
-                    }
+        //set the new segmentlist
+        solution.segments = newSegmentList;
+
+        //update the genotype
+        for(Pixel pixel1: newSegment1.pixels){
+            for(int i=0;i<pixel1.pixels.length;i++){
+                Pixel pixel2 = pixel1.pixels[i];
+                if(newSegment2.pixels.contains(pixel2)){
+                    genoType[pixel1.row][pixel1.column][i] = false;
+                    genoType[pixel2.row][pixel2.column][(i + 2) % 4] = false;
                 }
             }
         }
+        
     }
 
     //combines the segment with the neighbouring segment with the lowest border contrast
