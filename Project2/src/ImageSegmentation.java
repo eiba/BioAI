@@ -349,7 +349,7 @@ public class ImageSegmentation {
 //        return null;
 //    }
 
-    Solution[] singlePointCrossover(Solution[] solutions, int offspringCount, int minSegmentCount, int maxSegmentCount, boolean nsga2, int numberOfTournaments) {
+    Solution[] singlePointCrossover(Solution[] solutions, int offspringCount, int minSegmentCount, int maxSegmentCount, boolean nsga2, int numberOfTournaments, double mutationRate) {
         final Solution[] offspring = new Solution[offspringCount];
         final int size = imageParser.height * imageParser.width;
 
@@ -375,7 +375,10 @@ public class ImageSegmentation {
                     }
 
                 }
-
+                double p = Math.random();
+                if(p <= mutationRate) {
+                    mutate(child, minSegmentCount, maxSegmentCount);
+                }
                 offspring[index] = child;
                 Platform.runLater(gui::addProgress);
             });
@@ -589,7 +592,19 @@ public class ImageSegmentation {
     }
 
     public void mutate(Solution solution, int minSegCount, int maxSegCount){
-        int currentSegCount = solution.segments.length;
+        /*double worstEdgeValue = Double.MAX_VALUE;
+        Segment worstEdgeValueSegment = null;
+
+        for(Segment segment:solution.segments){
+            double averageEdge = segment.edgeValue / (double) segment.pixels.size();
+
+            if(averageEdge < worstEdgeValue){
+                worstEdgeValue = averageEdge;
+                worstEdgeValueSegment = segment;
+            }
+        }
+        combineSegment(solution,worstEdgeValueSegment);*/
+       int currentSegCount = solution.segments.length;
 
         if(currentSegCount == minSegCount){
             //split segment
@@ -597,8 +612,9 @@ public class ImageSegmentation {
             Segment worstOverallDeviationSegment = null;
 
             for(Segment segment:solution.segments){
-                if(segment.overallDeviation > worstOverallDeviation){
-                    worstOverallDeviation = segment.overallDeviation;
+                double averageDeviation = segment.overallDeviation / (double) segment.pixels.size();
+                if(averageDeviation > worstOverallDeviation){
+                    worstOverallDeviation = averageDeviation;
                     worstOverallDeviationSegment = segment;
                 }
             }
@@ -610,8 +626,10 @@ public class ImageSegmentation {
             Segment worstEdgeValueSegment = null;
 
             for(Segment segment:solution.segments){
-                if(segment.edgeValue < worstEdgeValue){
-                    worstEdgeValue = segment.edgeValue;
+                double averageEdge = segment.edgeValue / (double) segment.pixels.size();
+
+                if(averageEdge < worstEdgeValue){
+                    worstEdgeValue = averageEdge;
                     worstEdgeValueSegment = segment;
                 }
             }
@@ -625,8 +643,10 @@ public class ImageSegmentation {
                 Segment worstEdgeValueSegment = null;
 
                 for(Segment segment:solution.segments){
-                    if(segment.edgeValue < worstEdgeValue){
-                        worstEdgeValue = segment.edgeValue;
+                    double averageEdge = segment.edgeValue / (double) segment.pixels.size();
+
+                    if(averageEdge < worstEdgeValue){
+                        worstEdgeValue = averageEdge;
                         worstEdgeValueSegment = segment;
                     }
                 }
@@ -637,8 +657,9 @@ public class ImageSegmentation {
                 Segment worstOverallDeviationSegment = null;
 
                 for(Segment segment:solution.segments){
-                    if(segment.overallDeviation > worstOverallDeviation){
-                        worstOverallDeviation = segment.overallDeviation;
+                    double averageDeviation = segment.overallDeviation / (double) segment.pixels.size();
+                    if(averageDeviation > worstOverallDeviation){
+                        worstOverallDeviation = averageDeviation;
                         worstOverallDeviationSegment = segment;
                     }
                 }
@@ -698,6 +719,7 @@ public class ImageSegmentation {
 
         Segment[] newSegmentList = new Segment[solution.segments.length - 1];
 
+        //we want to merge the segment with the segment that has the lowest border contrast(most similar)
         Segment lowestEdgeValueSegment = null;
         Double lowestEdgeValue = Double.MAX_VALUE;
 
@@ -710,16 +732,16 @@ public class ImageSegmentation {
                 lowestEdgeValue = averageContrast;
             }
         }
-        //now we have the segments we want to merge and the border!
+        //now we have the segments we want to merge the border!
 
         //create the new combined segment
-        Segment newSement = new Segment();
+        Segment newSegment = new Segment();
 
         for(Pixel pixel: segment.pixels){
-            newSement.add(pixel);
+            newSegment.add(pixel);
         }
         for(Pixel pixel: lowestEdgeValueSegment.pixels){
-            newSement.add(pixel);
+            newSegment.add(pixel);
         }
 
         int segmentCounter = 0;
@@ -730,11 +752,11 @@ public class ImageSegmentation {
             newSegmentList[segmentCounter++] = segment1;
         }
 
-        newSegmentList[newSegmentList.length - 1] = newSement;
+        newSegmentList[newSegmentList.length - 1] = newSegment;
         //set the new segmentlist
         solution.segments = newSegmentList;
 
-        //change the genotype so that the pixels are connected
+        //change the genotype so that the pixels are connected (change boolean values to true)
         for (PixelEdge borderPixels: border.get(lowestEdgeValueSegment)){
             Pixel pixel1 = borderPixels.pixelB;
             Pixel pixel2 = borderPixels.pixelA;
@@ -749,7 +771,6 @@ public class ImageSegmentation {
 
         }
 
-    //TODO: Crowding distance!
     public Solution[] crowdingDistanceSort(ArrayList<Solution> dominationEdge, int neededSolutions){
         Solution[] returnedSolutions = new Solution[neededSolutions];
 

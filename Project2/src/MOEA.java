@@ -78,7 +78,7 @@ public class MOEA {
 
         //Step 4: run the evolutionary cycle for <iterations> generations
         gui.out("Starting MOEA");
-
+        //segmentation.combineSegment(solutions[0],solutions[0].segments[0]);
         if(weightedSum){
             //TODO: implement weighted sum
             for(int i=0; i<iterations;i++){
@@ -92,7 +92,7 @@ public class MOEA {
                 // Crossover
                 gui.resetProgress(solutions.length);
                 gui.out("Crossover");
-                final Solution[] offspring = segmentation.singlePointCrossover(solutions, solutions.length, minimumSegmentCount, maximumSegmentCount, false, numberOfTournaments);
+                final Solution[] offspring = segmentation.singlePointCrossover(solutions, solutions.length, minimumSegmentCount, maximumSegmentCount, false, numberOfTournaments, this.mutationRate);
 
                 //TODO step 7: Mutate
                 //children = segmnetation.Mutate(children, mutationRate)
@@ -122,7 +122,10 @@ public class MOEA {
                 // Crossover
                 gui.resetProgress(solutions.length);
                 gui.out("Crossover");
-                final Solution[] offspring = segmentation.singlePointCrossover(solutions, solutions.length, minimumSegmentCount, maximumSegmentCount, true, numberOfTournaments);
+                /*for(Solution solution: solutions){
+                    segmentation.mutate(solution,1,1);
+                }*/
+                final Solution[] offspring = segmentation.singlePointCrossover(solutions, solutions.length, minimumSegmentCount, maximumSegmentCount, true, numberOfTournaments, this.mutationRate);
 
                 //TODO step 6: Mutate
                 //children = segmnetation.Mutate(children, mutationRate)
@@ -131,6 +134,7 @@ public class MOEA {
                 gui.resetProgress(offspring.length);
                 gui.out("Evaluating new generation");
                 segmentation.evaluate(offspring);
+                //segmentation.evaluate(solutions);
 
                 //TODO step 8: select stuff for next generation
                 gui.out("Non dominating sort");
