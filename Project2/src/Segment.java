@@ -8,6 +8,8 @@ class Segment {
 //    final Pixel root;
 //    final HashMap<Pixel, ArrayList<PixelEdge>> pixelEdgeMap = new HashMap<>();
     final HashSet<Pixel> pixels = new HashSet<>();
+    public double overallDeviation;
+    public double edgeValue;
 //    final ArrayList<PixelEdge> edges = new ArrayList<>();
 
     // Segment color variables

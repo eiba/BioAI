@@ -11,7 +11,7 @@ public class Solution {
     public int dominationRank;
     public double crowdingDistance;
 
-    final Segment[] segments;
+    Segment[] segments;
     //[Row][Column][Edge]
     final boolean[][][] pixelEdges;
 

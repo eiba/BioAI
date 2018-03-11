@@ -23,6 +23,7 @@ public class ImageSegmentation {
     private final Comparator<Solution> overallDeviationComparator;
     private final Comparator<Solution> edgeValueComparator;
     private final Comparator<Solution> crowdingDistanceComparator;
+
     int imagesWritten = 0;
 
     ImageSegmentation(ImageParser imageParser, GUI gui, double edgeWeight, double overallDeviationWeight){
@@ -490,10 +491,14 @@ public class ImageSegmentation {
         double overAllDeviation = 0.0;
 
         for(Segment segment:solution.segments){
+            segment.overallDeviation = 0.0;
+            segment.edgeValue = 0.0;
+
             for(Pixel pixel: segment.pixels){
                 //Calculate overall deviation (summed rbg distance from current pixel to centroid of segment)
-                overAllDeviation += euclideanRGB(pixel.color, segment.getColor());
-
+                double o = euclideanRGB(pixel.color, segment.getColor());
+                overAllDeviation += o;
+                segment.overallDeviation += o;
                 //Calculate the edgeValues. Calculate rgb distance between the current pixel and all its neighbours
                 //that are not in the same segment
                 for(int i = 0; i < 4; i ++){
@@ -508,7 +513,9 @@ public class ImageSegmentation {
                     }
 
                     if(!segment.pixels.contains(neighbourPixel)){
-                        edgeValue += pixelEdge.distance;    //add the distance of the edge if the neighbouring pixels are not in the same segment
+                        double e = pixelEdge.distance;
+                        edgeValue += e;    //add the distance of the edge if the neighbouring pixels are not in the same segment
+                        segment.edgeValue += e;
                     }
                 }
             }
@@ -580,6 +587,167 @@ public class ImageSegmentation {
         }
         return returnedSolutions;
     }
+
+    public void mutate(Solution solution, int minSegCount, int maxSegCount){
+        int currentSegCount = solution.segments.length;
+
+        if(currentSegCount == minSegCount){
+            //split segment
+            double worstOverallDeviation = Double.MIN_VALUE;
+            Segment worstOverallDeviationSegment = null;
+
+            for(Segment segment:solution.segments){
+                if(segment.overallDeviation > worstOverallDeviation){
+                    worstOverallDeviation = segment.overallDeviation;
+                    worstOverallDeviationSegment = segment;
+                }
+            }
+            splitSegment(solution,worstOverallDeviationSegment);
+
+        }else if(currentSegCount == maxSegCount){
+            //combine segment
+            double worstEdgeValue = Double.MAX_VALUE;
+            Segment worstEdgeValueSegment = null;
+
+            for(Segment segment:solution.segments){
+                if(segment.edgeValue < worstEdgeValue){
+                    worstEdgeValue = segment.edgeValue;
+                    worstEdgeValueSegment = segment;
+                }
+            }
+            combineSegment(solution,worstEdgeValueSegment);
+        }else{
+            double p = Math.random();
+
+            if(p <= 0.5){
+                //combine
+                double worstEdgeValue = Double.MAX_VALUE;
+                Segment worstEdgeValueSegment = null;
+
+                for(Segment segment:solution.segments){
+                    if(segment.edgeValue < worstEdgeValue){
+                        worstEdgeValue = segment.edgeValue;
+                        worstEdgeValueSegment = segment;
+                    }
+                }
+                combineSegment(solution,worstEdgeValueSegment);
+            }else{
+                //split
+                double worstOverallDeviation = Double.MIN_VALUE;
+                Segment worstOverallDeviationSegment = null;
+
+                for(Segment segment:solution.segments){
+                    if(segment.overallDeviation > worstOverallDeviation){
+                        worstOverallDeviation = segment.overallDeviation;
+                        worstOverallDeviationSegment = segment;
+                    }
+                }
+                splitSegment(solution,worstOverallDeviationSegment);
+            }
+
+        }
+    }
+
+    public void splitSegment(Solution solution, Segment segment){
+
+    }
+
+    //combines the segment with the neighbouring segment with the lowest border contrast
+    public void combineSegment(Solution solution, Segment segment){
+        //Only one segment, no point in combining anything
+        if(solution.segments.length == 1){
+            return;
+        }
+        boolean[][][] genoType = solution.pixelEdges;
+
+        HashMap<Segment,Double> notConnectedNeighbours = new HashMap<>();
+        HashMap<Segment,ArrayList<PixelEdge>> border = new HashMap<>();   //determines the segment border
+
+        for(Pixel pixel: segment.pixels){
+            for(int i=0; i<pixel.edges.length; i++){
+                if(pixel.edges[i] != null && !genoType[pixel.row][pixel.column][i]){
+                    //we know that the pixels neighbour is not null (it has a neighbour) and it is also not connected to its neighbour which we want it to be
+
+                    Pixel connectingPixel = pixel.pixels[i];    //find the pixel we want to connect to
+
+                    //find the segment with connectingPixel in it. Add the segment to notConnectedNeighbours if it is not already there
+                    for(Segment neighbourSegment: solution.segments){
+                        if(neighbourSegment == segment){
+                            continue;
+                        }
+                        if(neighbourSegment.pixels.contains(connectingPixel)){
+                            //if neighboursegment does not exist add the edge distance, if it does add to the sum
+                            //Also add the bordering pixels to the border map
+                            if(!notConnectedNeighbours.containsKey(neighbourSegment)){
+                                notConnectedNeighbours.put(neighbourSegment,pixel.edges[i].distance);
+
+                                ArrayList<PixelEdge> borderPixels = new ArrayList<>();
+                                borderPixels.add(pixel.edges[i]);
+                                border.put(neighbourSegment,borderPixels);
+                            }else{
+                                //notConnectedNeighbours.put(neighbourSegment,notConnectedNeighbours.get(neighbourSegment)+pixel.edges[i].distance);
+                                border.get(neighbourSegment).add(pixel.edges[i]);
+                                notConnectedNeighbours.merge(neighbourSegment,pixel.edges[i].distance,Double::sum);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        Segment[] newSegmentList = new Segment[solution.segments.length - 1];
+
+        Segment lowestEdgeValueSegment = null;
+        Double lowestEdgeValue = Double.MAX_VALUE;
+
+        for(Segment segment1: notConnectedNeighbours.keySet()){
+
+            //To not favor small borders over large borders we divide the edgeValue by the size of the border
+            double averageContrast = notConnectedNeighbours.get(segment1) / (double) border.get(segment1).size();
+            if(lowestEdgeValue > averageContrast){
+                lowestEdgeValueSegment = segment1;
+                lowestEdgeValue = averageContrast;
+            }
+        }
+        //now we have the segments we want to merge and the border!
+
+        //create the new combined segment
+        Segment newSement = new Segment();
+
+        for(Pixel pixel: segment.pixels){
+            newSement.add(pixel);
+        }
+        for(Pixel pixel: lowestEdgeValueSegment.pixels){
+            newSement.add(pixel);
+        }
+
+        int segmentCounter = 0;
+        for(Segment segment1: solution.segments){
+            if(segment1 == segment || segment1 == lowestEdgeValueSegment){
+                continue;
+            }
+            newSegmentList[segmentCounter++] = segment1;
+        }
+
+        newSegmentList[newSegmentList.length - 1] = newSement;
+        //set the new segmentlist
+        solution.segments = newSegmentList;
+
+        //change the genotype so that the pixels are connected
+        for (PixelEdge borderPixels: border.get(lowestEdgeValueSegment)){
+            Pixel pixel1 = borderPixels.pixelB;
+            Pixel pixel2 = borderPixels.pixelA;
+
+            for(int i=0;i<pixel1.pixels.length;i++){
+                if(pixel1.pixels[i] == pixel2){
+                    genoType[pixel1.row][pixel1.column][i] = true;
+                    genoType[pixel2.row][pixel2.column][(i + 2) % 4] = true;
+                }
+            }
+        }
+
+        }
 
     //TODO: Crowding distance!
     public Solution[] crowdingDistanceSort(ArrayList<Solution> dominationEdge, int neededSolutions){
