@@ -333,6 +333,7 @@ public class GUI extends BorderPane {
 
     void moeaStopped() {
         start.setDisable(false);
+        stop.setDisable(true);
     }
 
     private int getPopulationSize() {
