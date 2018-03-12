@@ -19,6 +19,7 @@ public class ImageSegmentation {
     final Pixel[][] pixels;
     final double edgeWeight;
     final double overallDeviationWeight;
+    final boolean cielab;
     private final Comparator<Solution> weightedSumComparator;
     private final Comparator<Solution> overallDeviationComparator;
     private final Comparator<Solution> edgeValueComparator;
@@ -27,7 +28,7 @@ public class ImageSegmentation {
 
     int imagesWritten = 0;
 
-    ImageSegmentation(ImageParser imageParser, GUI gui, double edgeWeight, double overallDeviationWeight){
+    ImageSegmentation(ImageParser imageParser, GUI gui, double edgeWeight, double overallDeviationWeight, boolean cielab){
         this.imageParser = imageParser;
         this.gui = gui;
         this.edgeWeight = edgeWeight;
@@ -39,6 +40,7 @@ public class ImageSegmentation {
         this.edgeValueComparator = new edgeValueComparator();
         this.crowdingDistanceComparator = new crowdingDistanceComparator();
         this.pixelEdgeDistanceComparator = new rgbDistanceComparator();
+        this.cielab = cielab;
     }
 
 //    /**
@@ -293,15 +295,41 @@ public class ImageSegmentation {
         return solutions[bestIndex];
     }
 
-    //euclidean distance in RGB color space
-    public double euclideanRGB(Color Color1, Color Color2){
 
-        int differenceRed = Color1.getRed() - Color2.getRed();
-        int differenceGreen = Color1.getGreen() - Color2.getGreen();
-        int differenceBlue = Color1.getBlue() - Color2.getBlue();
+    private double euclideanDistance(Pixel pixel1, Pixel pixel2) {
+        if (cielab) {
+            double euclidean = 0;
+            for (int i = 0; i < pixel1.cielab.length; i ++) {
+                euclidean += Math.pow(pixel1.cielab[i] - pixel2.cielab[i], 2);
+            }
 
-        return Math.sqrt(Math.pow(differenceRed, 2) + Math.pow(differenceGreen, 2) + Math.pow(differenceBlue, 2));
+            return euclidean;
+        }
+        else {
+            int differenceRed = pixel1.color.getRed() - pixel2.color.getRed();
+            int differenceGreen = pixel1.color.getGreen() - pixel2.color.getGreen();
+            int differenceBlue = pixel1.color.getBlue() - pixel2.color.getBlue();
 
+            return Math.sqrt(Math.pow(differenceRed, 2) + Math.pow(differenceGreen, 2) + Math.pow(differenceBlue, 2));
+        }
+    }
+
+    private double euclideanDistance(Pixel pixel1, Segment segment) {
+        if (cielab) {
+            double euclidean = 0;
+            for (int i = 0; i < pixel1.cielab.length; i ++) {
+                euclidean += Math.pow(pixel1.cielab[i] - segment.getCielab()[i], 2);
+            }
+
+            return euclidean;
+        }
+        else {
+            int differenceRed = pixel1.color.getRed() - segment.getColor().getRed();
+            int differenceGreen = pixel1.color.getGreen() - segment.getColor().getGreen();
+            int differenceBlue = pixel1.color.getBlue() - segment.getColor().getBlue();
+
+            return Math.sqrt(Math.pow(differenceRed, 2) + Math.pow(differenceGreen, 2) + Math.pow(differenceBlue, 2));
+        }
     }
 
     //euclidean distance in pixel coordinate space
@@ -364,12 +392,12 @@ public class ImageSegmentation {
                 }
                 // Has neighbour below
                 if (i < imageParser.height - 1) {
-                    final PixelEdge pixelEdge = new PixelEdge(currentPixel, pixels[i+1][j], euclideanRGB(currentPixel.color, pixels[i+1][j].color));
+                    final PixelEdge pixelEdge = new PixelEdge(currentPixel, pixels[i+1][j], euclideanDistance(currentPixel, pixels[i+1][j]));
                     currentPixel.edges[2] = pixelEdge;
                 }
                 // Has neighbour right
                 if (j < imageParser.width - 1) {
-                    final PixelEdge pixelEdge = new PixelEdge(currentPixel, pixels[i][j+1], euclideanRGB(currentPixel.color, pixels[i][j+1].color));
+                    final PixelEdge pixelEdge = new PixelEdge(currentPixel, pixels[i][j+1], euclideanDistance(currentPixel, pixels[i][j+1]));
                     currentPixel.edges[1] = pixelEdge;
                 }
 
@@ -391,7 +419,7 @@ public class ImageSegmentation {
 
             for(Pixel pixel: segment.pixels){
                 //Calculate overall deviation (summed rbg distance from current pixel to centroid of segment)
-                double o = euclideanRGB(pixel.color, segment.getColor());
+                double o = euclideanDistance(pixel, segment);
                 overAllDeviation += o;
                 segment.overallDeviation += o;
                 //Calculate the edgeValues. Calculate rgb distance between the current pixel and all its neighbours

@@ -7,6 +7,8 @@ class Pixel {
     final Color color;
     final PixelEdge[] edges;
     final Pixel[] pixels;
+    final CIELab ci = new CIELab();
+    final float[] cielab;
 //    final ArrayList<PixelEdge> edgeList;
 
     /*
@@ -24,6 +26,7 @@ class Pixel {
         this.color = new Color(argb);
         edges = new PixelEdge[4];
         pixels = new Pixel[4];
+        cielab = ci.fromRGB(new float[]{color.getRed(), color.getGreen(), color.getBlue()});
 //        edgeList = new ArrayList<>();
 //        neighbours = new Pixel[4];
 //        neighbourDistances = new double[4];

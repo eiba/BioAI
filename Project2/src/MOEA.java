@@ -19,11 +19,12 @@ public class MOEA {
     private final double deviationWeight;
     private final boolean weightedSum;
     private final int numberOfTournaments;
+    private final boolean cielab;
 
     //Multi Objective Optimization Algorithm
     MOEA(GUI gui, String filename, int populationSize, int archiveSize, double mutationRate, double crossoverRate,
          int iterations, int minimumSegmentCount, int maximumSegmentCount, double edgeWeight, double deviationWeight,
-         boolean weightedSum, int numberOfTournaments){
+         boolean weightedSum, int numberOfTournaments, boolean cielab){
 
         this.gui = gui;
         this.filename = filename;
@@ -40,6 +41,7 @@ public class MOEA {
         this.deviationWeight = deviationWeight;
         this.weightedSum = weightedSum;
         this.numberOfTournaments = numberOfTournaments;
+        this.cielab = cielab;
 
         //Step 2: parse the image
         try {
@@ -52,7 +54,7 @@ public class MOEA {
     }
 
     Solution[] iterate(){
-        ImageSegmentation segmentation = new ImageSegmentation(img, gui, this.edgeWeight, this.deviationWeight);
+        ImageSegmentation segmentation = new ImageSegmentation(img, gui, this.edgeWeight, this.deviationWeight, cielab);
 
         //Step 3: Create Initial segments with Prim's algorithm
 

@@ -57,6 +57,7 @@ public class GUI extends BorderPane {
     TextField inputDeviation = new TextField("0.5");
     Text textTournament = new Text("Tournament size");
     TextField inputTournament = new TextField("3");
+    CheckBox cielab = new CheckBox("Use CIELab");
     Button start = new Button("Start");
     Button stop = new Button("Stop");
 
@@ -84,7 +85,7 @@ public class GUI extends BorderPane {
         optionBox.getChildren().addAll(textFilename, taskMenu, textMin, inputMin, textMax, inputMax,
                 textPopulation, inputPopulation, textIterations, inputIterations, textCrossover, inputCrossover,
                 textMutation, inputMutation, weightedSum, textEdge, inputEdge, textDeviation, inputDeviation, textTournament,
-                inputTournament);
+                inputTournament, cielab);
         optionBox.setAlignment(Pos.CENTER);
         setLeft(optionBox);
 
@@ -130,7 +131,8 @@ public class GUI extends BorderPane {
                     getEdgeWeight(),
                     getDeviationWeight(),
                     weightedSum.isSelected(),
-                    getNuberOfTournaments());
+                    getNuberOfTournaments(),
+                    cielab.isSelected());
 
             Thread mooaThread = new Thread(() -> {
                 Solution[] solutions = MOEA.iterate();

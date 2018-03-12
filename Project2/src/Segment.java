@@ -13,6 +13,8 @@ class Segment {
 //    final ArrayList<PixelEdge> edges = new ArrayList<>();
 
     // Segment color variables
+    private final CIELab ci = new CIELab();
+    private float[] cielab;
     private int alphaTotal, redTotal, greenTotal, blueTotal, pixelCount;
 
     Segment(Pixel root) {
@@ -61,6 +63,10 @@ class Segment {
 
     Color getColor() {
         return new Color(redTotal / pixelCount, greenTotal / pixelCount, blueTotal / pixelCount, alphaTotal / pixelCount);
+    }
+
+    float[] getCielab() {
+        return ci.fromRGB(new float[]{redTotal / pixelCount, greenTotal / pixelCount, blueTotal / pixelCount, alphaTotal / pixelCount});
     }
 
     boolean containsAllNeighbours(Pixel pixel) {
