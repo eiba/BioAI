@@ -311,6 +311,7 @@ public class ImageSegmentation {
             int differenceBlue = pixel1.color.getBlue() - pixel2.color.getBlue();
 
             return Math.sqrt(Math.pow(differenceRed, 2) + Math.pow(differenceGreen, 2) + Math.pow(differenceBlue, 2));
+//            return Math.sqrt(2* Math.pow(differenceRed, 2) + 4*Math.pow(differenceGreen, 2) + 3*Math.pow(differenceBlue, 2));
         }
     }
 
@@ -329,6 +330,7 @@ public class ImageSegmentation {
             int differenceBlue = pixel1.color.getBlue() - segment.getColor().getBlue();
 
             return Math.sqrt(Math.pow(differenceRed, 2) + Math.pow(differenceGreen, 2) + Math.pow(differenceBlue, 2));
+//            return Math.sqrt(2* Math.pow(differenceRed, 2) + 4*Math.pow(differenceGreen, 2) + 3*Math.pow(differenceBlue, 2));
         }
     }
 

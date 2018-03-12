@@ -153,6 +153,11 @@ public class MOEA {
                 break;
             }
             segmentation.writeImage(solutions[i]);
+            gui.out("Solution " + (i + 1));
+            gui.out("Segments: " + solutions[i].segments.length);
+            gui.out("Edge score: " + solutions[i].edgeValue);
+            gui.out("Deviation score: " + solutions[i].overallDeviation);
+            gui.out("Weighted sum: " + solutions[i].score);
         }
         gui.moeaStopped();
 
