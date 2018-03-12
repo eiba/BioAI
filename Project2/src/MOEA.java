@@ -154,6 +154,9 @@ public class MOEA {
             }
             segmentation.writeImage(solutions[i]);
             gui.out("Solution " + (i + 1));
+            if (!weightedSum) {
+                gui.out("Domination rank: " + solutions[i].dominationRank);
+            }
             gui.out("Segments: " + solutions[i].segments.length);
             gui.out("Edge score: " + solutions[i].edgeValue);
             gui.out("Deviation score: " + solutions[i].overallDeviation);
