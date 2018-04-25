@@ -5,8 +5,10 @@ public class Job {
     // [X][1] = Time Required
     // X is ordered by machine order required
     final int[][] requirements;
+    final int jobNumber;
 
-    Job(int[][] requirements) {
+    Job(int jobNumber, int[][] requirements) {
+        this.jobNumber = jobNumber;
         this.requirements = requirements;
     }
 
