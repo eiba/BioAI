@@ -47,13 +47,16 @@ public class JSSP extends Application {
         ba = new BA(jobs);
 
         //Dev
-        int[][] schedule = new int[][]{
-                {},
-                {},
-                {}
+        //1 2 3 4
+        //2 3 4 1
+        //3 4 1 2
+        int[][][] schedule = new int[][][]{
+                {{0, 10}, {10, 10}, {20, 10}, {30, 10}},
+                {{30, 10}, {0, 10}, {10, 10}, {20, 10}},
+                {{20, 10}, {30, 10}, {0, 10}, {10, 10}}
         };
         Solution solution = new Solution(schedule);
-//        gui.createGantt(solution, "Test Solution");
+        gui.createGantt(solution, "Test Solution");
 
     }
 
