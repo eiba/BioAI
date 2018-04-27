@@ -69,8 +69,8 @@ class ACO {
             path[machineNumber][jobNumber][0] = startTime;
             // Time required
             path[machineNumber][jobNumber][1] = timeRequired;
-            jobTime[jobNumber] += timeRequired;
-            machineTime[machineNumber] += timeRequired;
+            jobTime[jobNumber] = startTime + timeRequired;
+            machineTime[machineNumber] = startTime + timeRequired;
 
             // Adding next option
             if (visited[jobNumber] < machineCount) {
