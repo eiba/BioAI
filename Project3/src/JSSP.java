@@ -23,6 +23,8 @@ public class JSSP extends Application {
         MAKESPAN_VALUES.put("6", 979);
     }
 
+    final String task = "1";
+
     // Useful links
     // Ant colonies for TSP: https://www.youtube.com/watch?v=anY6hqBf7Pg
     // Bees algorithm and its application: https://www.youtube.com/watch?v=O9BYK-7hY0s
@@ -38,26 +40,22 @@ public class JSSP extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        // JavaFX Initialization
-        gui = new GUI(primaryStage);
 
         // JSSP Initialization
-        readProblem("1");
+        readProblem(task);
         aco = new ACO(jobs, machineCount, jobCount);
         ba = new BA(jobs);
+
+        // JavaFX Initialization
+        gui = new GUI(primaryStage, jobCount);
 
         //Dev
         //1 2 3 4
         //2 3 4 1
         //3 4 1 2
-        int[][][] schedule = new int[][][]{
-                {{0, 10}, {10, 10}, {20, 10}, {30, 10}},
-                {{30, 10}, {0, 10}, {10, 10}, {20, 10}},
-                {{20, 10}, {30, 10}, {0, 10}, {10, 10}}
-        };
         Solution solution = aco.solve(100, 1);
         if (solution != null) {
-            gui.createGantt(solution, "Test Solution");
+            gui.createGantt(solution, MAKESPAN_VALUES.get(task));
         }
         else {
             System.exit(0);

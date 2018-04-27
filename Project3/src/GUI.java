@@ -7,6 +7,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 /**
@@ -16,28 +17,28 @@ class GUI extends BorderPane {
 
     private final Stage primaryStage;
 
-    private final Color[] colors = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE, Color.AZURE, Color.PINK, Color.LIGHTGRAY};
+    private final Color[] colors = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE, Color.DARKBLUE, Color.PINK, Color.LIGHTGRAY, Color.DARKCYAN};
 
-    GUI(Stage primaryStage) {
+    GUI(Stage primaryStage, int jobCount) {
         super();
         this.primaryStage = primaryStage;
-        final Scene scene = new Scene(this, 800, 500);
+        final Scene scene = new Scene(this, 840, 100 + jobCount * 50);
         primaryStage.setScene(scene);
         primaryStage.setTitle("JSSP - Job Shop Scheduling Problem");
         primaryStage.show();
     }
 
-    void createGantt(Solution solution, String title) {
+    void createGantt(Solution solution, int optimal) {
 
         final int makespan = solution.getMakespan();
         final int[][][] schedule = solution.getSchedule();
         final int width = 800;
-        final double widthTranslate = width / makespan;
+        final double widthTranslate = (double) width / makespan;
         final int height = schedule.length * 50;
 
 //        final Stage stage = new Stage();
         final Pane pane = new Pane();
-        final ScrollPane scrollPane = new ScrollPane(pane);
+//        final ScrollPane scrollPane = new ScrollPane(pane);
 //        final Scene scene = new Scene(scrollPane, width + 15, height + 15);
 //        stage.setScene(scene);
 //        stage.setTitle(title);
@@ -56,8 +57,13 @@ class GUI extends BorderPane {
             }
         }
 
-        setCenter(scrollPane);
-        BorderPane.setAlignment(scrollPane, Pos.CENTER);
+        setCenter(pane);
+        pane.setStyle("-fx-border-color: gray");
+        BorderPane.setAlignment(pane, Pos.CENTER);
+        String rating = String.format("%.2f%%", (double) optimal / solution.getMakespan() * 100);
+        final Text text = new Text("Current makespan: " + solution.getMakespan() + ", optimal: " + optimal + ", rating: " + rating);
+        setBottom(text);
+        BorderPane.setAlignment(text, Pos.CENTER);
 //        stage.show();
     }
 
