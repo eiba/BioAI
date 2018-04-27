@@ -1,3 +1,4 @@
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
@@ -15,7 +16,7 @@ class GUI extends BorderPane {
 
     private final Stage primaryStage;
 
-    private final Color[] colors = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE};
+    private final Color[] colors = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE, Color.AZURE, Color.PINK, Color.LIGHTGRAY};
 
     GUI(Stage primaryStage) {
         super();
@@ -34,12 +35,12 @@ class GUI extends BorderPane {
         final double widthTranslate = width / makespan;
         final int height = schedule.length * 50;
 
-        final Stage stage = new Stage();
+//        final Stage stage = new Stage();
         final Pane pane = new Pane();
         final ScrollPane scrollPane = new ScrollPane(pane);
-        final Scene scene = new Scene(scrollPane, width + 15, height + 15);
-        stage.setScene(scene);
-        stage.setTitle(title);
+//        final Scene scene = new Scene(scrollPane, width + 15, height + 15);
+//        stage.setScene(scene);
+//        stage.setTitle(title);
 
         pane.setMaxSize(width, height);
         pane.setMinSize(width, height);
@@ -55,7 +56,9 @@ class GUI extends BorderPane {
             }
         }
 
-        stage.show();
+        setCenter(scrollPane);
+        BorderPane.setAlignment(scrollPane, Pos.CENTER);
+//        stage.show();
     }
 
     private class Task extends StackPane {

@@ -43,7 +43,7 @@ public class JSSP extends Application {
 
         // JSSP Initialization
         readProblem("1");
-        aco = new ACO(jobs);
+        aco = new ACO(jobs, machineCount, jobCount);
         ba = new BA(jobs);
 
         //Dev
@@ -55,8 +55,13 @@ public class JSSP extends Application {
                 {{30, 10}, {0, 10}, {10, 10}, {20, 10}},
                 {{20, 10}, {30, 10}, {0, 10}, {10, 10}}
         };
-        Solution solution = new Solution(schedule);
-        gui.createGantt(solution, "Test Solution");
+        Solution solution = aco.solve(100, 1);
+        if (solution != null) {
+            gui.createGantt(solution, "Test Solution");
+        }
+        else {
+            System.exit(0);
+        }
 
     }
 
