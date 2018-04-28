@@ -54,7 +54,7 @@ public class JSSP extends Application {
         ba = new BA(jobs, machineCount, jobCount);
 
         if (algorithm.equals("ACO")) {
-            Solution solution = aco.solve(100, 1000);
+            Solution solution = aco.solve(100, 100);
 
             if (solution != null) {
                 gui.createGantt(solution, MAKESPAN_VALUES.get(task));

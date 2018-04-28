@@ -35,7 +35,7 @@ class ACO {
             final Vertex neighbour = new Vertex(machineNumber, jobNumber, timeRequired);
             vertices.add(neighbour);
             root.edges[i] = neighbour;
-            root.pheromones[i] = 0.0;
+            root.pheromones[i] = 1.0;
         }
     }
 
@@ -174,7 +174,7 @@ class ACO {
                 current.edges = new Vertex[choices.size()];
                 current.pheromones = new double[current.edges.length];
                 choices.toArray(current.edges);
-                Arrays.fill(current.pheromones, 0.0);
+                Arrays.fill(current.pheromones, 1.0);
             }
         }
 
