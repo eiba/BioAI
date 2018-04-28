@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,13 +23,15 @@ class ACO {
         total = machineCount * jobCount;
 
         root = new Vertex(-1, -1, -1);
+        root.edges = new Vertex[jobCount];
+        root.pheromones = new double[jobCount];
         for (int i = 0; i < jobCount; i ++) {
             final int machineNumber = jobs[i].requirements[0][0];
             final int timeRequired = jobs[i].requirements[0][1];
             final int jobNumber = jobs[i].jobNumber;
             final Vertex neighbour = new Vertex(machineNumber, jobNumber, timeRequired);
-            root.edges.add(neighbour);
-            root.pheromones.add(1.0);
+            root.edges[i] = neighbour;
+            root.pheromones[i] = 1.0;
         }
     }
 
@@ -61,21 +64,18 @@ class ACO {
         final int[] machineTime = new int[machineCount];
         final int[][][] path = new int[machineCount][jobCount][2];
 
+        int makespan = 0;
+
         Vertex current = root;
         final ArrayList<Integer> vertexPath = new ArrayList<>();
-        final HashSet<Vertex> choices = new HashSet<>(root.edges);
+        final ArrayList<Vertex> choices = new ArrayList<>(Arrays.asList(root.edges));
 
         while (!choices.isEmpty()) {
 
             //Selecting a path
-            final int index = selectPath(current);
-            if (index == -1) {
-                System.out.println(vertexPath.size());
-                System.out.println(current.edges.size());
-                System.out.println(choices.size());
-            }
+            final int index = selectPath(current, jobTime, machineTime, makespan);
             vertexPath.add(index);
-            current = current.edges.get(index);
+            current = current.edges[index];
             choices.remove(current);
 
             final int machineNumber = current.machineNumber;
@@ -88,8 +88,12 @@ class ACO {
             // Time required
             path[machineNumber][jobNumber][1] = timeRequired;
             // Updating variables
-            jobTime[jobNumber] = startTime + timeRequired;
-            machineTime[machineNumber] = startTime + timeRequired;
+            final int time = startTime + timeRequired;
+            jobTime[jobNumber] = time;
+            machineTime[machineNumber] = time;
+            if (time > makespan) {
+                makespan = time;
+            }
 
             // Adding next option
             if (++ visited[jobNumber] < machineCount) {
@@ -99,11 +103,11 @@ class ACO {
             }
 
             // Updating outgoing edges
-            if (current.edges.size() == 0) {
-                for (Vertex choice : choices) {
-                    current.edges.add(choice);
-                    current.pheromones.add(1.0);
-                }
+            if (current.edges == null) {
+                current.edges = new Vertex[choices.size()];
+                current.pheromones = new double[current.edges.length];
+                choices.toArray(current.edges);
+                Arrays.fill(current.pheromones, 1.0);
             }
         }
 
@@ -115,18 +119,20 @@ class ACO {
      * @param current current vertex
      * @return index of the path selected
      */
-    private int selectPath(Vertex current) {
+    private int selectPath(Vertex current, int[] jobTime, int[] machineTime, int makespan) {
 
-        double a = 0, b = 1;
+        double a = 1, b = 1;
         double denominator = 0;
-        for (int i = 0; i < current.edges.size(); i ++) {
-            denominator += Math.pow(current.pheromones.get(i), a);
+        final double[] probability = new double[current.edges.length];
+        for (int i = 0; i < probability.length; i ++) {
+            probability[i] = Math.pow(current.pheromones[i], a) * Math.pow((heuristic(current.edges[i], jobTime, machineTime, makespan)), b);
+            denominator += probability[i];
         }
 
         double cumulativeProbability = 0;
         double threshold = Math.random();
-        for (int i = 0; i < current.edges.size(); i ++) {
-            cumulativeProbability += Math.pow(current.pheromones.get(i), a) / denominator;
+        for (int i = 0; i < current.edges.length; i ++) {
+            cumulativeProbability += probability[i] / denominator;
             if (threshold <= cumulativeProbability) {
                 return i;
             }
@@ -135,10 +141,15 @@ class ACO {
         return -1;
     }
 
+    private double heuristic(Vertex vertex, int[] jobTime, int[] machineTime, int makespan) {
+        final int startTime = Math.max(jobTime[vertex.jobNumber], machineTime[vertex.machineNumber]);
+        return 1.0 / Math.max(startTime + vertex.timeRequired, makespan);
+    }
+
     private class Vertex {
         private final int machineNumber, jobNumber, timeRequired;
-        private ArrayList<Vertex> edges = new ArrayList<>();
-        private ArrayList<Double> pheromones = new ArrayList<>();
+        private Vertex[] edges;
+        private double[] pheromones;
 
         private Vertex(int machineNumber, int jobNumber, int timeRequired) {
             this.machineNumber = machineNumber;
