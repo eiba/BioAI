@@ -23,7 +23,7 @@ public class JSSP extends Application {
         MAKESPAN_VALUES.put("6", 979);
     }
 
-    final String task = "1";
+    private final String task = "1";
 
     // Useful links
     // Ant colonies for TSP: https://www.youtube.com/watch?v=anY6hqBf7Pg
