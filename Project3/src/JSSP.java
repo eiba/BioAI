@@ -44,7 +44,7 @@ public class JSSP extends Application {
         // JSSP Initialization
         readProblem(task);
         aco = new ACO(jobs, machineCount, jobCount);
-        ba = new BA(jobs);
+        ba = new BA(jobs, machineCount, jobCount);
 
         // JavaFX Initialization
         gui = new GUI(primaryStage, jobCount);
