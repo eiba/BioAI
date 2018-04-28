@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -13,6 +13,8 @@ class ACO {
     private final Job[] jobs;
     private final int jobCount, machineCount, total;
     private final Vertex root;
+    private final ArrayList<Vertex> vertices = new ArrayList<>();
+    private AntSolution bestGlobalAntSolution = null;
 
     private final double evaporationRate = 0.1;
 
@@ -23,7 +25,7 @@ class ACO {
         total = machineCount * jobCount;
 
         root = new Vertex(-1, -1, -1);
-//        System.out.println("root: " + root);
+        vertices.add(root);
         root.edges = new Vertex[jobCount];
         root.pheromones = new double[jobCount];
         for (int i = 0; i < jobCount; i ++) {
@@ -31,8 +33,9 @@ class ACO {
             final int timeRequired = jobs[i].requirements[0][1];
             final int jobNumber = jobs[i].jobNumber;
             final Vertex neighbour = new Vertex(machineNumber, jobNumber, timeRequired);
+            vertices.add(neighbour);
             root.edges[i] = neighbour;
-            root.pheromones[i] = 1.0;
+            root.pheromones[i] = 0.0;
         }
     }
 
@@ -40,10 +43,11 @@ class ACO {
 
         for (int i = 0; i < iterations; i ++) {
             final ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-            final Solution[] solutions = new Solution[antCount];
+            final AntSolution[] solutions = new AntSolution[antCount];
             for (int j = 0; j < antCount; j ++) {
                 final int index = j;
-                pool.execute(() -> solutions[index] = findSolution());
+                solutions[index] = findSolution();
+//                pool.execute(() -> solutions[index] = findSolution());
             }
             pool.shutdown();
             try {
@@ -52,19 +56,64 @@ class ACO {
             catch (InterruptedException e) {
                 e.printStackTrace();
             }
-//            final ExecutorService pool2 = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-//            for (int j = 0; j < antCount; j ++) {
-//                final int index = j;
-//                pool.execute(updatePhermones(solutions[index]));
-//            }
-            return solutions[0];
+
+            int bestMakespan = Integer.MAX_VALUE;
+            AntSolution bestAntSolution = null;
+            for (int j = 0; j < antCount; j ++) {
+                final AntSolution antSolution = solutions[j];
+                if (bestAntSolution == null || bestMakespan > antSolution.makespan) {
+                    bestAntSolution = antSolution;
+                    bestMakespan = antSolution.makespan;
+                }
+            }
+
+            if (bestGlobalAntSolution == null || bestGlobalAntSolution.makespan > bestAntSolution.makespan) {
+                bestGlobalAntSolution = bestAntSolution;
+            }
+
+            final double delta = 1.0 / bestMakespan;
+
+            for (Vertex vertex : vertices) {
+                if (vertex.edges != null) {
+                    for (int j = 0; j < vertex.edges.length; j ++) {
+                        if (vertex.pheromones[j] == 0.0) {
+                            continue;
+                        }
+                        vertex.pheromones[j] *= (1.0 - evaporationRate);
+                    }
+                }
+            }
+            Vertex current = root;
+            for (int j = 0; j < total; j ++) {
+                final int index = bestAntSolution.path.get(j);
+                current.pheromones[index] += delta;
+                current = current.edges[index];
+            }
+
         }
 
-        return null;
+        return bestGlobalAntSolution.solution;
     }
 
+//    private void updatePheromones(Vertex current, int depth, ArrayList<Integer> path, double delta) {
+//
+//        if (current.edges == null) {
+//            return;
+//        }
+//
+//        for (int i = 0; i < current.edges.length; i ++) {
+//            // Best solution this iteration
+//            if (i == path.get(depth)) {
+//                current.pheromones[i] = (1.0 - evaporationRate) * current.pheromones[i] + delta;
+//            }
+//            else {
+//                current.pheromones[i] = (1.0 - evaporationRate) * current.pheromones[i];
+//            }
+//            updatePheromones(current.edges[i], depth + 1, path, delta);
+//        }
+//    }
 
-    private Solution findSolution() {
+    private AntSolution findSolution() {
 
         final int[] visited = new int[jobCount];
         final int[] jobTime = new int[jobCount];
@@ -80,6 +129,12 @@ class ACO {
 
             //Selecting a path
             final int index = selectPath(current, jobTime, machineTime, makespan);
+
+            //Fixing random exception
+            if (index == -1) {
+                return findSolution();
+            }
+
             vertexPath.add(index);
             current = current.edges[index];
             visited[current.jobNumber] ++;
@@ -111,17 +166,19 @@ class ACO {
                     if (visited[i] < machineCount) {
                         final int neighbourMachineNumber = jobs[i].requirements[visited[i]][0];
                         final int neighbourTimeRequired = jobs[i].requirements[visited[i]][1];
-                        choices.add(new Vertex(neighbourMachineNumber, jobs[i].jobNumber, neighbourTimeRequired));
+                        final Vertex neighbour = new Vertex(neighbourMachineNumber, jobs[i].jobNumber, neighbourTimeRequired);
+                        choices.add(neighbour);
+                        vertices.add(neighbour);
                     }
                 }
                 current.edges = new Vertex[choices.size()];
                 current.pheromones = new double[current.edges.length];
                 choices.toArray(current.edges);
-                Arrays.fill(current.pheromones, 1.0);
+                Arrays.fill(current.pheromones, 0.0);
             }
         }
 
-        return new Solution(path);
+        return new AntSolution(new Solution(path), vertexPath, makespan);
     }
 
     /**
@@ -129,7 +186,7 @@ class ACO {
      * @param current current vertex
      * @return index of the path selected
      */
-    private int selectPath(Vertex current, int[] jobTime, int[] machineTime, int makespan) {
+    private synchronized int selectPath(Vertex current, int[] jobTime, int[] machineTime, int makespan) {
 
         double a = 1, b = 1;
         double denominator = 0;
@@ -137,6 +194,11 @@ class ACO {
         for (int i = 0; i < probability.length; i ++) {
             probability[i] = Math.pow(current.pheromones[i], a) * Math.pow((heuristic(current.edges[i], jobTime, machineTime, makespan)), b);
             denominator += probability[i];
+        }
+
+        if (denominator == 0.0) {
+            Random random = new Random();
+            return random.nextInt(current.edges.length);
         }
 
         double cumulativeProbability = 0;
@@ -151,9 +213,10 @@ class ACO {
         return -1;
     }
 
-    private double heuristic(Vertex vertex, int[] jobTime, int[] machineTime, int makespan) {
+    private synchronized double heuristic(Vertex vertex, int[] jobTime, int[] machineTime, int makespan) {
         final int startTime = Math.max(jobTime[vertex.jobNumber], machineTime[vertex.machineNumber]);
-        return 1.0 / Math.max(startTime + vertex.timeRequired, makespan);
+        return 1.0;
+//        return 1.0 / Math.max(startTime + vertex.timeRequired, makespan);
     }
 
     private class Vertex {
@@ -168,18 +231,15 @@ class ACO {
         }
     }
 
-//    private class Edge implements Comparable<Edge> {
-//        private final Vertex current, neighbour;
-//        private double phermone = 1;
-//
-//        private Edge(Vertex current, Vertex neighbour) {
-//            this.current = current;
-//            this.neighbour = neighbour;
-//        }
-//
-//        @Override
-//        public int compareTo(Edge o) {
-//            return 0;
-//        }
-//    }
+    private class AntSolution {
+        private final Solution solution;
+        private final ArrayList<Integer> path;
+        private final int makespan;
+
+        private AntSolution(Solution solution, ArrayList<Integer> path, int makespan) {
+            this.solution = solution;
+            this.path = path;
+            this.makespan = makespan;
+        }
+    }
 }
