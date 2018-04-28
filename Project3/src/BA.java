@@ -34,7 +34,20 @@ class BA {
         return null;
     }
 
+    Solution[] initialSolutions(int count){
+        Solution[] solutions = new Solution[count];
+
+        for(int i=0; i<count;i++){
+            //randomly generate solution
+            
+        }
+
+        return null;
+    }
+
     private class Bee{
         //Bee class
+        public int fitness;
+        public Solution solution;
     }
 }
