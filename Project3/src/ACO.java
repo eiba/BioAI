@@ -23,6 +23,7 @@ class ACO {
         total = machineCount * jobCount;
 
         root = new Vertex(-1, -1, -1);
+//        System.out.println("root: " + root);
         root.edges = new Vertex[jobCount];
         root.pheromones = new double[jobCount];
         for (int i = 0; i < jobCount; i ++) {
@@ -51,11 +52,17 @@ class ACO {
             catch (InterruptedException e) {
                 e.printStackTrace();
             }
+//            final ExecutorService pool2 = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+//            for (int j = 0; j < antCount; j ++) {
+//                final int index = j;
+//                pool.execute(updatePhermones(solutions[index]));
+//            }
             return solutions[0];
         }
 
         return null;
     }
+
 
     private Solution findSolution() {
 
@@ -68,15 +75,14 @@ class ACO {
 
         Vertex current = root;
         final ArrayList<Integer> vertexPath = new ArrayList<>();
-        final ArrayList<Vertex> choices = new ArrayList<>(Arrays.asList(root.edges));
 
-        while (!choices.isEmpty()) {
+        while (vertexPath.size() != total) {
 
             //Selecting a path
             final int index = selectPath(current, jobTime, machineTime, makespan);
             vertexPath.add(index);
             current = current.edges[index];
-            choices.remove(current);
+            visited[current.jobNumber] ++;
 
             final int machineNumber = current.machineNumber;
             final int jobNumber = current.jobNumber;
@@ -95,15 +101,19 @@ class ACO {
                 makespan = time;
             }
 
-            // Adding next option
-            if (++ visited[jobNumber] < machineCount) {
-                final int neighbourMachineNumber = jobs[jobNumber].requirements[visited[jobNumber]][0];
-                final int neighbourTimeRequired = jobs[jobNumber].requirements[visited[jobNumber]][1];
-                choices.add(new Vertex(neighbourMachineNumber, jobNumber, neighbourTimeRequired));
-            }
 
-            // Updating outgoing edges
+            // New Vertex
             if (current.edges == null) {
+
+                // Adding next option
+                final ArrayList<Vertex> choices = new ArrayList<>();
+                for (int i = 0; i < jobCount; i ++) {
+                    if (visited[i] < machineCount) {
+                        final int neighbourMachineNumber = jobs[i].requirements[visited[i]][0];
+                        final int neighbourTimeRequired = jobs[i].requirements[visited[i]][1];
+                        choices.add(new Vertex(neighbourMachineNumber, jobs[i].jobNumber, neighbourTimeRequired));
+                    }
+                }
                 current.edges = new Vertex[choices.size()];
                 current.pheromones = new double[current.edges.length];
                 choices.toArray(current.edges);

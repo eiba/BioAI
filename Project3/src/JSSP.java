@@ -53,7 +53,7 @@ public class JSSP extends Application {
         //1 2 3 4
         //2 3 4 1
         //3 4 1 2
-        Solution solution = aco.solve(100, 1);
+        Solution solution = aco.solve(100, 100);
         if (solution != null) {
             gui.createGantt(solution, MAKESPAN_VALUES.get(task));
         }
