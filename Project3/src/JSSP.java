@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -11,17 +12,7 @@ import java.util.HashMap;
 public class JSSP extends Application {
 
     // JavaFX Variables
-
-    // Test Data Variables
-    private final static HashMap<String, Integer> MAKESPAN_VALUES = new HashMap<>();
-    static {
-        MAKESPAN_VALUES.put("1", 56);
-        MAKESPAN_VALUES.put("2", 1059);
-        MAKESPAN_VALUES.put("3", 1276);
-        MAKESPAN_VALUES.put("4", 1130);
-        MAKESPAN_VALUES.put("5", 1451);
-        MAKESPAN_VALUES.put("6", 979);
-    }
+    private boolean running = false;
 
     // Useful links
     // Ant colonies for TSP: https://www.youtube.com/watch?v=anY6hqBf7Pg
@@ -46,33 +37,61 @@ public class JSSP extends Application {
 //        run("ACO", "1");
     }
 
-    void run(String algorithm, String task) {
+    void run(String algorithm, String task, int iterations, int bestMakespan) {
+
+        running = true;
+        gui.startButton.setDisable(true);
+        gui.stopButton.setDisable(false);
 
         // JSSP Initialization
         readProblem(task);
-        aco = new ACO(jobs, machineCount, jobCount);
+        aco = new ACO(jobs, machineCount, jobCount, this, gui, bestMakespan);
         ba = new BA(jobs, machineCount, jobCount);
 
-        if (algorithm.equals("ACO")) {
-            Solution solution = aco.solve(100, 100);
+        gui.createStatGraph(iterations);
 
-            if (solution != null) {
-                gui.createGantt(solution, MAKESPAN_VALUES.get(task));
-            }
-            else {
-                System.exit(0);
-            }
+        if (algorithm.equals("ACO")) {
+            Thread acoThread = new Thread(() -> {
+                final Solution solution = aco.solve(iterations, 100);
+                if (solution != null) {
+                    Platform.runLater(() -> {
+                        gui.startButton.setDisable(false);
+                        gui.stopButton.setDisable(true);
+                        gui.createGantt(solution, bestMakespan);
+                    });
+                }
+                else {
+                    System.exit(0);
+                }
+            });
+            acoThread.start();
         }
         else {
-            Solution solution = ba.solve();
+            Thread baThread = new Thread(() -> {
+                Solution solution = ba.solve();
 
-            if (solution != null) {
-                gui.createGantt(solution, MAKESPAN_VALUES.get(task));
-            }
-            else {
-                System.exit(0);
-            }
+                if (solution != null) {
+                    Platform.runLater(() -> {
+                        gui.createGantt(solution, bestMakespan);
+                    });
+                }
+                else {
+                    System.exit(0);
+                }
+            });
+            baThread.start();
         }
+
+    }
+
+    void stopRunning() {
+        running = false;
+        gui.startButton.setDisable(false);
+        gui.stopButton.setDisable(true);
+    }
+
+    synchronized boolean getRunning() {
+        return running;
     }
 
     private void readProblem(String task) {
@@ -101,6 +120,11 @@ public class JSSP extends Application {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void stop(){
+        System.exit(0);
     }
 
     public static void main(String[] args) {

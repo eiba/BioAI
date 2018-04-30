@@ -10,18 +10,23 @@ import java.util.concurrent.TimeUnit;
  */
 class ACO {
 
+    private final JSSP jssp;
+    private final GUI gui;
     private final Job[] jobs;
-    private final int jobCount, machineCount, total;
+    private final int jobCount, machineCount, total, bestPossibleMakespan;
     private final Vertex root;
     private final ArrayList<Vertex> vertices = new ArrayList<>();
     private AntSolution bestGlobalAntSolution = null;
 
     private final double evaporationRate = 0.1;
 
-    ACO(Job[] jobs, int machineCount, int jobCount) {
+    ACO(Job[] jobs, int machineCount, int jobCount, JSSP jssp, GUI gui, int bestPossibleMakespan) {
         this.jobs = jobs;
         this.machineCount = machineCount;
         this.jobCount = jobCount;
+        this.jssp = jssp;
+        this.gui = gui;
+        this.bestPossibleMakespan = bestPossibleMakespan;
         total = machineCount * jobCount;
 
         root = new Vertex(-1, -1, -1);
@@ -42,12 +47,17 @@ class ACO {
     Solution solve(int iterations, int antCount) {
 
         for (int i = 0; i < iterations; i ++) {
+
+            if (!jssp.getRunning()) {
+                return bestGlobalAntSolution.solution;
+            }
+
             final ExecutorService pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
             final AntSolution[] solutions = new AntSolution[antCount];
             for (int j = 0; j < antCount; j ++) {
                 final int index = j;
-                solutions[index] = findSolution();
-//                pool.execute(() -> solutions[index] = findSolution());
+//                solutions[index] = findSolution();
+                pool.execute(() -> solutions[index] = findSolution());
             }
             pool.shutdown();
             try {
@@ -69,11 +79,20 @@ class ACO {
 
             if (bestGlobalAntSolution == null || bestGlobalAntSolution.makespan > bestAntSolution.makespan) {
                 bestGlobalAntSolution = bestAntSolution;
+                final double percent = (double) bestPossibleMakespan / bestMakespan;
+                if (percent >= 0.9) {
+                    //return bestGlobalAntSolution.solution;
+                }
+                gui.setBestSolution(bestMakespan, percent);
             }
 
-            final double delta = 1.0 / bestMakespan;
+//            final double delta = 1.0 / bestMakespan;
+            final double delta = 1.0;
 
             for (Vertex vertex : vertices) {
+                if (vertex == null) {
+                    System.out.println("NULL");
+                }
                 if (vertex.edges != null) {
                     for (int j = 0; j < vertex.edges.length; j ++) {
                         if (vertex.pheromones[j] == 0.0) {
@@ -90,6 +109,7 @@ class ACO {
                 current = current.edges[index];
             }
 
+            gui.addIteration((double) bestPossibleMakespan / bestMakespan);
         }
 
         return bestGlobalAntSolution.solution;
@@ -168,7 +188,7 @@ class ACO {
                         final int neighbourTimeRequired = jobs[i].requirements[visited[i]][1];
                         final Vertex neighbour = new Vertex(neighbourMachineNumber, jobs[i].jobNumber, neighbourTimeRequired);
                         choices.add(neighbour);
-                        vertices.add(neighbour);
+                        addVertex(neighbour);
                     }
                 }
                 current.edges = new Vertex[choices.size()];
@@ -213,16 +233,27 @@ class ACO {
         return -1;
     }
 
-    private synchronized double heuristic(Vertex vertex, int[] jobTime, int[] machineTime, int makespan) {
-        final int startTime = Math.max(jobTime[vertex.jobNumber], machineTime[vertex.machineNumber]);
-        return 1.0;
-//        return 1.0 / Math.max(startTime + vertex.timeRequired, makespan);
+    private synchronized void addVertex(Vertex vertex) {
+        vertices.add(vertex);
     }
 
-    private class Vertex {
-        private final int machineNumber, jobNumber, timeRequired;
-        private Vertex[] edges;
-        private double[] pheromones;
+    private synchronized double heuristic(Vertex vertex, int[] jobTime, int[] machineTime, int makespan) {
+        double heuristic = 1.0;
+        final int startTime = Math.max(jobTime[vertex.jobNumber], machineTime[vertex.machineNumber]);
+        heuristic =  1.0 / Math.max(startTime + vertex.timeRequired, makespan);
+
+        heuristic = makespan - (startTime + vertex.timeRequired);
+        if (heuristic < 0.0) {
+            return 1;
+        }
+
+        return heuristic;
+    }
+
+    class Vertex {
+         final int machineNumber, jobNumber, timeRequired;
+         Vertex[] edges;
+         double[] pheromones;
 
         private Vertex(int machineNumber, int jobNumber, int timeRequired) {
             this.machineNumber = machineNumber;
@@ -231,10 +262,10 @@ class ACO {
         }
     }
 
-    private class AntSolution {
-        private final Solution solution;
-        private final ArrayList<Integer> path;
-        private final int makespan;
+    class AntSolution {
+         final Solution solution;
+         final ArrayList<Integer> path;
+         final int makespan;
 
         private AntSolution(Solution solution, ArrayList<Integer> path, int makespan) {
             this.solution = solution;
