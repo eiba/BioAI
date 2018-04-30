@@ -52,7 +52,7 @@ public class JSSP extends Application {
 
         if (algorithm.equals("ACO")) {
             Thread acoThread = new Thread(() -> {
-                final Solution solution = aco.solve(iterations, 100);
+                final Solution solution = aco.solve(iterations, 10);
                 if (solution != null) {
                     Platform.runLater(() -> {
                         gui.startButton.setDisable(false);

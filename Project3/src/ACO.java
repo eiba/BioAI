@@ -86,13 +86,10 @@ class ACO {
                 gui.setBestSolution(bestMakespan, percent);
             }
 
-//            final double delta = 1.0 / bestMakespan;
-            final double delta = 1.0;
+            final double delta = 1.0 / bestMakespan;
+//            final double delta = 1.0;
 
             for (Vertex vertex : vertices) {
-                if (vertex == null) {
-                    System.out.println("NULL");
-                }
                 if (vertex.edges != null) {
                     for (int j = 0; j < vertex.edges.length; j ++) {
                         if (vertex.pheromones[j] == 0.0) {
@@ -238,16 +235,17 @@ class ACO {
     }
 
     private synchronized double heuristic(Vertex vertex, int[] jobTime, int[] machineTime, int makespan) {
-        double heuristic = 1.0;
+//        double heuristic;
         final int startTime = Math.max(jobTime[vertex.jobNumber], machineTime[vertex.machineNumber]);
-        heuristic =  1.0 / Math.max(startTime + vertex.timeRequired, makespan);
+//        heuristic =  1.0 / Math.max(startTime + vertex.timeRequired, makespan);
+        return 1.0 / (startTime + vertex.timeRequired);
 
-        heuristic = makespan - (startTime + vertex.timeRequired);
-        if (heuristic < 0.0) {
-            return 1;
-        }
+//        heuristic = makespan - (startTime + vertex.timeRequired);
+//        if (heuristic < 0.0) {
+//            return 1;
+//        }
 
-        return heuristic;
+//        return heuristic;
     }
 
     class Vertex {
