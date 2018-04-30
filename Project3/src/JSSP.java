@@ -65,7 +65,14 @@ public class JSSP extends Application {
             acoThread.start();
         }
         else {
+            Solution solution = ba.solve();
 
+            if (solution != null) {
+                gui.createGantt(solution, MAKESPAN_VALUES.get(task));
+            }
+            else {
+                System.exit(0);
+            }
         }
 
     }
