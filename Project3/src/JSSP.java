@@ -55,6 +55,8 @@ public class JSSP extends Application {
                 final Solution solution = aco.solve(iterations, 100);
                 if (solution != null) {
                     Platform.runLater(() -> {
+                        gui.startButton.setDisable(false);
+                        gui.stopButton.setDisable(true);
                         gui.createGantt(solution, bestMakespan);
                     });
                 }
@@ -65,14 +67,19 @@ public class JSSP extends Application {
             acoThread.start();
         }
         else {
-            Solution solution = ba.solve();
+            Thread baThread = new Thread(() -> {
+                Solution solution = ba.solve();
 
-            if (solution != null) {
-                gui.createGantt(solution, MAKESPAN_VALUES.get(task));
-            }
-            else {
-                System.exit(0);
-            }
+                if (solution != null) {
+                    Platform.runLater(() -> {
+                        gui.createGantt(solution, bestMakespan);
+                    });
+                }
+                else {
+                    System.exit(0);
+                }
+            });
+            baThread.start();
         }
 
     }
