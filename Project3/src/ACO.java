@@ -15,13 +15,13 @@ class ACO {
     private final Job[] jobs;
     private final int jobCount, machineCount, total, bestPossibleMakespan;
     private final Vertex root;
-    private final ArrayList<Vertex> vertices = new ArrayList<>();
+//    private final ArrayList<Vertex> vertices = new ArrayList<>();
     private AntSolution bestGlobalAntSolution = null;
 
-    private final double evaporationRate = 0.05;
-    private final double p = 1 - evaporationRate;
+    private final double evaporationRate = 0.1;
+    private final double p = 1.0 - evaporationRate;
 
-    double tMax = 1.0, tMin;
+    double tMax = 0.0, tMin;
     final double pDec, tMinBase;
 
     ACO(Job[] jobs, int machineCount, int jobCount, JSSP jssp, GUI gui, int bestPossibleMakespan) {
@@ -37,7 +37,7 @@ class ACO {
         tMinBase = (1 - pDec) / (jobCount - 1) * pDec;
 
         root = new Vertex(-1, -1, -1);
-        vertices.add(root);
+//        vertices.add(root);
         root.edges = new Vertex[jobCount];
         root.pheromones = new double[jobCount];
         for (int i = 0; i < jobCount; i ++) {
@@ -45,13 +45,15 @@ class ACO {
             final int timeRequired = jobs[i].requirements[0][1];
             final int jobNumber = jobs[i].jobNumber;
             final Vertex neighbour = new Vertex(machineNumber, jobNumber, timeRequired);
-            vertices.add(neighbour);
+//            vertices.add(neighbour);
             root.edges[i] = neighbour;
             root.pheromones[i] = tMax;
         }
     }
 
     Solution solve(int iterations, int antCount) {
+
+        int count = 0;
 
         for (int i = 0; i < iterations; i ++) {
 
@@ -93,42 +95,61 @@ class ACO {
                 gui.setBestSolution(bestMakespan, percent);
             }
 
-            final double delta = 1.0 / bestGlobalAntSolution.makespan;
-            tMax = 1.0 / evaporationRate * 1 / (bestGlobalAntSolution.makespan);
-            tMin = tMax * tMinBase;
+//            final double delta = 1.0 / bestAntSolution.makespan;
+            final double delta = 1.0;
 //            System.out.println(delta);
-//            System.out.println(tMax + ", " + tMin);
-//            final double delta = 1.0;
+            tMax = 1.0 / evaporationRate * 1 / (bestAntSolution.makespan);
+            tMin = tMax * tMinBase;
+            System.out.println(tMax + ", " + tMin);
 
-            for (Vertex vertex : vertices) {
-                if (vertex.edges != null) {
-                    for (int j = 0; j < vertex.edges.length; j ++) {
-                        vertex.pheromones[j] *= p;
-                        if (vertex.pheromones[j] < tMin) {
-                            vertex.pheromones[j] = tMin;
-                        }
-                        else if (vertex.pheromones[j] > tMax) {
-                            vertex.pheromones[j] = tMax;
-                        }
-                    }
-                }
-            }
+//            for (Vertex vertex : vertices) {
+//                if (vertex.edges != null) {
+//                    for (int j = 0; j < vertex.edges.length; j ++) {
+//                        vertex.pheromones[j] *= p;
+//                        if (vertex.pheromones[j] < tMin) {
+//                            vertex.pheromones[j] = tMin;
+//                        }
+//                        else if (vertex.pheromones[j] > tMax) {
+//                            vertex.pheromones[j] = tMax;
+//                        }
+//                    }
+//                }
+//            }
             Vertex current = root;
             for (int j = 0; j < total; j ++) {
-                final int index = bestGlobalAntSolution.path.get(j);
-                current.pheromones[index] += delta;
-                if (current.pheromones[index] < tMin) {
-                    current.pheromones[index] = tMin;
+                if (!current.visited) {
+                    current.visited = true;
+                    count ++;
                 }
-                else if (current.pheromones[index] > tMax) {
-                    current.pheromones[index] = tMax;
+                final int index = bestAntSolution.path.get(j);
+                for (int c = 0; c < current.pheromones.length; c ++) {
+                    current.pheromones[c] *= p;
+                    if (c == index) {
+                        current.pheromones[c] += delta;
+                    }
+                    if (current.pheromones[c] < tMin) {
+                        current.pheromones[c] = tMin;
+                    }
+                    else if (current.pheromones[c] > tMax) {
+                        current.pheromones[c] = tMax;
+                    }
                 }
+                for (double pheromone : current.pheromones) {
+//                    System.out.println(pheromone);
+                }
+//                System.out.println();
+//            System.out.println("> " + current.pheromones.length);
+//                System.out.println(tMax + ", " + tMin);
                 current = current.edges[index];
             }
+//            System.out.println(bestGlobalAntSolution.path.size());
 
             gui.addIteration((double) bestPossibleMakespan / bestMakespan);
+//            break;
         }
 
+        System.out.println(count);
+//        System.out.println(vertices.size());
         return bestGlobalAntSolution.solution;
     }
 
@@ -169,7 +190,7 @@ class ACO {
 
             //Fixing random exception
             if (index == -1) {
-                return findSolution();
+//                return findSolution();
             }
 
             vertexPath.add(index);
@@ -226,17 +247,21 @@ class ACO {
     private synchronized int selectPath(Vertex current, int[] jobTime, int[] machineTime, int makespan) {
 
         double a = 1.0, b = 1.0;
-        double denominator = 0;
+        double denominator = 0.0;
         final double[] probability = new double[current.edges.length];
-        for (int i = 0; i < probability.length; i ++) {
-            probability[i] = Math.pow(current.pheromones[i], a) * Math.pow((heuristic(current.edges[i], jobTime, machineTime, makespan)), b);
-            denominator += probability[i];
-        }
 
-//        if (denominator == 0.0) {
-//            Random random = new Random();
-//            return random.nextInt(current.edges.length);
-//        }
+        if (!current.visited) {
+            for (int i = 0; i < probability.length; i ++) {
+                probability[i] = heuristic(current.edges[i], jobTime, machineTime, makespan);
+                denominator += probability[i];
+            }
+        }
+        else {
+            for (int i = 0; i < probability.length; i ++) {
+                probability[i] = Math.pow(current.pheromones[i], a) * Math.pow((heuristic(current.edges[i], jobTime, machineTime, makespan)), b);
+                denominator += probability[i];
+            }
+        }
 
         double cumulativeProbability = 0;
         double threshold = Math.random();
@@ -251,14 +276,14 @@ class ACO {
     }
 
     private synchronized void addVertex(Vertex vertex) {
-        vertices.add(vertex);
+//        vertices.add(vertex);
     }
 
     private synchronized double heuristic(Vertex vertex, int[] jobTime, int[] machineTime, int makespan) {
 //        double heuristic;
         final int startTime = Math.max(jobTime[vertex.jobNumber], machineTime[vertex.machineNumber]);
-//        heuristic =  1.0 / Math.max(startTime + vertex.timeRequired, makespan);
-        return 1.0 / (startTime + vertex.timeRequired);
+        return  1.0 / Math.max(startTime + vertex.timeRequired, makespan);
+//        return 1.0 / (startTime + vertex.timeRequired);
 
 //        heuristic = makespan - (startTime + vertex.timeRequired);
 //        if (heuristic < 0.0) {
@@ -272,6 +297,7 @@ class ACO {
          final int machineNumber, jobNumber, timeRequired;
          Vertex[] edges;
          double[] pheromones;
+         boolean visited = false;
 
         private Vertex(int machineNumber, int jobNumber, int timeRequired) {
             this.machineNumber = machineNumber;

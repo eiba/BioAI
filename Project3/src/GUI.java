@@ -82,7 +82,7 @@ class GUI extends BorderPane {
 
 
         algorithmBox.setValue("ACO");
-        taskBox.setValue("1");
+        taskBox.setValue("5");
 
         HBox menu = new HBox(10);
         menu.setAlignment(Pos.CENTER);
