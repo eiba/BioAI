@@ -238,14 +238,14 @@ class ACO {
     }
 
     private synchronized double heuristic(Vertex vertex, int[] jobTime, int[] machineTime, int makespan) {
-//        double heuristic = 1.0;
+
         final int startTime = Math.max(jobTime[vertex.jobNumber], machineTime[vertex.machineNumber]);
 //        heuristic =  1.0 / Math.max(startTime + vertex.timeRequired, makespan);
 
         double heuristic = makespan - (startTime + vertex.timeRequired);
         if (heuristic < 0.0) {
             return 0;
-        }
+            }
 
         return heuristic;
     }
