@@ -1,196 +1,184 @@
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
 
 /**
- * Bees Algorithm
+ * Bees algorithm, the Stigen way
  */
-class BA {
 
+public class BA {
+    private final JSSP jssp;
+    private final GUI gui;
     private final Job[] jobs;
-    private final int machineCount;
-    private final int jobCount;
-    private final Random random;
-    private final Comparator<TimeSlot> timeSlotComparator;
+    private final int jobCount, machineCount, total, bestPossibleMakespan;
+    private final BA.Vertex root;
+    private final ArrayList<BA.Vertex> vertices = new ArrayList<>();
 
-    BA(Job[] jobs, int machineCount, int jobCount) {
-        this.machineCount = machineCount;
+    BA(Job[] jobs, int machineCount, int jobCount, JSSP jssp, GUI gui, int bestPossibleMakespan){
         this.jobs = jobs;
+        this.machineCount = machineCount;
         this.jobCount = jobCount;
-        this.random = new Random();
-        this.timeSlotComparator = new timeSlotComparator();
+        this.jssp = jssp;
+        this.gui = gui;
+        this.bestPossibleMakespan = bestPossibleMakespan;
+        this.total = machineCount * jobCount;
 
-        //initialize some shit
+        root = new BA.Vertex(-1, -1, -1);
+        vertices.add(root);
+        root.edges = new BA.Vertex[jobCount];
+        //root.pheromones = new double[jobCount];
+        for (int i = 0; i < jobCount; i ++) {
+            final int machineNumber = jobs[i].requirements[0][0];
+            final int timeRequired = jobs[i].requirements[0][1];
+            final int jobNumber = jobs[i].jobNumber;
+            final BA.Vertex neighbour = new BA.Vertex(machineNumber, jobNumber, timeRequired);
+            vertices.add(neighbour);
+            root.edges[i] = neighbour;
+            //root.pheromones[i] = tMax;
+        }
     }
 
-    Solution solve(/*int iterations,
-                   int scoutCount,
-                   int eliteSiteCount,
-                   int bestSiteCount,
-                   Bee[] eliteSiteBees,
-                   Bee[] bestSitesBees,
-                   int initalNeighbourhoodSize,
-                   int stagnationCycleLimit*/) {
+    Solution solve(int iterations, int beeCount) {
 
-        Solution[] initialSolutions = initialSolutions(1);
-        //Solve this shit yo
+        Solution solution = findSolution().solution;
+        /*for (int i= 0; i<beeCount;i++){
 
-        System.out.println(initialSolutions[0].getMakespan());
-        return initialSolutions[0];
+        }*/
+
+        return solution;
     }
 
-    /*Solution[] initialSolutions(int count){
-        Solution[] solutions = new Solution[count];
-        int[][][] schedule = new int[machineCount][jobCount][2];
-        int[] machineTimes = new int[machineCount];
-        int[] jobTimes = new int[jobCount];
+        private BeeSolution findSolution() {
 
-        for(int i=0; i<count;i++){
-            //randomly generate solution
+        final int[] visited = new int[jobCount];
+        final int[] jobTime = new int[jobCount];
+        final int[] machineTime = new int[machineCount];
+        final int[][][] path = new int[machineCount][jobCount][2];
 
-            int randomJobIndex = random.nextInt(jobs.length);
-            Job randomJob = jobs[randomJobIndex];
+        int makespan = 0;
 
-            for(int j=0;j<randomJob.requirements.length;j++){
-                int machineNumber = randomJob.requirements[j][0];
-                int timeRequired= randomJob.requirements[j][1];
+        BA.Vertex current = root;
+        final ArrayList<Integer> vertexPath = new ArrayList<>();
 
-                int currentMachineTime = machineTimes[machineNumber];
-                int currentJobTime = jobTimes[randomJobIndex];
+        while (vertexPath.size() != total) {
 
-                if(currentMachineTime >= currentJobTime){
-                    jobTimes[randomJobIndex] = currentMachineTime + timeRequired;
-                    machineTimes[machineNumber] += timeRequired;
+            //Selecting a path
+            final int index = selectPath(current, jobTime, machineTime, makespan);
 
-                    schedule[machineNumber][randomJobIndex][0] = currentMachineTime;
-                    schedule[machineNumber][randomJobIndex][1] = timeRequired;
-                }
-                else{   //currentMachineTime < currentJobTime
-                    jobTimes[randomJobIndex] += timeRequired;
-                    machineTimes[machineNumber] = currentJobTime + timeRequired;
-
-                    schedule[machineNumber][randomJobIndex][0] = currentJobTime;
-                    schedule[machineNumber][randomJobIndex][1] = timeRequired;
-                }
-
-                //machineTimes[machineNumber] += currentJobTime;
+            //Fixing random exception
+            if (index == -1) {
+                return findSolution();
             }
 
-        }
+            vertexPath.add(index);
+            current = current.edges[index];
+            visited[current.jobNumber] ++;
 
-        return null;
-    }*/
-    Solution[] initialSolutions(int count){
-        Solution[] solutions = new Solution[count];
-        int[][][] schedule = new int[machineCount][jobCount][2];
-        int[] jobTimes = new int[jobCount];
+            final int machineNumber = current.machineNumber;
+            final int jobNumber = current.jobNumber;
+            final int timeRequired = current.timeRequired;
 
-        HashMap<Integer,ArrayList<TimeSlot>> timeSlotMap = new HashMap<>();
-
-        for(int i=0; i<machineCount;i++){
-            ArrayList<TimeSlot> timeSlots = new ArrayList<>();
-            timeSlots.add(new TimeSlot(i,0,Integer.MAX_VALUE));     //add initial timeslot
-            timeSlotMap.put(i,timeSlots);
-        }
-
-        for(int i=0; i<count;i++) {
-            ArrayList<Job> jobArray = new ArrayList(Arrays.asList(jobs));   //Parse to arraylist to make it easier to pick and remove random elements
-
-            while (!jobArray.isEmpty()){
-                int randomJobIndex = random.nextInt(jobArray.size());
-                Job randomJob = jobArray.remove(randomJobIndex);
-
-                for(int j=0;j<randomJob.requirements.length;j++) {
-                    int machineNumber = randomJob.requirements[j][0];   //required machine by the job
-                    int timeRequired = randomJob.requirements[j][1];
-
-                    ArrayList<TimeSlot> timeSlots = timeSlotMap.get(machineNumber); //get the available timeslots for the machine
-
-                    TimeSlot chosenTimeSlot = null;
-                    int chosenTimeSlotIndex = 0;
-                    for(int k=0; k<timeSlots.size();k++){
-                        TimeSlot timeSlot = timeSlots.get(k);
-
-                        if(timeSlot.startTime + timeSlot.totalTime >= jobTimes[randomJobIndex] + timeRequired){
-                            chosenTimeSlot = timeSlot;
-                            chosenTimeSlotIndex = k;
-                            break;
-                        }
-                    }
-                    //jobTimes[randomJobIndex] = chosenTimeSlot.startTime + timeRequired;
-                    schedule[machineNumber][randomJobIndex][0] = chosenTimeSlot.startTime;
-                    schedule[machineNumber][randomJobIndex][1] = timeRequired;
-
-                    TimeSlot nextTimeSlot;
-                    if(chosenTimeSlot.totalTime == Integer.MAX_VALUE){
-                        continue;   //let it stay null if there is no next timeslot
-                    }else{
-                        nextTimeSlot = timeSlotMap.get(machineNumber).get(chosenTimeSlotIndex+1);
-                    }
-
-                    if(nextTimeSlot == null){   //no timeslot after the chosen one
-                        TimeSlot newTimeSlot = new TimeSlot(machineNumber,jobTimes[randomJobIndex] + timeRequired,Integer.MAX_VALUE);
-                        timeSlotMap.get(machineNumber).add(newTimeSlot);
-                    }
-                    else{
-                        System.out.println("here");
-                        TimeSlot newTimeSlot = new TimeSlot(machineNumber,chosenTimeSlot.startTime + timeRequired,nextTimeSlot.startTime - (chosenTimeSlot.startTime + timeRequired));
-                        if(newTimeSlot.totalTime != 0){
-                            timeSlotMap.get(machineNumber).add(newTimeSlot);
-                        }
-                    }
-
-                    timeSlotMap.get(machineNumber).remove(chosenTimeSlotIndex);
-                    timeSlotMap.get(machineNumber).sort(timeSlotComparator);
-                }
-
+            // Start time
+            final int startTime = Math.max(jobTime[jobNumber], machineTime[machineNumber]);
+            path[machineNumber][jobNumber][0] = startTime;
+            // Time required
+            path[machineNumber][jobNumber][1] = timeRequired;
+            // Updating variables
+            final int time = startTime + timeRequired;
+            jobTime[jobNumber] = time;
+            machineTime[machineNumber] = time;
+            if (time > makespan) {
+                makespan = time;
             }
-            solutions[i] = new Solution(schedule);
+
+
+            // New Vertex
+            if (current.edges == null) {
+
+                // Adding next option
+                final ArrayList<BA.Vertex> choices = new ArrayList<>();
+                for (int i = 0; i < jobCount; i ++) {
+                    if (visited[i] < machineCount) {
+                        final int neighbourMachineNumber = jobs[i].requirements[visited[i]][0];
+                        final int neighbourTimeRequired = jobs[i].requirements[visited[i]][1];
+                        final BA.Vertex neighbour = new BA.Vertex(neighbourMachineNumber, jobs[i].jobNumber, neighbourTimeRequired);
+                        choices.add(neighbour);
+                        addVertex(neighbour);
+                    }
+                }
+                current.edges = new BA.Vertex[choices.size()];
+                //current.pheromones = new double[current.edges.length];
+                choices.toArray(current.edges);
+                //Arrays.fill(current.pheromones, tMax);
+            }
         }
-        System.out.println("Done");
-        return solutions;
+
+        return new BeeSolution(new Solution(path), vertexPath, makespan);
     }
 
-    private class Bee{
-        //Bee class
-        public int fitness;
-        public Solution solution;
+    private synchronized int selectPath(BA.Vertex current, int[] jobTime, int[] machineTime, int makespan) {
+
+        double a = 1.0, b = 1.0;
+        double denominator = 0;
+        final double[] probability = new double[current.edges.length];
+        for (int i = 0; i < probability.length; i ++) {
+            probability[i] = /*Math.pow(current.pheromones[i], a) */ Math.pow((heuristic(current.edges[i], jobTime, machineTime, makespan)), b);
+            denominator += probability[i];
+        }
+
+//        if (denominator == 0.0) {
+//            Random random = new Random();
+//            return random.nextInt(current.edges.length);
+//        }
+
+        double cumulativeProbability = 0;
+        double threshold = Math.random();
+        for (int i = 0; i < current.edges.length; i ++) {
+            cumulativeProbability += probability[i] / denominator;
+            if (threshold <= cumulativeProbability) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
-    /**
-     * Time slot class for a machine. A time slot denotes an available execution slot on that machine
-     */
-    private class TimeSlot{
-        public int machineNumber;
-        public int startTime;
-        public int totalTime;
+    private synchronized void addVertex(BA.Vertex vertex) {
+        vertices.add(vertex);
+    }
 
-        public TimeSlot(int machineNumber, int startTime, int totalTime){
+    private synchronized double heuristic(BA.Vertex vertex, int[] jobTime, int[] machineTime, int makespan) {
+        double heuristic = 1.0;
+        final int startTime = Math.max(jobTime[vertex.jobNumber], machineTime[vertex.machineNumber]);
+        heuristic =  1.0 / Math.max(startTime + vertex.timeRequired, makespan);
+
+        heuristic = makespan - (startTime + vertex.timeRequired);
+        if (heuristic < 0.0) {
+            return 1;
+        }
+
+        return heuristic;
+    }
+
+    class Vertex {
+        final int machineNumber, jobNumber, timeRequired;
+        BA.Vertex[] edges;
+        //double[] pheromones;
+
+        private Vertex(int machineNumber, int jobNumber, int timeRequired) {
             this.machineNumber = machineNumber;
-            this.startTime = startTime;
-            this.totalTime = totalTime;
-        }
-        public TimeSlot(int startTime, int totalTime){
-            this.startTime = startTime;
-            this.totalTime = totalTime;
+            this.jobNumber = jobNumber;
+            this.timeRequired = timeRequired;
         }
     }
 
-    private class timeSlotComparator implements Comparator<TimeSlot>
-    {
-        @Override
-        public int compare(TimeSlot x, TimeSlot y)
-        {
-            if (x.startTime > y.startTime)
-            {
-                return 1;
-            }
-            if (x.startTime < y.startTime)
-            {
-                return -1;
-            }
-            return 0;
+    class BeeSolution {
+        final Solution solution;
+        final ArrayList<Integer> path;
+        final int makespan;
+
+        private BeeSolution(Solution solution, ArrayList<Integer> path, int makespan) {
+            this.solution = solution;
+            this.path = path;
+            this.makespan = makespan;
         }
     }
 }

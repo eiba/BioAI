@@ -1,10 +1,8 @@
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.util.HashMap;
 
 /**
  * Job Shop Scheduling Problem
@@ -47,13 +45,13 @@ public class JSSP extends Application {
         // JSSP Initialization
         readProblem(task);
         aco = new ACO(jobs, machineCount, jobCount, this, gui, bestMakespan);
-        ba = new BA(jobs, machineCount, jobCount);
+        ba = new BA(jobs, machineCount, jobCount, this, gui, bestMakespan);
 
         gui.createStatGraph(iterations);
 
         if (algorithm.equals("ACO")) {
             Thread acoThread = new Thread(() -> {
-                final Solution solution = aco.solve(iterations, 20);
+                final Solution solution = aco.solve(iterations, 100);
                 if (solution != null) {
                     Platform.runLater(() -> {
                         gui.startButton.setDisable(false);
@@ -69,10 +67,12 @@ public class JSSP extends Application {
         }
         else {
             Thread baThread = new Thread(() -> {
-                Solution solution = ba.solve();
+                Solution solution = ba.solve(iterations,100);
 
                 if (solution != null) {
                     Platform.runLater(() -> {
+                        gui.startButton.setDisable(false);
+                        gui.stopButton.setDisable(true);
                         gui.createGantt(solution, bestMakespan);
                     });
                 }
