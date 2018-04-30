@@ -64,7 +64,7 @@ public class JSSP extends Application {
             }
         }
         else {
-
+            Solution solution = ba.solve();
         }
     }
 
