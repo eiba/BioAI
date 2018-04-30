@@ -118,7 +118,7 @@ class BA {
                             break;
                         }
                     }
-                    jobTimes[randomJobIndex] = chosenTimeSlot.startTime + timeRequired;
+                    //jobTimes[randomJobIndex] = chosenTimeSlot.startTime + timeRequired;
                     schedule[machineNumber][randomJobIndex][0] = chosenTimeSlot.startTime;
                     schedule[machineNumber][randomJobIndex][1] = timeRequired;
 
@@ -130,23 +130,22 @@ class BA {
                     }
 
                     if(nextTimeSlot == null){   //no timeslot after the chosen one
-                        TimeSlot newTimeSlot = new TimeSlot(machineNumber,chosenTimeSlot.startTime + timeRequired,Integer.MAX_VALUE);
+                        TimeSlot newTimeSlot = new TimeSlot(machineNumber,jobTimes[randomJobIndex] + timeRequired,Integer.MAX_VALUE);
                         timeSlotMap.get(machineNumber).add(newTimeSlot);
                     }
                     else{
+                        System.out.println("here");
                         TimeSlot newTimeSlot = new TimeSlot(machineNumber,chosenTimeSlot.startTime + timeRequired,nextTimeSlot.startTime - (chosenTimeSlot.startTime + timeRequired));
                         if(newTimeSlot.totalTime != 0){
                             timeSlotMap.get(machineNumber).add(newTimeSlot);
                         }
                     }
 
-                    timeSlotMap.get(machineNumber).remove(chosenTimeSlot);
+                    timeSlotMap.get(machineNumber).remove(chosenTimeSlotIndex);
                     timeSlotMap.get(machineNumber).sort(timeSlotComparator);
                 }
 
             }
-
-
             solutions[i] = new Solution(schedule);
         }
         System.out.println("Done");
