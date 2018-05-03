@@ -55,6 +55,10 @@ public class BA {
 
         //iterations
         for(int i=0; i<iterations;i++){
+            if (!jssp.getRunning()) {
+                return bestGlobalBeeSolution.solution;
+            }
+
             double bestSiteCount =  0.2 * flowerPatches.size();  //number of best sites are 40% of the population
             double eliteSiteCount =  0.1 * flowerPatches.size();    //number of best sites are 10% of the population
             double bestSiteBees = 0.8 * beeCount;
