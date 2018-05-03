@@ -14,7 +14,8 @@ public class BA {
     private final BA.Vertex root;
     private final ArrayList<BA.Vertex> vertices = new ArrayList<>();
     private final Comparator<BeeSolution> makespanComparator;
-
+    private BeeSolution bestGlobalBeeSolution = null;
+    private final Random random;
     BA(Job[] jobs, int machineCount, int jobCount, JSSP jssp, GUI gui, int bestPossibleMakespan){
         this.jobs = jobs;
         this.machineCount = machineCount;
@@ -24,6 +25,7 @@ public class BA {
         this.bestPossibleMakespan = bestPossibleMakespan;
         this.total = machineCount * jobCount;
         this.makespanComparator = new makespanComparator();
+        this.random = new Random();
 
         root = new BA.Vertex(-1, -1, -1);
         vertices.add(root);
@@ -49,9 +51,7 @@ public class BA {
         }
         flowerPatches.sort(makespanComparator);
 
-        /*for (BeeSolution beeSolution: flowerPatches){
-            findSolution(beeSolution,3);
-        }*/
+        bestGlobalBeeSolution = flowerPatches.get(0);
 
         //iterations
         for(int i=0; i<iterations;i++){
@@ -61,25 +61,37 @@ public class BA {
             double bestSiteBees = 0.8 * beeCount;
             double eliteSiteBees = 0.6 * bestSiteBees;
             /*Let bees do bee stuff*/
-
             for (int j=0; j<flowerPatches.size();j++){
-
+                if(j <= eliteSiteCount){
+                    flowerPatches.get(j).neighbourhood = (int)(total * 0.1);
+                }
+                else if(j > eliteSiteCount  && j<= bestSiteCount){
+                    flowerPatches.get(j).neighbourhood = (int)(total * 0.2);
+                }else{
+                    flowerPatches.get(j).neighbourhood = (int)(total * 0.5);
+                }
             }
-            for (int j=0;j<bestSiteCount;j++){
 
+            ArrayList<BeeSolution> newSolutions = new ArrayList<>();
+            for (int j=0;j<beeCount;j++){
+                newSolutions.add(findSolution(flowerPatches.get(j),random.nextInt(flowerPatches.get(j).neighbourhood)+1));
             }
 
+            flowerPatches = newSolutions;
             //sort and add to graph
             flowerPatches.sort(makespanComparator);
-            final double percent = (double) bestPossibleMakespan / flowerPatches.get(0).solution.getMakespan();
-            if (percent >= 0.9) {
-                return flowerPatches.get(0).solution;
+            if (bestGlobalBeeSolution.makespan >= flowerPatches.get(0).makespan) {
+                bestGlobalBeeSolution = flowerPatches.get(0);
+                final double percent = (double) bestPossibleMakespan / bestGlobalBeeSolution.makespan;
+                if (percent >= 0.9) {
+                    return bestGlobalBeeSolution.solution;
+                }
+                gui.setBestSolution(bestGlobalBeeSolution.makespan, percent);
             }
-            gui.setBestSolution(flowerPatches.get(0).solution.getMakespan(), percent);
             gui.addIteration((double) bestPossibleMakespan / flowerPatches.get(0).solution.getMakespan());
         }
 
-        return flowerPatches.get(0).solution;
+        return bestGlobalBeeSolution.solution;
     }
 
         private BeeSolution findSolution(BeeSolution beeSolution, int neighbourhood) {
@@ -187,7 +199,7 @@ public class BA {
         }
 
         if (denominator == 0.0) {
-            Random random = new Random();
+            //Random random = new Random();
             return random.nextInt(current.edges.length);
         }
 
