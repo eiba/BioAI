@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Random;
 
 /**
  * Bees algorithm, the Stigen way
@@ -44,19 +45,39 @@ public class BA {
         //Initial population
         ArrayList<BeeSolution> flowerPatches = new ArrayList<>();
         for(int i=0; i<beeCount;i++){
-            flowerPatches.add(findSolution());
+            flowerPatches.add(findSolution(null,0));
         }
         flowerPatches.sort(makespanComparator);
+
+        for (BeeSolution beeSolution: flowerPatches){
+            findSolution(beeSolution,3);
+        }
 
         //iterations
         for(int i=0; i<iterations;i++){
 
+            double bestSites =  0.4 * flowerPatches.size();  //number of best sites are 40% of the population
+            double eliteSites =  0.1 * flowerPatches.size();    //number of best sites are 10% of the population
+
+
+
+            final double percent = (double) bestPossibleMakespan / flowerPatches.get(0).solution.getMakespan();
+            if (percent >= 0.9) {
+                return flowerPatches.get(0).solution;
+
+            }
+            gui.setBestSolution(flowerPatches.get(0).solution.getMakespan(), percent);
+            gui.addIteration((double) bestPossibleMakespan / flowerPatches.get(0).solution.getMakespan());
+
         }
 
+        for(Integer index: flowerPatches.get(0).path){
+            System.out.println(index);
+        }
         return flowerPatches.get(0).solution;
     }
 
-        private BeeSolution findSolution() {
+        private BeeSolution findSolution(BeeSolution beeSolution, int neighbourhood) {
 
         final int[] visited = new int[jobCount];
         final int[] jobTime = new int[jobCount];
@@ -68,6 +89,32 @@ public class BA {
         BA.Vertex current = root;
         final ArrayList<Integer> vertexPath = new ArrayList<>();
 
+        //if we are performing neighbourhood search, do this first
+        if(beeSolution != null){
+            for(int k = 0; k<beeSolution.path.size() - neighbourhood;k++){
+                vertexPath.add(beeSolution.path.get(k));
+                current = current.edges[beeSolution.path.get(k)];
+                visited[current.jobNumber] ++;
+
+                final int machineNumber = current.machineNumber;
+                final int jobNumber = current.jobNumber;
+                final int timeRequired = current.timeRequired;
+
+                // Start time
+                final int startTime = Math.max(jobTime[jobNumber], machineTime[machineNumber]);
+                path[machineNumber][jobNumber][0] = startTime;
+                // Time required
+                path[machineNumber][jobNumber][1] = timeRequired;
+                // Updating variables
+                final int time = startTime + timeRequired;
+                jobTime[jobNumber] = time;
+                machineTime[machineNumber] = time;
+                if (time > makespan) {
+                    makespan = time;
+                }
+            }
+        }
+
         while (vertexPath.size() != total) {
 
             //Selecting a path
@@ -75,7 +122,7 @@ public class BA {
 
             //Fixing random exception
             if (index == -1) {
-                return findSolution();
+                return findSolution(null,0);
             }
 
             vertexPath.add(index);
@@ -134,10 +181,10 @@ public class BA {
             denominator += probability[i];
         }
 
-//        if (denominator == 0.0) {
-//            Random random = new Random();
-//            return random.nextInt(current.edges.length);
-//        }
+        if (denominator == 0.0) {
+            Random random = new Random();
+            return random.nextInt(current.edges.length);
+        }
 
         double cumulativeProbability = 0;
         double threshold = Math.random();
@@ -155,13 +202,12 @@ public class BA {
     }
 
     private synchronized double heuristic(BA.Vertex vertex, int[] jobTime, int[] machineTime, int makespan) {
-        double heuristic = 1.0;
         final int startTime = Math.max(jobTime[vertex.jobNumber], machineTime[vertex.machineNumber]);
-        heuristic =  1.0 / Math.max(startTime + vertex.timeRequired, makespan);
+//        heuristic =  1.0 / Math.max(startTime + vertex.timeRequired, makespan);
 
-        heuristic = makespan - (startTime + vertex.timeRequired);
+        double heuristic = makespan - (startTime + vertex.timeRequired);
         if (heuristic < 0.0) {
-            return 1;
+            return 0;
         }
 
         return heuristic;
@@ -183,6 +229,7 @@ public class BA {
         final Solution solution;
         final ArrayList<Integer> path;
         final int makespan;
+        public int neighbourhood;
 
         private BeeSolution(Solution solution, ArrayList<Integer> path, int makespan) {
             this.solution = solution;
