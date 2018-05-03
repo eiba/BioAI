@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 
 /**
  * Bees algorithm, the Stigen way
@@ -11,6 +12,7 @@ public class BA {
     private final int jobCount, machineCount, total, bestPossibleMakespan;
     private final BA.Vertex root;
     private final ArrayList<BA.Vertex> vertices = new ArrayList<>();
+    private final Comparator<BeeSolution> makespanComparator;
 
     BA(Job[] jobs, int machineCount, int jobCount, JSSP jssp, GUI gui, int bestPossibleMakespan){
         this.jobs = jobs;
@@ -20,6 +22,7 @@ public class BA {
         this.gui = gui;
         this.bestPossibleMakespan = bestPossibleMakespan;
         this.total = machineCount * jobCount;
+        this.makespanComparator = new makespanComparator();
 
         root = new BA.Vertex(-1, -1, -1);
         vertices.add(root);
@@ -38,12 +41,19 @@ public class BA {
 
     Solution solve(int iterations, int beeCount) {
 
-        Solution solution = findSolution().solution;
-        /*for (int i= 0; i<beeCount;i++){
+        //Initial population
+        ArrayList<BeeSolution> flowerPatches = new ArrayList<>();
+        for(int i=0; i<beeCount;i++){
+            flowerPatches.add(findSolution());
+        }
+        flowerPatches.sort(makespanComparator);
 
-        }*/
+        //iterations
+        for(int i=0; i<iterations;i++){
 
-        return solution;
+        }
+
+        return flowerPatches.get(0).solution;
     }
 
         private BeeSolution findSolution() {
@@ -137,7 +147,6 @@ public class BA {
                 return i;
             }
         }
-
         return -1;
     }
 
@@ -179,6 +188,23 @@ public class BA {
             this.solution = solution;
             this.path = path;
             this.makespan = makespan;
+        }
+    }
+
+    class makespanComparator implements Comparator<BeeSolution>
+    {
+        @Override
+        public int compare(BeeSolution x, BeeSolution y)
+        {
+            if (x.makespan > y.makespan)
+            {
+                return 1;
+            }
+            if (x.makespan < y.makespan)
+            {
+                return -1;
+            }
+            return 0;
         }
     }
 }

@@ -82,7 +82,8 @@ public class JSSP extends Application {
             });
             baThread.start();
         }
-
+        gui.startButton.setDisable(false);
+        gui.stopButton.setDisable(true);
     }
 
     void stopRunning() {
