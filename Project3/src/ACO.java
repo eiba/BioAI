@@ -79,9 +79,9 @@ class ACO {
             if (bestGlobalAntSolution == null || bestGlobalAntSolution.makespan > bestAntSolution.makespan) {
                 bestGlobalAntSolution = bestAntSolution;
                 final double percent = (double) bestPossibleMakespan / bestMakespan;
-                if (percent >= 0.9) {
+                /*if (percent >= 0.9) {
                     return bestGlobalAntSolution.solution;
-                }
+                }*/
                 gui.setBestSolution(bestMakespan, percent);
             }
 

@@ -55,7 +55,6 @@ public class BA {
 
         //iterations
         for(int i=0; i<iterations;i++){
-
             double bestSiteCount =  0.2 * flowerPatches.size();  //number of best sites are 40% of the population
             double eliteSiteCount =  0.1 * flowerPatches.size();    //number of best sites are 10% of the population
             double bestSiteBees = 0.8 * beeCount;
@@ -74,18 +73,46 @@ public class BA {
 
             ArrayList<BeeSolution> newSolutions = new ArrayList<>();
             for (int j=0;j<beeCount;j++){
-                newSolutions.add(findSolution(flowerPatches.get(j),random.nextInt(flowerPatches.get(j).neighbourhood)+1));
-            }
+                /*if(j <= eliteSiteBees){
+                    int beesPerSite = (int) (eliteSiteBees / eliteSiteCount);
+                    for(int k=0; k<beesPerSite;k++){
+                        newSolutions.add(findSolution(flowerPatches.get(j),random.nextInt(flowerPatches.get(j).neighbourhood)+1));
+                    }
+                }
+                else if(j > eliteSiteBees && j <= bestSiteBees - eliteSiteBees){
+                    int beesPerSite = (int) (bestSiteBees - eliteSiteBees / bestSiteCount);
+                    for(int k=0; k<beesPerSite;k++){
+                        newSolutions.add(findSolution(flowerPatches.get(j),random.nextInt(flowerPatches.get(j).neighbourhood)+1));
+                    }
+                }else{
+                    newSolutions.add(findSolution(null,0));
+                    //newSolutions.add(findSolution(flowerPatches.get(j),random.nextInt(flowerPatches.get(j).neighbourhood)+1));
+                }
 
+                if (newSolutions.size() >= beeCount){
+                    break;
+                }*/
+                //flowerPatches.remove(j);
+                BeeSolution flowerPatch = flowerPatches.get(j);
+                if (j > bestSiteBees){
+                    newSolutions.add(j,findSolution(null,0));
+                    //newSolutions.add(findSolution(flowerPatches.get(j),random.nextInt(flowerPatches.get(j).neighbourhood)+1));
+                }/*else if(j <= eliteSiteCount){
+
+                }*/
+                else{
+                    newSolutions.add(j,findSolution(flowerPatch,random.nextInt(flowerPatch.neighbourhood)+1));
+                }
+            }
             flowerPatches = newSolutions;
             //sort and add to graph
             flowerPatches.sort(makespanComparator);
             if (bestGlobalBeeSolution.makespan >= flowerPatches.get(0).makespan) {
                 bestGlobalBeeSolution = flowerPatches.get(0);
                 final double percent = (double) bestPossibleMakespan / bestGlobalBeeSolution.makespan;
-                if (percent >= 0.9) {
+                /*if (percent >= 0.9) {
                     return bestGlobalBeeSolution.solution;
-                }
+                }*/
                 gui.setBestSolution(bestGlobalBeeSolution.makespan, percent);
             }
             gui.addIteration((double) bestPossibleMakespan / flowerPatches.get(0).solution.getMakespan());
