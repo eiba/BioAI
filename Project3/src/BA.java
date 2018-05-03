@@ -49,31 +49,36 @@ public class BA {
         }
         flowerPatches.sort(makespanComparator);
 
-        for (BeeSolution beeSolution: flowerPatches){
+        /*for (BeeSolution beeSolution: flowerPatches){
             findSolution(beeSolution,3);
-        }
+        }*/
 
         //iterations
         for(int i=0; i<iterations;i++){
 
-            double bestSites =  0.4 * flowerPatches.size();  //number of best sites are 40% of the population
-            double eliteSites =  0.1 * flowerPatches.size();    //number of best sites are 10% of the population
+            double bestSiteCount =  0.2 * flowerPatches.size();  //number of best sites are 40% of the population
+            double eliteSiteCount =  0.1 * flowerPatches.size();    //number of best sites are 10% of the population
+            double bestSiteBees = 0.8 * beeCount;
+            double eliteSiteBees = 0.6 * bestSiteBees;
+            /*Let bees do bee stuff*/
 
+            for (int j=0; j<flowerPatches.size();j++){
 
+            }
+            for (int j=0;j<bestSiteCount;j++){
 
+            }
+
+            //sort and add to graph
+            flowerPatches.sort(makespanComparator);
             final double percent = (double) bestPossibleMakespan / flowerPatches.get(0).solution.getMakespan();
             if (percent >= 0.9) {
                 return flowerPatches.get(0).solution;
-
             }
             gui.setBestSolution(flowerPatches.get(0).solution.getMakespan(), percent);
             gui.addIteration((double) bestPossibleMakespan / flowerPatches.get(0).solution.getMakespan());
-
         }
 
-        for(Integer index: flowerPatches.get(0).path){
-            System.out.println(index);
-        }
         return flowerPatches.get(0).solution;
     }
 

@@ -47,7 +47,6 @@ class ACO {
     Solution solve(int iterations, int antCount) {
 
         for (int i = 0; i < iterations; i ++) {
-
             if (!jssp.getRunning()) {
                 return bestGlobalAntSolution.solution;
             }
