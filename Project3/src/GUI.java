@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
@@ -33,6 +34,16 @@ class GUI extends BorderPane {
         MAKESPAN_VALUES.put("6", 979);
     }
 
+    private final static HashMap<String, Integer> MAKESPAN_OPTIMAL_VALUES = new HashMap<>();
+    static {
+        MAKESPAN_OPTIMAL_VALUES.put("1", 55);
+        MAKESPAN_OPTIMAL_VALUES.put("2", 930);
+        MAKESPAN_OPTIMAL_VALUES.put("3", 1165);
+        MAKESPAN_OPTIMAL_VALUES.put("4", 1005);
+        MAKESPAN_OPTIMAL_VALUES.put("5", 1235);
+        MAKESPAN_OPTIMAL_VALUES.put("6", 943);
+    }
+
     private final Stage primaryStage;
     private final JSSP jssp;
     private StatGraph statGraph;
@@ -41,6 +52,7 @@ class GUI extends BorderPane {
     final Button stopButton = new Button("Stop");
     private final ChoiceBox<String> taskBox = new ChoiceBox<>(FXCollections.observableArrayList("1", "2", "3", "4", "5", "6"));
     private final ChoiceBox<String> algorithmBox = new ChoiceBox<>(FXCollections.observableArrayList("ACO", "BA"));
+    private final CheckBox optimalCheckbox = new CheckBox("Use optimal makespan");
 
     private final TextField inputIterations = new TextField("1000");
     private final TextField inputMakespan = new TextField("REQUIRED");
@@ -68,26 +80,28 @@ class GUI extends BorderPane {
 
         stopButton.setDisable(true);
 
-        taskBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
-                int makespan = MAKESPAN_VALUES.getOrDefault(taskBox.getItems().get((int) number2), 0);
-                if (makespan > 0) {
-                    inputMakespan.setText(String.valueOf(makespan));
-                }
-                else {
-                    inputMakespan.setText("REQUIRED");
-                }
+        taskBox.getSelectionModel().selectedIndexProperty().addListener((observableValue, number, number2) -> {
+            int makespan;
+            if (optimalCheckbox.isSelected()) {
+                makespan = MAKESPAN_OPTIMAL_VALUES.getOrDefault(taskBox.getItems().get((int) number2), 0);
+            } else {
+                makespan = MAKESPAN_VALUES.getOrDefault(taskBox.getItems().get((int) number2), 0);
+            }
+            if (makespan > 0) {
+                inputMakespan.setText(String.valueOf(makespan));
+            } else {
+                inputMakespan.setText("REQUIRED");
             }
         });
 
 
+        optimalCheckbox.setSelected(true);
         algorithmBox.setValue("ACO");
         taskBox.setValue("5");
 
         HBox menu = new HBox(10);
         menu.setAlignment(Pos.CENTER);
-        menu.getChildren().addAll(algorithmBox, taskBox, startButton, stopButton);
+        menu.getChildren().addAll(algorithmBox, taskBox, optimalCheckbox, startButton, stopButton);
         setTop(menu);
 
         VBox options = new VBox(10);
