@@ -10,6 +10,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -117,6 +118,23 @@ class GUI extends BorderPane {
 
         pane.setMaxSize(width, height);
         pane.setMinSize(width, height);
+
+        // Creating X-Axis lines
+        final int xLines = 10;
+        final int xInterval = makespan / xLines;
+        for (int i = 0; i < xLines; i ++) {
+            final double x = widthTranslate * xInterval * i;
+            final Line line = new Line(x, 0, x, height + 5);
+            final Text text = new Text(String.valueOf(xInterval * i));
+            text.setTranslateY(height + 15);
+            text.setTranslateX(x + 5);
+            pane.getChildren().addAll(line, text);
+        }
+        final Line lineLast = new Line(width, 0, width, height + 5);
+        final Text textLast = new Text(String.valueOf(makespan));
+        textLast.setTranslateY(height + 15);
+        textLast.setTranslateX(width + 5);
+        pane.getChildren().addAll(lineLast, textLast);
 
         for (int i = 0; i < schedule.length; i ++) {
             final int y = i * 50;
