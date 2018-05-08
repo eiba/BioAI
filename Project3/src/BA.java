@@ -16,6 +16,7 @@ public class BA {
     private final Comparator<BeeSolution> makespanComparator;
     private BeeSolution bestGlobalBeeSolution = null;
     private final Random random;
+    private int count;
     BA(Job[] jobs, int machineCount, int jobCount, JSSP jssp, GUI gui, int bestPossibleMakespan){
         this.jobs = jobs;
         this.machineCount = machineCount;
@@ -26,7 +27,7 @@ public class BA {
         this.total = machineCount * jobCount;
         this.makespanComparator = new makespanComparator();
         this.random = new Random();
-
+        this.count = 0;
         root = new BA.Vertex(-1, -1, -1);
         vertices.add(root);
         root.edges = new BA.Vertex[jobCount];
@@ -128,7 +129,7 @@ public class BA {
             gui.addIteration((double) bestPossibleMakespan / flowerPatches.get(0).solution.getMakespan());
         }
 
-        System.out.println(vertices.size());
+        System.out.println(count);
         return bestGlobalBeeSolution.solution;
     }
 
@@ -205,6 +206,7 @@ public class BA {
             // New Vertex
             if (current.edges == null) {
 
+                count++;
                 // Adding next option
                 final ArrayList<BA.Vertex> choices = new ArrayList<>();
                 for (int i = 0; i < jobCount; i ++) {
