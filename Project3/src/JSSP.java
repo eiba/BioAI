@@ -35,7 +35,7 @@ public class JSSP extends Application {
 //        run("ACO", "1");
     }
 
-    void run(String algorithm, String task, int iterations, int bestMakespan) {
+    void run(String algorithm, String task, int iterations, int bestMakespan, int antBeeCount, boolean stopOnPercent) {
 
         running = true;
         gui.startButton.setDisable(true);
@@ -51,7 +51,7 @@ public class JSSP extends Application {
 
         if (algorithm.equals("ACO")) {
             Thread acoThread = new Thread(() -> {
-                final Solution solution = aco.solve(iterations, 100);
+                final Solution solution = aco.solve(iterations, antBeeCount, stopOnPercent);
                 if (solution != null) {
                     Platform.runLater(() -> {
                         gui.startButton.setDisable(false);
@@ -67,7 +67,7 @@ public class JSSP extends Application {
         }
         else {
             Thread baThread = new Thread(() -> {
-                Solution solution = ba.solve(iterations,100);
+                Solution solution = ba.solve(iterations,antBeeCount, stopOnPercent);
 
                 if (solution != null) {
                     Platform.runLater(() -> {

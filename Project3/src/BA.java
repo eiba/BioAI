@@ -42,7 +42,7 @@ public class BA {
         }
     }
 
-    Solution solve(int iterations, int beeCount) {
+    Solution solve(int iterations, int beeCount, boolean stopOnPercent) {
 
         //Initial population
         ArrayList<BeeSolution> flowerPatches = new ArrayList<>();
@@ -122,9 +122,9 @@ public class BA {
             if (bestGlobalBeeSolution.makespan >= flowerPatches.get(0).makespan) {
                 bestGlobalBeeSolution = flowerPatches.get(0);
                 final double percent = (double) bestPossibleMakespan / bestGlobalBeeSolution.makespan;
-                /*if (percent >= 0.9) {
+                if (percent >= 0.9 && stopOnPercent) {
                     return bestGlobalBeeSolution.solution;
-                }*/
+                }
                 gui.setBestSolution(bestGlobalBeeSolution.makespan, percent);
             }
             gui.addIteration((double) bestPossibleMakespan / flowerPatches.get(0).solution.getMakespan());
