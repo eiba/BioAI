@@ -62,7 +62,7 @@ public class BA {
             double bestSiteCount =  0.2 * flowerPatches.size();  //number of best sites are 40% of the population
             double eliteSiteCount =  0.1 * flowerPatches.size();    //number of best sites are 10% of the population
             double bestSiteBees = 0.8 * beeCount;
-            double eliteSiteBees = 0.6 * bestSiteBees;
+            double eliteSiteBees = 0.1 * bestSiteBees;
             /*Let bees do bee stuff*/
             for (int j=0; j<flowerPatches.size();j++){
                 if(j <= eliteSiteCount){
@@ -77,28 +77,30 @@ public class BA {
 
             ArrayList<BeeSolution> newSolutions = new ArrayList<>();
             for (int j=0;j<beeCount;j++){
-                /*if(j <= eliteSiteBees){
-                    int beesPerSite = (int) (eliteSiteBees / eliteSiteCount);
-                    for(int k=0; k<beesPerSite;k++){
-                        newSolutions.add(findSolution(flowerPatches.get(j),random.nextInt(flowerPatches.get(j).neighbourhood)+1));
-                    }
-                }
-                else if(j > eliteSiteBees && j <= bestSiteBees - eliteSiteBees){
-                    int beesPerSite = (int) (bestSiteBees - eliteSiteBees / bestSiteCount);
-                    for(int k=0; k<beesPerSite;k++){
-                        newSolutions.add(findSolution(flowerPatches.get(j),random.nextInt(flowerPatches.get(j).neighbourhood)+1));
-                    }
-                }else{
-                    newSolutions.add(findSolution(null,0));
-                    //newSolutions.add(findSolution(flowerPatches.get(j),random.nextInt(flowerPatches.get(j).neighbourhood)+1));
-                }
 
-                if (newSolutions.size() >= beeCount){
-                    break;
-                }*/
-                //flowerPatches.remove(j);
                 BeeSolution flowerPatch = flowerPatches.get(j);
-                if (j > bestSiteBees){
+                /*if(j < eliteSiteBees){
+                    if(flowerPatch.age < 2){
+                    BeeSolution eliteSoltuion = null;
+                    int bestMakespan = Integer.MAX_VALUE;
+                    for(int m=0; m<5;m++){
+                        BeeSolution newEliteSolution = findSolution(flowerPatch,random.nextInt(flowerPatch.neighbourhood)+1);
+                        if(bestMakespan > newEliteSolution.makespan){
+                            bestMakespan = newEliteSolution.makespan;
+                            eliteSoltuion = newEliteSolution;
+                        }
+                        //eliteSolutions.add(findSolution(flowerPatch,random.nextInt(flowerPatch.neighbourhood)+1));
+                        //eliteSolutions.sort(makespanComparator);
+
+                    }
+                    eliteSoltuion.age = flowerPatch.age + 1;
+                    newSolutions.add(eliteSoltuion);
+                    }else{
+                        newSolutions.add(findSolution(flowerPatch,random.nextInt(flowerPatch.neighbourhood)+1));
+                    }
+                }
+                else*/ if (j > bestSiteBees){
+                    //random pupulation generation and search
                     double p = Math.random() + (i / iterations);
                     if(p > 0.5){
                         newSolutions.add(findSolution(null,0));
@@ -106,12 +108,9 @@ public class BA {
                         BeeSolution randomBeeSolution = flowerPatches.get(random.nextInt(flowerPatches.size()));
                         newSolutions.add(findSolution(randomBeeSolution,randomBeeSolution.neighbourhood));
                     }
-                    //newSolutions.add(findSolution(null,0));
-                    //newSolutions.add(findSolution(flowerPatches.get(j),random.nextInt(flowerPatches.get(j).neighbourhood)+1));
-                }/*else if(j <= eliteSiteCount){
-
-                }*/
+                }
                 else{
+                    //best sites
                     newSolutions.add(findSolution(flowerPatch,random.nextInt(flowerPatch.neighbourhood)+1));
                 }
             }
@@ -242,7 +241,7 @@ public class BA {
         double denominator = 0;
         final double[] probability = new double[current.edges.length];
         for (int i = 0; i < probability.length; i ++) {
-            probability[i] = /*Math.pow(current.pheromones[i], a) */ Math.pow((heuristic(current.edges[i], jobTime, machineTime, makespan)), b);
+            probability[i] = Math.pow((heuristic(current.edges[i], jobTime, machineTime, makespan)), b);
             denominator += probability[i];
         }
 
@@ -281,7 +280,6 @@ public class BA {
     class Vertex {
         final int machineNumber, jobNumber, timeRequired;
         BA.Vertex[] edges;
-        //double[] pheromones;
 
         private Vertex(int machineNumber, int jobNumber, int timeRequired) {
             this.machineNumber = machineNumber;
