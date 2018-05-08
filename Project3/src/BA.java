@@ -99,10 +99,9 @@ public class BA {
                 //flowerPatches.remove(j);
                 BeeSolution flowerPatch = flowerPatches.get(j);
                 if (j > bestSiteBees){
-                    double p = Math.random();
+                    double p = Math.random() + (i / iterations);
                     if(p > 0.5){
                         newSolutions.add(findSolution(null,0));
-                        //System.out.println("sadfasf");
                     }else{
                         BeeSolution randomBeeSolution = flowerPatches.get(random.nextInt(flowerPatches.size()));
                         newSolutions.add(findSolution(randomBeeSolution,randomBeeSolution.neighbourhood));
@@ -130,6 +129,7 @@ public class BA {
             gui.addIteration((double) bestPossibleMakespan / flowerPatches.get(0).solution.getMakespan());
         }
 
+        System.out.println(vertices.size());
         return bestGlobalBeeSolution.solution;
     }
 
@@ -224,7 +224,16 @@ public class BA {
             }
         }
 
-        return new BeeSolution(new Solution(path), vertexPath, makespan);
+        BeeSolution newSolution = new BeeSolution(new Solution(path), vertexPath, makespan);
+
+        /*if(beeSolution == null || newSolution.makespan <= beeSolution.makespan || beeSolution.age > 1){
+            return newSolution;
+        }else{
+            beeSolution.age++;
+            return beeSolution;
+        }*/
+        return newSolution;
+        //return new BeeSolution(new Solution(path), vertexPath, makespan);
     }
 
     private synchronized int selectPath(BA.Vertex current, int[] jobTime, int[] machineTime, int makespan) {
@@ -286,6 +295,7 @@ public class BA {
         final ArrayList<Integer> path;
         final int makespan;
         public int neighbourhood;
+        public int age = 0;
 
         private BeeSolution(Solution solution, ArrayList<Integer> path, int makespan) {
             this.solution = solution;

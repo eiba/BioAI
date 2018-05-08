@@ -111,6 +111,7 @@ class ACO {
             gui.addIteration((double) bestPossibleMakespan / bestMakespan);
         }
 
+        System.out.println(vertices.size());
         return bestGlobalAntSolution.solution;
     }
 
