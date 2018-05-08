@@ -152,8 +152,6 @@ class ACO {
 //            break;
         }
 
-//        System.out.println(count);
-//        System.out.println(vertices.size());
         return bestGlobalAntSolution.solution;
     }
 
