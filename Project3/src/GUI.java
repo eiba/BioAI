@@ -53,9 +53,11 @@ class GUI extends BorderPane {
     private final ChoiceBox<String> taskBox = new ChoiceBox<>(FXCollections.observableArrayList("1", "2", "3", "4", "5", "6"));
     private final ChoiceBox<String> algorithmBox = new ChoiceBox<>(FXCollections.observableArrayList("ACO", "BA"));
     private final CheckBox optimalCheckbox = new CheckBox("Use optimal makespan");
+    private final CheckBox stopCheckbox = new CheckBox("Stop on 90%");
 
     private final TextField inputIterations = new TextField("1000");
     private final TextField inputMakespan = new TextField("REQUIRED");
+    private final TextField inputAntBees = new TextField("100");
 
     private final Color[] colors = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.PURPLE, Color.ORANGE, Color.DARKBLUE, Color.PINK, Color.LIGHTGRAY, Color.DARKCYAN};
 
@@ -72,7 +74,7 @@ class GUI extends BorderPane {
                 inputMakespan.requestFocus();
             }
             else {
-                jssp.run(algorithmBox.getValue(), taskBox.getValue(), Integer.valueOf(inputIterations.getText()), Integer.valueOf(inputMakespan.getText()));
+                jssp.run(algorithmBox.getValue(), taskBox.getValue(), Integer.valueOf(inputIterations.getText()), Integer.valueOf(inputMakespan.getText()), Integer.valueOf(inputAntBees.getText()), stopCheckbox.isSelected());
             }
         });
 
@@ -96,18 +98,20 @@ class GUI extends BorderPane {
 
 
         optimalCheckbox.setSelected(true);
+        stopCheckbox.setSelected(true);
         algorithmBox.setValue("ACO");
         taskBox.setValue("5");
 
         HBox menu = new HBox(10);
         menu.setAlignment(Pos.CENTER);
-        menu.getChildren().addAll(algorithmBox, taskBox, optimalCheckbox, startButton, stopButton);
+        menu.getChildren().addAll(algorithmBox, taskBox, optimalCheckbox, stopCheckbox, startButton, stopButton);
         setTop(menu);
 
         VBox options = new VBox(10);
         options.setPadding(new Insets(5, 5, 5, 5));
         options.setAlignment(Pos.CENTER);
         options.getChildren().addAll(new Text("Iterations:"), inputIterations,
+                new Text("Ants / Bees"), inputAntBees,
                 new Text("Best makespan:"), inputMakespan);
         setLeft(options);
 
