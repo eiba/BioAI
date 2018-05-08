@@ -66,12 +66,12 @@ public class BA {
             /*Let bees do bee stuff*/
             for (int j=0; j<flowerPatches.size();j++){
                 if(j <= eliteSiteCount){
-                    flowerPatches.get(j).neighbourhood = (int)(total * 0.1);
+                    flowerPatches.get(j).neighbourhood = (int)(total * (0.1 /*+ (Math.random()*0.5)*/));
                 }
                 else if(j > eliteSiteCount  && j<= eliteSiteCount + bestSiteCount){
-                    flowerPatches.get(j).neighbourhood = (int)(total * 0.2);
+                    flowerPatches.get(j).neighbourhood = (int)(total * (0.2 /*+ (Math.random()*0.5)*/));
                 }else{
-                    flowerPatches.get(j).neighbourhood = (int)(total * 0.5);
+                    flowerPatches.get(j).neighbourhood = (int)(total * (0.5 /*+ (Math.random()*0.5)*/));
                 }
             }
 
