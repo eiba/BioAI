@@ -1,9 +1,5 @@
 # BioAI
 
-![alt text](https://i.imgur.com/Mee8inR.png)
-![alt text](https://i.imgur.com/Mee8inR.png)
-![alt text](https://i.imgur.com/Mee8inR.png)
-Hei Stigen :)
-![alt text](https://i.imgur.com/Mee8inR.png)
-![alt text](https://i.imgur.com/Mee8inR.png)
-![alt text](https://i.imgur.com/Mee8inR.png)
+This is a course repo for the course IT3708 - Biological Inspired Artificial Intelligence at NTNU spring 2018.
+
+The projects were developed by students Martin Stigen and Eirik Baug
